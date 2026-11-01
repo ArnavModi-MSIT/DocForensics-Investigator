@@ -14,6 +14,11 @@ def template_summary(case_id, docs, findings):
     n = {"high": 0, "medium": 0, "low": 0}
     for f in findings:
         n[f.severity] += 1
+    unk = [d for d in docs if d.doc_type == "unknown"]
+    if unk and len(unk) == len(docs):
+        return (f"Case {case_id}: none of the {len(docs)} submitted page(s) was recognised as a supported document type "
+                f"(application form, ID card, salary slip, bank statement), so no forensic or cross-document analysis was run. "
+                f"Reason for {unk[0].doc_id}: {unk[0].class_info.get('decision', 'unrecognised')}.")
     if not findings:
         return (f"Case {case_id}: {len(docs)} documents analysed; no inconsistencies or visual anomalies were "
                 f"detected by the automated checks. This does not prove authenticity.")

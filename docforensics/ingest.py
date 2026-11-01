@@ -72,7 +72,7 @@ def expand_inputs(paths, workdir, audit):
                 dst.write(data)
             total += len(data); taken += 1
             out.append(target)
-        audit.log("zip_expanded", source=p, extracted=taken, skipped=len(skipped))
+        audit.log("zip_expanded", source=os.path.basename(p), extracted=taken, skipped=len(skipped))
     for sk in skipped:
         audit.log("input_skipped", **sk)
     return out, skipped
@@ -137,7 +137,7 @@ def ingest(paths, workdir, audit):
             d = Document(doc_id=doc_id, path=p, sha256=digest, image_path=out,
                          width=img.width, height=img.height, skew_deg=skew)
             docs.append(d)
-            audit.log("ingest", doc_id=doc_id, source=p, sha256=digest,
+            audit.log("ingest", doc_id=doc_id, source=os.path.basename(p), sha256=digest,
                       size=[img.width, img.height])
     return docs
 

@@ -28,7 +28,9 @@ PROTOTYPES = {
     "other:research_paper": [
         "Abstract. Introduction. Related work. Methodology. Experiments and results. Conclusion. References. A research paper on machine learning."],
     "other:resume": [
-        "Curriculum vitae resume. Education, technical skills, projects, internships, work experience, achievements."],
+        "Curriculum vitae resume. Education, technical skills, projects, internships, work experience, achievements.",
+        "Student resume: B.Tech information technology, skills in Python, SQL, Power BI, projects, internship, CGPA, certifications.",
+        "Professional summary and career objective. Skills, tools, projects, experience, education, contact email, LinkedIn and GitHub."],
     "other:invoice": [
         "Tax invoice with item descriptions, quantities, unit price, GST and total amount payable."],
     "other:article_letter": [

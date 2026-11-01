@@ -205,7 +205,7 @@ def classify(doc, audit):
         cand = None
     g = cand or guess
     ev = 0.5 * kw.get(g, 0) + 0.5 * (cov.get(g, 0) / len(EXPECTED[g]) if g in EXPECTED else 0)
-    doc.best_guess = guess
+    doc.best_guess = max(SUPPORTED, key=sem["sims"].get) if sem else guess     # display: embedding's own top pick
     doc.doc_type = cand or "unknown"
     doc.type_conf = round(ev, 2)
     doc.class_info = {"keyword": kw, "expected_fields_found": cov, "semantic": sem, "decision": reason or f"accepted as {cand}"}

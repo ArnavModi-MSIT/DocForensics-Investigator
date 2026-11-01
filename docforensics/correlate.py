@@ -40,7 +40,8 @@ def check_intra(docs):
                            "low", 0.7, "observed",
                            "These pages did not match any supported type (application form, ID card, salary slip, bank "
                            "statement), so field-level checks were skipped for them: "
-                           + ", ".join(d.doc_id for d in unknown[:12]) + ("..." if len(unknown) > 12 else ""),
+                           + "; ".join(f"{d.doc_id} ({d.class_info.get('decision', 'unrecognised')})" for d in unknown[:6])
+                           + (" ..." if len(unknown) > 6 else ""),
                            [{"doc_id": d.doc_id, "field": None, "value": None, "bbox": None} for d in unknown[:12]],
                            method="document classification"))
     for d in docs:

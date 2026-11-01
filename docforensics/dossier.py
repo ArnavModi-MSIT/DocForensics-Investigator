@@ -4,16 +4,19 @@ from PIL import Image, ImageDraw, ImageFont
 
 COL = {"potential_manipulation": (220, 30, 30), "inconsistency": (240, 140, 0), "observed": (40, 110, 200)}
 CAPABILITIES = [
-    ("Ingestion of scanned images / PDFs, multi-document cases", "Implemented"),
-    ("OCR + field extraction with field-level confidence and bbox", "Implemented (Tesseract; printed text, label:value layouts)"),
-    ("Document classification", "Implemented (keyword scoring); layout-model classification planned"),
-    ("Visual forensics: ELA, grain/noise, paper tone, ink darkness (peer-relative)", "Implemented"),
+    ("Ingestion: images, PDFs and ZIP bundles (one zip = one case); multi-document cases", "Implemented"),
+    ("Page normalisation: deskew (tilt up to +/-8 deg) and lighting flattening for phone photos", "Implemented; perspective correction planned"),
+    ("OCR + field extraction with field-level confidence and bounding boxes", "Implemented (Tesseract; printed text, label:value layouts)"),
+    ("Semantic label matching (embeddings) for field labels outside the dictionary", "Implemented (needs embedding model; falls back to fuzzy dictionary)"),
+    ("Document classification: embeddings + keywords, unsupported-class veto, structural gate (>=3 expected fields)",
+     "Implemented (keyword + structure fallback when no model)"),
+    ("Visual forensics: ELA, grain/noise, paper tone, ink darkness (peer-relative, lighting-corrected)", "Implemented"),
     ("Contextual checks: arithmetic, formats, date logic, completeness", "Implemented"),
-    ("Cross-document entity matching & income reconciliation", "Implemented"),
-    ("Evidence mapping (annotated regions) and audit trail", "Implemented"),
+    ("Cross-document entity matching (odd-one-out) and income reconciliation", "Implemented"),
+    ("Evidence mapping (annotated regions), audit trail, reviewer UI, PDF/JSON dossier", "Implemented"),
     ("Handwriting recognition", "Unsupported"),
-    ("Signature analysis, copy-move detection, metadata forensics", "Planned"),
-    ("Layout-aware ML models (LayoutLM etc.), multilingual OCR", "Planned"),
+    ("Signature analysis, copy-move detection, PDF metadata forensics", "Planned"),
+    ("Layout-aware ML models (LayoutLM etc.), table extraction, multilingual OCR", "Planned"),
 ]
 
 
@@ -50,7 +53,8 @@ def build_json(case_id, docs, findings, summary, summary_src, audit_events):
     return {
         "case_id": case_id, "summary": summary, "summary_source": summary_src,
         "documents": [{"doc_id": d.doc_id, "type": d.doc_type, "type_conf": d.type_conf, "sha256": d.sha256,
-                       "size": [d.width, d.height],
+                       "size": [d.width, d.height], "decision": d.class_info.get("decision", ""),
+                       "best_guess": d.best_guess, "skew_deg": d.skew_deg,
                        "fields": [{"key": f.key, "label": f.label, "raw": f.raw, "value": f.value,
                                    "confidence": f.conf, "bbox": list(f.bbox)} for f in d.fields]} for d in docs],
         "findings": [f.to_dict() for f in findings],
@@ -96,16 +100,21 @@ def build_pdf(dossier, annotated, path):
     S += [P("3. Findings (most severe first)", ss["Heading2"])]
     order = {"high": 0, "medium": 1, "low": 2}
     for f in sorted(dossier["findings"], key=lambda x: (order[x["severity"]], -x["confidence"])):
-        refs = "; ".join(f"{r['doc_id']}.{r['field']}={r['value']!r}" for r in f["refs"])
+        refs = "; ".join((f"{r['doc_id']}.{r['field']}={r['value']!r}" if r.get("field") else f"{r['doc_id']} (whole page)")
+                         for r in f["refs"])
         S += [P(f"<b>{f['fid']}</b> [{f['severity'].upper()} | conf {f['confidence']:.2f} | {f['status'].replace('_', ' ')}] {f['title']}", ss["BodyText"]),
               P(f["explanation"], sm), P(f"<i>Evidence:</i> {refs}  <i>Method:</i> {f['method']}", sm), Spacer(1, 4)]
     if not dossier["findings"]:
         S += [P("No findings.")]
     S += [PageBreak(), P("4. Extracted information and evidence maps", ss["Heading2"])]
     for d in dossier["documents"]:
-        S += [P(f"<b>{d['doc_id']}</b> ({d['type']})", ss["BodyText"]),
-              tbl([["Field", "Value", "OCR conf."]] + [[f["key"], str(f["raw"]), f"{f['confidence']:.2f}"] for f in d["fields"]],
-                  [40 * mm, 100 * mm, 25 * mm])]
+        S += [P(f"<b>{d['doc_id']}</b> ({d['type']})", ss["BodyText"])]
+        if d["fields"]:
+            S += [tbl([["Field", "Value", "OCR conf."]] + [[f["key"], str(f["raw"]), f"{f['confidence']:.2f}"] for f in d["fields"]],
+                      [40 * mm, 100 * mm, 25 * mm])]
+        else:
+            S += [P("No fields extracted: page not recognised as a supported document type. "
+                    + (d.get("decision") or ""), sm)]
         img = annotated.get(d["doc_id"])
         if img:
             S += [Spacer(1, 4), RLImage(img, width=85 * mm, height=85 * mm * 1300 / 1000 * d["size"][1] / 1300 * 1000 / d["size"][0])]
