@@ -1,0 +1,11 @@
+numpy
+opencv-python-headless
+pillow
+pytesseract
+pymupdf
+rapidfuzz
+reportlab
+streamlit
+pandas
+anthropic   # optional: LLM-written explanations (set ANTHROPIC_API_KEY)
+fastembed        # optional: semantic page classification (downloads ~130MB model on first run; falls back to keywords if absent)
