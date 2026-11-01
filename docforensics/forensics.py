@@ -7,7 +7,7 @@ do not dominate):
   bglum  - mean background luminance: pasted patches rarely match paper tone exactly
   stroke - ink stroke width (distance transform): different font/rendering pipeline
 A field is flagged only when it is an outlier relative to the other fields of the SAME
-document (robust z-score, median/MAD), so no external thresholds on absolute values.
+document (robust z-score, median/MAD). Page lighting is flattened first (phone photos).
 """
 import cv2
 import numpy as np
@@ -17,7 +17,10 @@ from .ingest import read_gray, read_rgb
 # (relative floor, absolute floor) for the robust scale of each metric
 FLOORS = {"ela": (0.10, 0.10), "noise": (0.10, 0.20), "bglum": (0.0, 0.8), "inkdark": (0.0, 5.0), "stroke": (0.12, 0.25)}
 FLAGGING = ("ela", "noise", "bglum", "inkdark")      # stroke is reported but not used for flagging (quantised at this DPI)
-Z_STRONG, Z_WEAK = 8.0, 4.0
+# (weak, strong) robust-z thresholds per signal, set from the distribution of innocent vs pasted fields on the
+# synthetic benchmark (innocent max |z|: ela/noise ~6, paper tone ~1, ink darkness ~2; pasted: ink 7-12, tone 3-4.5).
+# A field is flagged when >= 2 independent signal FAMILIES reach their weak threshold, or any one signal reaches its strong one.
+THRESH = {"ela": (4.0, 8.0), "noise": (4.0, 8.0), "bglum": (2.5, 5.0), "inkdark": (3.5, 5.0)}
 # ela & noise are both compression/ringing based -> one family; tone and ink darkness are independent
 FAMILY = {"ela": "compression", "noise": "compression", "bglum": "paper_tone", "inkdark": "ink_darkness"}
 
@@ -33,6 +36,14 @@ def save_ela_heatmap(doc, path):
     v = np.clip(ela / max(1e-6, np.percentile(ela, 99.5)) * 255, 0, 255).astype(np.uint8)
     cv2.imwrite(path, cv2.applyColorMap(v, cv2.COLORMAP_INFERNO))
     return path
+
+
+def flatten_illumination(gray):
+    """Divide out slowly varying page lighting (phone shadows / vignette) so tone and ink-darkness
+    comparisons between fields are not dominated by the lighting gradient."""
+    bg = cv2.morphologyEx(gray, cv2.MORPH_CLOSE, np.ones((15, 15), np.uint8))   # removes thin text strokes
+    bg = cv2.GaussianBlur(bg.astype(np.float32), (0, 0), 60)
+    return np.clip(gray.astype(np.float32) / np.maximum(bg, 1.0) * 240.0, 0, 255).astype(np.uint8)
 
 
 def _metrics(gray, ela, resid, bbox, pad=8):
@@ -70,6 +81,7 @@ def _robust_z(vals, i, rel, ab):
 
 def analyze(doc, audit, id_start=1):
     gray, bgr = read_gray(doc), read_rgb(doc)
+    gray = flatten_illumination(gray)
     ela = ela_map(bgr)
     resid = gray.astype(np.float32) - cv2.medianBlur(gray, 3).astype(np.float32)
     rows = []
@@ -87,11 +99,11 @@ def analyze(doc, audit, id_start=1):
         for name in FLOORS:
             z, med = _robust_z([r[1][name] for r in rows], i, *FLOORS[name])
             detail[name] = {"value": round(m[name], 3), "peer_median": round(med, 3), "z": round(z, 1)}
-            if name in FLAGGING and abs(z) >= Z_WEAK:
+            if name in FLAGGING and abs(z) >= THRESH[name][0]:
                 flags.append((name, abs(z)))
         table.append({"doc_id": doc.doc_id, "field": f.key, **{k: v["z"] for k, v in detail.items()}})
         fams = {FAMILY[k] for k, _ in flags}
-        strong = [x for x in flags if x[1] >= Z_STRONG]
+        strong = [x for x in flags if x[1] >= THRESH[x[0]][1]]
         if len(fams) >= 2 or strong:
             maxz = max(z for _, z in flags)
             sev = "high" if (len(fams) >= 3 or len(flags) >= 3 or maxz >= 10) else "medium"

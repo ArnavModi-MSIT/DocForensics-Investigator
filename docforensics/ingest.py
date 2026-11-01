@@ -78,6 +78,45 @@ def expand_inputs(paths, workdir, audit):
     return out, skipped
 
 
+def estimate_skew(gray, max_angle=8.0):
+    """Page tilt in degrees via projection-profile search: the rotation that makes text rows
+    sharpest (largest squared difference of the row-ink profile). Returns (angle, gain) where gain is
+    the score improvement over 0 deg; apply only when both are significant."""
+    import cv2
+    h, w = gray.shape
+    if w > 1000:
+        gray = cv2.resize(gray, (1000, int(h * 1000 / w)), interpolation=cv2.INTER_AREA)
+    bw = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 31, 15)
+    h, w = bw.shape
+
+    def score(a):
+        M = cv2.getRotationMatrix2D((w / 2, h / 2), a, 1.0)
+        r = cv2.warpAffine(bw, M, (w, h), flags=cv2.INTER_NEAREST)
+        prof = r.sum(axis=1).astype(np.float64)
+        return float(np.sum(np.diff(prof) ** 2))
+    coarse = {a: score(a) for a in np.arange(-max_angle, max_angle + 1e-9, 0.5)}
+    a0 = max(coarse, key=coarse.get)
+    fine = {a: score(a) for a in np.arange(a0 - 0.5, a0 + 0.5 + 1e-9, 0.1)}
+    best = max(fine, key=fine.get)
+    return float(best), fine[best] / max(score(0.0), 1.0)
+
+
+def deskew(img, audit=None, doc_id="", min_angle=0.3, min_gain=1.03):
+    """Rotate a PIL page so text rows are horizontal. Untouched when tilt is negligible."""
+    import cv2
+    bgr = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
+    angle, gain = estimate_skew(cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY))
+    applied = abs(angle) >= min_angle and gain >= min_gain
+    if applied:
+        h, w = bgr.shape[:2]
+        M = cv2.getRotationMatrix2D((w / 2, h / 2), angle, 1.0)
+        bgr = cv2.warpAffine(bgr, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+        img = Image.fromarray(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB))
+    if audit:
+        audit.log("deskew", doc_id=doc_id, estimated_angle=round(angle, 2), gain=round(gain, 3), applied=applied)
+    return img, (round(angle, 2) if applied else 0.0)
+
+
 def ingest(paths, workdir, audit):
     """Create Document objects; one per page. Stores normalised page PNG."""
     os.makedirs(workdir, exist_ok=True)
@@ -93,9 +132,10 @@ def ingest(paths, workdir, audit):
         for i, img in enumerate(pages):
             doc_id = base if len(pages) == 1 else f"{base}_p{i+1}"
             out = os.path.join(workdir, f"{doc_id}.png")
+            img, skew = deskew(img, audit, doc_id)          # normalised page used by every later stage
             img.save(out)
             d = Document(doc_id=doc_id, path=p, sha256=digest, image_path=out,
-                         width=img.width, height=img.height)
+                         width=img.width, height=img.height, skew_deg=skew)
             docs.append(d)
             audit.log("ingest", doc_id=doc_id, source=p, sha256=digest,
                       size=[img.width, img.height])

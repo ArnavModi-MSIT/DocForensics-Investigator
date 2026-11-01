@@ -33,6 +33,7 @@ class Document:
     doc_type: str = "unknown"
     type_conf: float = 0.0
     best_guess: str = ""       # highest-scoring type even when the page is rejected
+    skew_deg: float = 0.0          # page rotation corrected before OCR (0 = untouched)
     class_info: dict = field(default_factory=dict)   # evidence behind the classification decision
     width: int = 0
     height: int = 0

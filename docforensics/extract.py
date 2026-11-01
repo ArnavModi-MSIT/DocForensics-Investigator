@@ -54,8 +54,8 @@ def keyword_hits(text, kws):
     return [k for k in kws if re.search(r"(?<![a-z0-9-])" + re.escape(k) + r"(?![a-z0-9-])", text)]
 
 
-SEM_LABEL_MIN = float(os.environ.get("DOCFOR_SEM_LABEL_MIN", 0.80))     # cosine needed for a semantic label match
-SEM_LABEL_MARGIN = float(os.environ.get("DOCFOR_SEM_LABEL_MARGIN", 0.03))  # lead over the 2nd-best field key
+SEM_LABEL_MIN = float(os.environ.get("DOCFOR_SEM_LABEL_MIN", 0.70))     # cosine needed for a semantic label match
+SEM_LABEL_MARGIN = float(os.environ.get("DOCFOR_SEM_LABEL_MARGIN", 0.06))  # lead over the 2nd-best field key
 EXTRA_LABELS = {   # synonyms used only by the semantic matcher (the fuzzy matcher keeps LABELS unchanged)
     "name": ["full name", "customer name", "name of employee", "account holder name", "name of applicant"],
     "dob": ["born on", "birth date"],
@@ -95,6 +95,11 @@ def _value_ok(key, raw):
         return len(re.sub(r"\s", "", raw)) >= 6 and any(c.isdigit() for c in raw)
     if key == "account_no":
         return sum(c.isdigit() for c in raw) >= 6
+    if key == "name":                               # a person/company name is mostly letters, not phone numbers/ids
+        t = re.sub(r"\s", "", raw)
+        return len(t) >= 2 and sum(c.isdigit() for c in t) / len(t) < 0.2
+    if key == "address":
+        return len(raw.strip()) >= 8
     return len(raw.strip()) >= 2
 
 
