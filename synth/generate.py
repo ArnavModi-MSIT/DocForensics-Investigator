@@ -18,6 +18,9 @@ FONT_DIRS = ["/usr/share/fonts/truetype/dejavu", "C:/Windows/Fonts", "/Library/F
 PROFILES = {
     "scan":  dict(rot=1.5, persp=0.0,   blur=0.5, noise=2.0, jpeg=70, grad=0,  bright=0),
     "phone": dict(rot=3.0, persp=0.012, blur=0.9, noise=1.5, jpeg=55, grad=18, bright=-10),
+    # harder profiles used only by the held-out benchmark (--hard)
+    "scan_hard": dict(rot=2.5, persp=0.005, blur=0.8, noise=2.5, jpeg=60, grad=8,  bright=-5),
+    "rough":     dict(rot=5.0, persp=0.020, blur=1.3, noise=2.5, jpeg=45, grad=25, bright=-15),
 }
 LABEL_KEY = {"Applicant Name": "name", "Name": "name", "Employee Name": "name", "Account Holder": "name",
              "Date of Birth": "dob", "ID Number": "id_number", "Address": "address", "Employer": "employer",
@@ -48,6 +51,17 @@ def money(x):
 PERSON = dict(name="Rohan Mehta", dob="14/03/1994", pid="ABCDE1234F",
               addr="Flat 12, Sector 21, Noida UP 201301", employer="Nimbus Analytics Pvt Ltd",
               gross=95000, ded=10000, acct="50100234567891")
+
+
+# unseen people for the held-out benchmark: forged_net = inflated net pay a forger claims
+PERSONS = {
+    "p1": dict(name="Ananya Verma", dob="22/07/1991", pid="FGHIJ5678K", addr="House 7, Block C, Dwarka Delhi 110075",
+               employer="Zenith Retail Solutions Pvt Ltd", gross=120000, ded=18000, acct="60200987654321",
+               forged_net=115000, dob_forged="22/07/1986", bank_name_typo="Ananya Varma", pid_typo="FGHIJ5638K"),
+    "p2": dict(name="Mohammed Irfan", dob="05/11/1988", pid="KLMNO9012P", addr="Plot 45, Sector 62, Gurugram 122001",
+               employer="Orbit Logistics India Ltd", gross=72000, ded=9500, acct="70300112233445",
+               forged_net=70000, dob_forged="05/11/1983", bank_name_typo="Mohamed Irfan", pid_typo="KLMNO9012R"),
+}
 
 
 def base_canvas(seed):
@@ -81,12 +95,24 @@ def jpeg(im, q):
     return Image.open(b).convert("RGB")
 
 
-def patch(im, bbox, new_text, size=28, serif=True):
+def patch(im, bbox, new_text, size=28, serif=True, skilled=False):
     """Paste-over tampering: new value rendered elsewhere (other font, other 'scan'
     with its own paper tone, grain, ink darkness and resampling blur) and pasted in."""
     from PIL import ImageFilter
     x0, y0, x1, y1 = bbox
     pad = 10
+    if skilled:
+        # a careful forger: same font/size/ink, paper tone and grain level matched, no resampling or blur.
+        # Only residual traces remain (independent grain pattern, different compression history).
+        f = font(SANS, 28)
+        tb = ImageDraw.Draw(im).textbbox((0, 0), new_text, font=f)
+        pw, ph = max(x1 - x0, tb[2]) + 2 * pad + 6, (y1 - y0) + 2 * pad
+        rng = np.random.default_rng(sum(map(ord, new_text)) + 7)
+        arr = np.full((ph, pw, 3), 246.0) + rng.normal(0, 2.2, (ph, pw, 1))
+        pimg = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
+        ImageDraw.Draw(pimg).text((pad, pad - tb[1]), new_text, font=f, fill=(15, 15, 15))
+        im.paste(pimg, (x0 - pad, y0 - pad))
+        return (x0, y0, x0 + tb[2], y1)
     pw, ph = (x1 - x0) + 2 * pad + 40, (y1 - y0) + 2 * pad
     rng = np.random.default_rng(sum(map(ord, new_text)))
     tone = 246 + 3.5                                  # slightly different paper tone
@@ -152,18 +178,18 @@ def docs(p, seed, variant):
     return sets
 
 
-def build_case(name, variant, tamper, profile=None):
+def build_case(name, variant, tamper, profile=None, persona=None, skilled=False):
     """tamper: list of (doc, label, new_text) pasted over after a first compression."""
     outdir = os.path.join(OUT, name); os.makedirs(outdir, exist_ok=True)
     seed0 = sum(map(ord, name)) % 1000
-    sets = docs(PERSON, seed0, variant)
+    sets = docs(persona or PERSON, seed0, variant)
     truth, ftruth = [], {}
     for i, (doc, (im, boxes, vals)) in enumerate(sets.items()):
         t = [x for x in tamper if x[0] == doc]
         if t:
             im = jpeg(im, 75)                       # prior compression history
             for _, label, new_text in t:
-                nb = patch(im, boxes[label], new_text)
+                nb = patch(im, boxes[label], new_text, skilled=skilled)
                 vals[label] = new_text
                 truth.append(dict(doc=doc, label=label, bbox=list(nb), kind="visual_patch"))
         ftruth[doc] = {LABEL_KEY[l]: v for l, v in vals.items()}
@@ -190,8 +216,47 @@ TAMPER_VARIANT = dict(
 TAMPER_PATCHES = [("salary_slip", "Net Pay", "Rs. 85,000"),        # patched: 58,000 -> 85,000
                   ("id_card", "Date of Birth", "14/03/1990")]      # patched DOB
 
+def skilled_by_quality():
+    """Skilled forgeries at better capture quality (digital render, mild scan): shows where detectability starts."""
+    for prof in (None, "scan"):
+        for pk, P in PERSONS.items():
+            G, D, F = P["gross"], P["ded"], P["forged_net"]
+            N = G - D
+            skilled = dict(slip_ded=D, slip_net=N, bank_credit=N, declared=F)
+            build_case(f"case_hard_{prof or 'digital'}_skilled_{pk}", skilled,
+                       [("salary_slip", "Net Pay", "Rs. " + money(F)), ("salary_slip", "Total Deductions", "Rs. " + money(G - F)),
+                        ("bank_statement", "Salary Credit", "Rs. " + money(F)),
+                        ("bank_statement", "Closing Balance", "Rs. " + money(120000 + F - 31500))], prof, P, skilled=True)
+
+
+def hard_cases():
+    """Held-out benchmark: unseen people, harsher capture, naive vs skilled (content-consistent) forgeries."""
+    for prof in ("scan_hard", "rough"):
+        for pk, P in PERSONS.items():
+            G, D, F = P["gross"], P["ded"], P["forged_net"]
+            N = G - D
+            pre = f"case_hard_{prof}_"
+            build_case(pre + f"clean_{pk}", {}, [], prof, P)
+            naive = dict(slip_ded=D, slip_net=N, bank_credit=N, declared=F, bank_name=P["bank_name_typo"], id_pid=P["pid_typo"],
+                         content_truth={"bank_statement": "Account Holder", "id_card": "ID Number",
+                                        "application_form": "Declared Monthly Income"})
+            build_case(pre + f"naive_{pk}", naive,
+                       [("salary_slip", "Net Pay", "Rs. " + money(F)), ("id_card", "Date of Birth", P["dob_forged"])], prof, P)
+            # skilled: every document is internally and mutually CONSISTENT after forgery -> only visual traces remain
+            skilled = dict(slip_ded=D, slip_net=N, bank_credit=N, declared=F)
+            build_case(pre + f"skilled_{pk}", skilled,
+                       [("salary_slip", "Net Pay", "Rs. " + money(F)), ("salary_slip", "Total Deductions", "Rs. " + money(G - F)),
+                        ("bank_statement", "Salary Credit", "Rs. " + money(F)),
+                        ("bank_statement", "Closing Balance", "Rs. " + money(120000 + F - 31500))], prof, P, skilled=True)
+
+
 if __name__ == "__main__":
-    for prof in (None, *PROFILES):
+    import sys
+    if "--hard" in sys.argv:
+        hard_cases()
+        skilled_by_quality()
+        sys.exit(0)
+    for prof in (None, "scan", "phone"):
         pre = "case_" + (prof + "_" if prof else "")
         build_case(pre + "clean", {}, [], prof)
         build_case(pre + "tampered", TAMPER_VARIANT, TAMPER_PATCHES, prof)

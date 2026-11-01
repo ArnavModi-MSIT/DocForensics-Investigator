@@ -96,8 +96,13 @@ def analyze(doc, audit, id_start=1):
     n = id_start
     for i, (f, m) in enumerate(rows):
         detail, flags = {}, []
+        h = max(1, f.bbox[3] - f.bbox[1])
+        grp = [j for j, (g, _) in enumerate(rows) if j == i or 0.75 <= max(1, g.bbox[3] - g.bbox[1]) / h <= 1.33]
+        if len(grp) < 4:                      # header vs table text etc.: not enough comparable peers -> do not judge
+            continue
+        gi = grp.index(i)
         for name in FLOORS:
-            z, med = _robust_z([r[1][name] for r in rows], i, *FLOORS[name])
+            z, med = _robust_z([rows[j][1][name] for j in grp], gi, *FLOORS[name])
             detail[name] = {"value": round(m[name], 3), "peer_median": round(med, 3), "z": round(z, 1)}
             if name in FLAGGING and abs(z) >= THRESH[name][0]:
                 flags.append((name, abs(z)))

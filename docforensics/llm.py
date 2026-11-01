@@ -19,14 +19,19 @@ def template_summary(case_id, docs, findings):
         return (f"Case {case_id}: none of the {len(docs)} submitted page(s) was recognised as a supported document type "
                 f"(application form, ID card, salary slip, bank statement), so no forensic or cross-document analysis was run. "
                 f"Reason for {unk[0].doc_id}: {unk[0].class_info.get('decision', 'unrecognised')}.")
-    if not findings:
-        return (f"Case {case_id}: {len(docs)} documents analysed; no inconsistencies or visual anomalies were "
-                f"detected by the automated checks. This does not prove authenticity.")
+    rec = [d for d in docs if d.doc_type != "unknown"]
+    ran = [d for d in rec if d.facts.get("forensics") == "run"]
+    not_ran = [d for d in rec if d.facts.get("forensics") != "run"]
+    cov = (f" Visual forensics ran on {len(ran)} of {len(rec)} recognised page(s)" +
+           (f"; it could not run on {len(not_ran)} ({'; '.join(sorted({str(d.facts.get('forensics', '?')) for d in not_ran}))})" if not_ran else "") + ".")
+    if not findings or all(f.kind == "missing" and f.fid.startswith("N-") for f in findings):
+        return (f"Case {case_id}: {len(docs)} documents analysed; no content inconsistencies or visual anomalies were detected." + cov +
+                " Absence of findings does not prove authenticity.")
     top = sorted(findings, key=lambda f: ({"high": 0, "medium": 1, "low": 2}[f.severity], -f.confidence))[:4]
     lines = "; ".join(f"{f.fid} {f.title}" for f in top)
     return (f"Case {case_id}: {len(docs)} documents analysed; {len(findings)} findings "
             f"({n['high']} high, {n['medium']} medium, {n['low']} low). Most significant: {lines}. "
-            f"Visual findings are indicators of possible alteration, not proof; confirm against originals.")
+            f"Visual findings are indicators of possible alteration, not proof; confirm against originals." + cov)
 
 
 def llm_summary(case_id, docs, findings):

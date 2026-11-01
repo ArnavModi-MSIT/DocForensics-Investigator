@@ -54,8 +54,8 @@ def build_json(case_id, docs, findings, summary, summary_src, audit_events):
         "case_id": case_id, "summary": summary, "summary_source": summary_src,
         "documents": [{"doc_id": d.doc_id, "type": d.doc_type, "type_conf": d.type_conf, "sha256": d.sha256,
                        "size": [d.width, d.height], "decision": d.class_info.get("decision", ""),
-                       "best_guess": d.best_guess, "skew_deg": d.skew_deg,
-                       "fields": [{"key": f.key, "label": f.label, "raw": f.raw, "value": f.value,
+                       "best_guess": d.best_guess, "skew_deg": d.skew_deg, "born_digital": d.born_digital, "forensics": d.facts.get("forensics", ""),
+                       "fields": [{"key": f.key, "label": f.label, "raw": f.raw, "value": (f.raw if f.key == "aadhaar_no" else f.value),
                                    "confidence": f.conf, "bbox": list(f.bbox),
                                    "matched_by": f.match, "label_score": f.label_sim} for f in d.fields]} for d in docs],
         "findings": [f.to_dict() for f in findings],
@@ -76,7 +76,11 @@ def build_pdf(dossier, annotated, path):
     S = []
     P = lambda t, st=None: Paragraph(t, st or ss["BodyText"])
 
+    from xml.sax.saxutils import escape
+    cell = ss["BodyText"].clone("cell", fontSize=8, leading=10)
+
     def tbl(rows, widths, head=True):
+        rows = [[Paragraph(escape(str(c)), cell) for c in r] for r in rows]       # wrap long cells
         t = Table(rows, colWidths=widths, repeatRows=1 if head else 0)
         st = [("GRID", (0, 0), (-1, -1), 0.3, colors.grey), ("VALIGN", (0, 0), (-1, -1), "TOP"),
               ("FONTSIZE", (0, 0), (-1, -1), 8)]
@@ -114,8 +118,8 @@ def build_pdf(dossier, annotated, path):
             S += [tbl([["Field", "Value", "OCR conf."]] + [[f["key"], str(f["raw"]), f"{f['confidence']:.2f}"] for f in d["fields"]],
                       [40 * mm, 100 * mm, 25 * mm])]
         else:
-            S += [P("No fields extracted: page not recognised as a supported document type. "
-                    + (d.get("decision") or ""), sm)]
+            S += [P(("No fields extracted: page not recognised as a supported document type. " if d["type"] == "unknown"
+                     else "No label:value fields on this page. ") + (d.get("decision") or ""), sm)]
         img = annotated.get(d["doc_id"])
         if img:
             S += [Spacer(1, 4), RLImage(img, width=85 * mm, height=85 * mm * 1300 / 1000 * d["size"][1] / 1300 * 1000 / d["size"][0])]

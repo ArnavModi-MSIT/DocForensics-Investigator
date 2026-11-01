@@ -1,0 +1,33 @@
+{
+  "application_form": {
+    "name": "Mohammed Irfan",
+    "dob": "05/11/1988",
+    "id_number": "KLMNO9012P",
+    "address": "Plot 45, Sector 62, Gurugram 122001",
+    "employer": "Orbit Logistics India Ltd",
+    "declared_income": "Rs. 70,000"
+  },
+  "id_card": {
+    "name": "Mohammed Irfan",
+    "dob": "05/11/1988",
+    "id_number": "KLMNO9012P",
+    "address": "Plot 45, Sector 62, Gurugram 122001",
+    "issue_date": "02/06/2019"
+  },
+  "salary_slip": {
+    "name": "Mohammed Irfan",
+    "employer": "Orbit Logistics India Ltd",
+    "pay_month": "October 2026",
+    "gross": "Rs. 72,000",
+    "deductions": "Rs. 2,000",
+    "net_pay": "Rs. 70,000"
+  },
+  "bank_statement": {
+    "name": "Mohammed Irfan",
+    "account_no": "70300112233445",
+    "period": "01/10/2026 - 31/10/2026",
+    "opening_balance": "Rs. 120,000",
+    "salary_credit": "Rs. 70,000",
+    "closing_balance": "Rs. 158,500"
+  }
+}

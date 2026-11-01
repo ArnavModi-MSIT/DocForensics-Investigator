@@ -1,0 +1,46 @@
+[
+  {
+    "doc": "salary_slip",
+    "label": "Net Pay",
+    "bbox": [
+      430,
+      621,
+      598,
+      645
+    ],
+    "kind": "visual_patch"
+  },
+  {
+    "doc": "salary_slip",
+    "label": "Total Deductions",
+    "bbox": [
+      430,
+      536,
+      562,
+      560
+    ],
+    "kind": "visual_patch"
+  },
+  {
+    "doc": "bank_statement",
+    "label": "Salary Credit",
+    "bbox": [
+      430,
+      536,
+      598,
+      560
+    ],
+    "kind": "visual_patch"
+  },
+  {
+    "doc": "bank_statement",
+    "label": "Closing Balance",
+    "bbox": [
+      430,
+      621,
+      598,
+      645
+    ],
+    "kind": "visual_patch"
+  }
+]

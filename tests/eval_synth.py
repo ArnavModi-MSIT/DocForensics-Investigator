@@ -9,8 +9,9 @@ from docforensics.pipeline import run_case
 from docforensics.embed_classifier import status
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
-KEY = {"Net Pay": "net_pay", "Date of Birth": "dob", "Account Holder": "name",
-       "ID Number": "id_number", "Declared Monthly Income": "declared_income"}
+KEY = {"Net Pay": "net_pay", "Date of Birth": "dob", "Account Holder": "name", "ID Number": "id_number",
+       "Declared Monthly Income": "declared_income", "Total Deductions": "deductions",
+       "Salary Credit": "salary_credit", "Closing Balance": "closing_balance"}
 
 
 def norm(s):
@@ -56,6 +57,22 @@ def main():
         iss = f"{r['detected']}/{r['truth']}" if r["truth"] else "-"
         fp = f"{r['n_findings']} (FP)" if not r["truth"] else str(r["n_findings"])
         print(f"{r['case']:22} {r['cls_ok']}/{r['cls_n']:>5} {r['extract_ok']}/{r['extract_n']:>6} {iss:>13} {fp:>9}")
+    groups = {}
+    for r in res:
+        m = re.match(r"case_hard_(digital|scan_hard|scan|rough)_(clean|naive|skilled)_", r["case"])
+        if m:
+            g = groups.setdefault((m.group(1), m.group(2)), dict(cases=0, fp=0, truth=0, det=0, ex_ok=0, ex_n=0, cls_ok=0, cls_n=0))
+            g["cases"] += 1; g["ex_ok"] += r["extract_ok"]; g["ex_n"] += r["extract_n"]; g["cls_ok"] += r["cls_ok"]; g["cls_n"] += r["cls_n"]
+            if r["truth"]:
+                g["truth"] += r["truth"]; g["det"] += r["detected"]
+            else:
+                g["fp"] += r["n_findings"]
+    if groups:
+        print(f"\nHELD-OUT SUMMARY  {'capture':10} {'forgery':8} {'cases':>5} {'issues found':>13} {'false pos':>10} {'extract':>9} {'classif':>8}")
+        for (prof, kind), g in sorted(groups.items()):
+            iss = f"{g['det']}/{g['truth']}" if g["truth"] else "-"
+            fp = g["fp"] if kind == "clean" else "-"
+            print(f"                  {prof:10} {kind:8} {g['cases']:>5} {iss:>13} {fp!s:>10} {g['ex_ok']}/{g['ex_n']:<4} {g['cls_ok']}/{g['cls_n']}")
     for r in res:
         bad = [d for d in r["detail"] if not d["detected"]]
         if bad or (not r["truth"] and r["n_findings"]) or r["extract_miss"]:

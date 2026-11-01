@@ -26,10 +26,14 @@ LABELS = {
     "net_pay": ["net pay", "net salary", "take home"],
     "pay_month": ["pay month", "month", "salary month"],
     "account_no": ["account number", "account no", "a/c no"],
-    "period": ["statement period", "period"],
-    "opening_balance": ["opening balance"],
+    "period": ["statement period", "statement date", "period"],
+    "opening_balance": ["opening balance", "balance forward", "balance brought forward", "balance b/f"],
     "salary_credit": ["salary credit", "salary credited"],
     "closing_balance": ["closing balance"],
+    "currency": ["currency"],
+    "branch": ["branch"],
+    "ifsc": ["ifsc", "ifsc code"],
+    "account_type": ["account type"],
 }
 DATE_KEYS = {"dob", "issue_date"}
 MONEY_KEYS = {"declared_income", "gross", "deductions", "net_pay",
@@ -38,11 +42,13 @@ MONEY_KEYS = {"declared_income", "gross", "deductions", "net_pay",
 
 EXPECTED = {   # fields that genuinely belong to each type (used as structural evidence)
     "application_form": {"name", "dob", "id_number", "address", "employer", "declared_income"},
-    "id_card": {"name", "dob", "id_number", "address", "issue_date"},
+    "id_card": {"name", "dob", "id_number", "aadhaar_no", "address", "issue_date"},
     "salary_slip": {"name", "employer", "pay_month", "gross", "deductions", "net_pay"},
-    "bank_statement": {"name", "account_no", "period", "opening_balance", "salary_credit", "closing_balance"},
+    "bank_statement": {"name", "account_no", "period", "opening_balance", "salary_credit", "closing_balance",
+                       "currency", "branch", "ifsc", "account_type"},
 }
 MIN_FIELDS = int(os.environ.get("DOCFOR_MIN_FIELDS", 3))          # a page is a supported document only if >= this many of its expected fields were found
+STRONG_KW = float(os.environ.get("DOCFOR_STRONG_KW", 0.75))   # keyword score that counts as strong evidence
 KW_CUTOFF = 0.5         # keyword evidence needed when no embedding model is available
 KW_WEIGHT = float(os.environ.get("DOCFOR_KW_WEIGHT", 0.2))         # weight of keywords when mixing with embedding similarity (tunable)
 NEG_MARGIN = float(os.environ.get("DOCFOR_NEG_MARGIN", 0.03))       # an "other:*" class must beat the best supported class by this cosine margin to veto
@@ -103,14 +109,14 @@ def _value_ok(key, raw):
         return parse_date(raw) is not None
     if key in MONEY_KEYS:
         return parse_money(raw) is not None
-    if key == "id_number":
-        return len(re.sub(r"\s", "", raw)) >= 6 and any(c.isdigit() for c in raw)
+    if key == "id_number":                           # report codes like RPT-2026-1507 have several hyphens: not an ID
+        return len(re.sub(r"\s", "", raw)) >= 6 and any(c.isdigit() for c in raw) and raw.count("-") < 2
     if key == "account_no":
         return sum(c.isdigit() for c in raw) >= 6
     if key == "period":                              # a date, a date range, or month + year
         return bool(DATE_LIKE.search(raw) or (MONTH_RE.search(raw) and YEAR_RE.search(raw)))
     if key == "pay_month":                           # month name, month/year or a year
-        return bool(MONTH_RE.search(raw) or MONTH_NUM.search(raw) or YEAR_RE.search(raw))
+        return bool(MONTH_RE.search(raw) or MONTH_NUM.search(raw) or (YEAR_RE.search(raw) and re.search(r"[A-Za-z]{3}", raw)))
     if key == "name":                                # person/company-like: few words, some capitalised, mostly letters
         toks = raw.split()
         t = re.sub(r"\s", "", raw)
@@ -120,37 +126,47 @@ def _value_ok(key, raw):
         return len(raw) >= 8 and (any(c.isdigit() for c in raw) or "," in raw)
     if key == "employer":
         return sum(c.isalpha() for c in raw) >= 3 and "@" not in raw
+    if key == "currency":
+        return bool(re.fullmatch(r"[A-Za-z]{3}", raw.strip(" :,.")))
+    if key == "ifsc":
+        return bool(re.search(r"[A-Z]{4}0[A-Z0-9]{6}", raw.upper()))
+    if key in ("branch", "account_type"):
+        return sum(c.isalpha() for c in raw) >= 3 and "@" not in raw
     return len(raw) >= 2
 
 
 def semantic_extract(doc, wanted, audit):
-    """Find fields the fuzzy matcher missed by embedding the leading words of each line and
-    comparing them with all known label phrases. Only `wanted` keys can be added (the expected
-    fields of the candidate type that are still missing), the best-scoring key over ALL keys must
-    be a wanted one with a clear margin, and the value must pass a type guard."""
+    """Find fields the fuzzy matchers missed by embedding the leading words of each CELL of each line and
+    comparing them with all known label phrases. Only `wanted` keys can be added (the expected fields of the
+    candidate type that are still missing), the best-scoring key over ALL keys must be a wanted one with a clear
+    margin, and the value must pass a type guard."""
     from .embed_classifier import get_embedder
     emb = get_embedder()
     if emb is None or not wanted:
         return []
-    have_y = [((f.bbox[1] + f.bbox[3]) / 2) for f in doc.fields]
-    cands = []   # (line_idx, n, label_text)
-    lines = group_lines(doc.words)
-    for li, ln in enumerate(lines):
-        cy = sum((w.bbox[1] + w.bbox[3]) / 2 for w in ln) / len(ln)
-        if any(abs(cy - y) < (ln[0].bbox[3] - ln[0].bbox[1]) * 0.6 for y in have_y):
-            continue                                   # line already produced a field
-        for n in range(1, min(4, len(ln) - 1) + 1):
-            if ln[n].text.endswith(":"):               # label continues into the next token
-                continue
-            cands.append((li, n, " ".join(w.text for w in ln[:n]).strip(" :")))
-    cands = [c for c in cands if re.search(r"[A-Za-z]{3}", c[2]) and not _bad_label(c[2])]
+    taken = [f.bbox for f in doc.fields]
+    cands = []    # (label_words, value_words, label_text)
+    for ln in group_lines(doc.words):
+        cells = split_cells(ln)
+        for ci, cell in enumerate(cells):
+            for n in range(1, min(4, len(cell)) + 1):
+                rest = cell[n:]
+                vw = rest if rest else (cells[ci + 1] if ci + 1 < len(cells) else [])
+                if vw and vw[0].text == ":":
+                    vw = vw[1:]
+                if not vw or (rest and rest[0].text.endswith(":")):
+                    continue
+                txt = " ".join(w.text for w in cell[:n]).strip(" :")
+                if not re.search(r"[A-Za-z]{3}", txt) or _bad_label(txt) or _overlaps(_union(vw), taken):
+                    continue
+                cands.append((cell[:n], vw, txt))
     if not cands:
         return []
     keys, P = _label_protos(emb)
     V = emb.embed([c[2] for c in cands])
     S = V @ P.T
-    best = {}      # key -> (sim, line_idx, n)
-    for ci, (li, n, txt) in enumerate(cands):
+    best = {}      # key -> (sim, label_words, value_words)
+    for ci, (lw, vw, txt) in enumerate(cands):
         per_key = {}
         for kj, k in enumerate(keys):
             per_key[k] = max(per_key.get(k, -1), float(S[ci, kj]))
@@ -158,27 +174,26 @@ def semantic_extract(doc, wanted, audit):
         (k1, s1), (k2, s2) = order[0], order[1]
         if k1 in wanted and s1 >= SEM_LABEL_MIN and s1 - s2 >= SEM_LABEL_MARGIN:
             if k1 not in best or s1 > best[k1][0]:
-                best[k1] = (s1, li, n)
+                best[k1] = (s1, lw, vw)
     added = []
-    for k, (sim, li, n) in best.items():
-        ln = lines[li]
-        vw = ln[n:]
-        if vw and vw[0].text == ":":
-            vw = vw[1:]
-        if not vw:
-            continue
+    for k, (sim, lw, vw) in best.items():
         raw = " ".join(w.text for w in vw)
-        if not _value_ok(k, raw):
+        bb = _union(vw)
+        if k == "ifsc":
+            m = re.search(r"[A-Z]{4}0[A-Z0-9]{6}", raw.upper())
+            if not m:
+                continue
+            raw = m.group(0)
+        if not _value_ok(k, raw) or _overlaps(bb, [f.bbox for f in doc.fields]):
             continue
-        bbox = (min(w.bbox[0] for w in vw), min(w.bbox[1] for w in vw), max(w.bbox[2] for w in vw), max(w.bbox[3] for w in vw))
         val = raw
         if k in DATE_KEYS:
             val = parse_date(raw) or raw
         elif k in MONEY_KEYS:
             val = parse_money(raw)
-        elif k == "id_number":
+        elif k in ("id_number", "ifsc"):
             val = re.sub(r"\s", "", raw).upper()
-        f = Field(key=k, label=" ".join(w.text for w in ln[:n]), raw=raw, value=val, bbox=bbox,
+        f = Field(key=k, label=" ".join(w.text for w in lw), raw=raw, value=val, bbox=bb,
                   conf=round(sum(w.conf for w in vw) / len(vw), 3), match="semantic", label_sim=round(sim, 3))
         doc.fields.append(f)
         added.append(f)
@@ -196,6 +211,10 @@ def classify(doc, audit):
     text = " ".join(w.text for w in doc.words)
     low = text.lower()
     kw = {t: round(len(keyword_hits(low, kws)) / len(kws), 2) for t, kws in DOC_TYPES.items()}
+    from .id_patterns import STRONG_CUES
+    for t, cues in STRONG_CUES.items():           # e.g. 'Aadhaar', 'Government of India' on an ID card
+        if keyword_hits(low, cues):
+            kw[t] = max(kw[t], 0.8)
     found = {f.key for f in doc.fields}
     cov = {t: len(found & EXPECTED[t]) for t in EXPECTED}
     sem = semantic_scores(text)
@@ -220,7 +239,14 @@ def classify(doc, audit):
         semantic_extract(doc, EXPECTED[cand] - found, audit)       # fill fields whose labels the dictionary lacks
         found = {f.key for f in doc.fields}
         cov = {t: len(found & EXPECTED[t]) for t in EXPECTED}
-    if cand and cov[cand] < MIN_FIELDS:
+    strong = False
+    if cand:
+        if sem:
+            strong = bool(sem_ok and kw[cand] >= STRONG_KW and cov[cand] >= 1
+                          and max(SUPPORTED, key=sem["sims"].get) == cand)
+        else:
+            strong = kw[cand] >= STRONG_KW and cov[cand] >= 2
+    if cand and cov[cand] < MIN_FIELDS and not strong:
         reason = f"only {cov[cand]} of {len(EXPECTED[cand])} expected '{cand}' fields found (need {MIN_FIELDS})"
         cand = None
     g = cand or guess
@@ -228,7 +254,7 @@ def classify(doc, audit):
     doc.best_guess = max(SUPPORTED, key=sem["sims"].get) if sem else guess     # display: embedding's own top pick
     doc.doc_type = cand or "unknown"
     doc.type_conf = round(ev, 2)
-    doc.class_info = {"keyword": kw, "expected_fields_found": cov, "semantic": sem, "decision": reason or f"accepted as {cand}"}
+    doc.class_info = {"keyword": kw, "expected_fields_found": cov, "semantic": sem, "decision": reason or (f"accepted as {cand}" + (f" (strong keyword + semantic evidence with {cov[cand]} field(s))" if strong and cov[cand] < MIN_FIELDS else ""))}
     audit.log("classify", doc_id=doc.doc_id, doc_type=doc.doc_type, best_guess=guess, keyword=kw,
               expected_fields_found=cov, semantic=(sem or {}).get("sims"), decision=doc.class_info["decision"])
 
@@ -268,6 +294,133 @@ def _best_label(label_text):
     return (best, bs) if best else (None, 0)
 
 
+def split_cells(ln, factor=2.5):
+    """Split a visual line into cells at large horizontal gaps (multi-column headers, label | value layouts)."""
+    hs = sorted(w.bbox[3] - w.bbox[1] for w in ln)
+    thr = max(factor * hs[len(hs) // 2], 45)
+    cells = [[ln[0]]]
+    for a, b in zip(ln, ln[1:]):
+        if b.bbox[0] - a.bbox[2] > thr:
+            cells.append([b])
+        else:
+            cells[-1].append(b)
+    return cells
+
+
+def _union(ws):
+    return (min(w.bbox[0] for w in ws), min(w.bbox[1] for w in ws), max(w.bbox[2] for w in ws), max(w.bbox[3] for w in ws))
+
+
+def _overlaps(bb, boxes):
+    for o in boxes:
+        if min(bb[2], o[2]) > max(bb[0], o[0]) and min(bb[3], o[3]) > max(bb[1], o[1]):
+            return True
+    return False
+
+
+ANYWHERE_OK = {"ifsc"}      # distinctive single-word labels that may appear mid-cell
+
+
+def extract_cells(doc, audit):
+    """Second extraction pass for real-world layouts: labels in any cell of a line (e.g. 'ACCOUNT NO.' after an
+    address column) or inside a cell after other text ('... BALANCE FORWARD'). The value is the rest of the cell,
+    or the next cell. Only keys not found yet are added, values must pass the type guards, and single-word labels
+    are accepted only at the start of a cell (multi-word labels may appear mid-cell)."""
+    have = {f.key for f in doc.fields}
+    taken = [f.bbox for f in doc.fields]
+    added = []
+    for ln in group_lines(doc.words):
+        cells = split_cells(ln)
+        for ci, cell in enumerate(cells):
+            for j in range(len(cell)):
+                best = (None, 0, 0)
+                for n in range(1, min(4, len(cell) - j) + 1):
+                    txt = " ".join(w.text for w in cell[j:j + n]).strip(" :")
+                    if not re.search(r"[A-Za-z]{3}", txt) or _bad_label(txt):
+                        continue
+                    key, sc = _best_label(txt)
+                    if key and (sc > best[1] or (sc == best[1] and n > best[2])):
+                        best = (key, sc, n)
+                key, sc, n = best
+                if not key or key in have:
+                    continue
+                if j > 0 and n < 2 and key not in ANYWHERE_OK:
+                    continue
+                rest = cell[j + n:]
+                vw = rest if rest else (cells[ci + 1] if ci + 1 < len(cells) else [])
+                if vw and vw[0].text == ":":
+                    vw = vw[1:]
+                if not vw or (rest and rest[0].text.endswith(":")):
+                    continue
+                raw = " ".join(w.text for w in vw)
+                bb = _union(vw)
+                if key == "ifsc":
+                    m = re.search(r"[A-Z]{4}0[A-Z0-9]{6}", raw.upper())
+                    if not m:
+                        continue
+                    raw = m.group(0)
+                if not _value_ok(key, raw) or _overlaps(bb, taken):
+                    continue
+                val = raw
+                if key in DATE_KEYS:
+                    val = parse_date(raw) or raw
+                elif key in MONEY_KEYS:
+                    val = parse_money(raw)
+                elif key in ("id_number", "ifsc"):
+                    val = re.sub(r"\s", "", raw).upper()
+                f = Field(key=key, label=" ".join(w.text for w in cell[j:j + n]).strip(" :,;"), raw=raw, value=val, bbox=bb,
+                          conf=round(sum(w.conf for w in vw) / len(vw), 3), match="fuzzy-cell", label_sim=round(float(sc), 1))
+                doc.fields.append(f)
+                added.append(f)
+                have.add(key)
+                taken.append(bb)
+    if added:
+        audit.log("cell_fields", doc_id=doc.doc_id, added=[(f.key, f.label) for f in added])
+    return added
+
+
+def mask_aadhaar(digits):
+    d = re.sub(r"\D", "", digits)
+    return "XXXX XXXX " + d[-4:] if len(d) == 12 else "XXXX"
+
+
+def extract_id_patterns(doc, audit):
+    """Label-free extraction for Indian ID documents (see id_patterns.py). Adds, only when missing:
+    aadhaar_no (kept separate from the PAN-style id_number so different ID kinds are never compared),
+    id_number (PAN pattern), name (line above DOB), address (up to the PIN code). The Aadhaar number is stored
+    masked in `raw`; the digits stay in `value` for matching, and the Verhoeff checksum result in doc.facts."""
+    from .id_patterns import find_aadhaar, find_pan, name_above_dob, address_to_pin
+    lines = group_lines(doc.words)
+    have = {f.key for f in doc.fields}
+    added = []
+
+    def add(key, label, raw, value, hit, sim=1.0):
+        doc.fields.append(Field(key=key, label=label, raw=raw, value=value, bbox=tuple(hit["bbox"]), conf=hit["conf"],
+                                match="pattern", label_sim=sim))
+        have.add(key)
+        added.append(key)
+    if "aadhaar_no" not in have:
+        for a in find_aadhaar(lines):
+            add("aadhaar_no", "Aadhaar number", mask_aadhaar(a["digits"]), a["digits"], a)
+            doc.facts["aadhaar_checksum_ok"] = bool(a["checksum_ok"])
+            break
+    if "id_number" not in have:
+        for pan in find_pan(lines):
+            add("id_number", "PAN pattern", pan["raw"], pan["raw"], pan)
+            break
+    if "name" not in have:
+        n = name_above_dob(lines)
+        if n and _value_ok("name", n["raw"]):
+            add("name", "line above DOB", n["raw"], n["raw"], n, 0.8)
+    if "address" not in have:
+        a = address_to_pin(lines)
+        if a and _value_ok("address", a["raw"]):
+            add("address", "Address (to PIN code)", a["raw"], a["raw"], a)
+    if added:
+        audit.log("pattern_fields", doc_id=doc.doc_id, added=added)
+    return added
+
+
 def extract_fields(doc, audit):
     lines = group_lines(doc.words)
     fields = []
@@ -293,7 +446,7 @@ def extract_fields(doc, audit):
         if value_words[0].text.endswith(":"):      # label continues ('Company Name:'): not a clean label/value split
             continue
         raw = " ".join(w.text for w in value_words)
-        if key in ("period", "pay_month") and not _value_ok(key, raw):
+        if key in ("period", "pay_month", "currency", "ifsc", "branch", "account_type") and not _value_ok(key, raw):
             continue                                   # loosely typed keys: require a plausible value
         bbox = (min(w.bbox[0] for w in value_words), min(w.bbox[1] for w in value_words),
                 max(w.bbox[2] for w in value_words), max(w.bbox[3] for w in value_words))
@@ -316,6 +469,43 @@ def extract_fields(doc, audit):
             seen.add(f.key)
             uniq.append(f)
     doc.fields = uniq
+    extract_cells(doc, audit)
+    extract_id_patterns(doc, audit)
     doc.status = "extracted"
-    audit.log("extract", doc_id=doc.doc_id, fields=[f.key for f in uniq])
-    return uniq
+    audit.log("extract", doc_id=doc.doc_id, fields=[f.key for f in doc.fields])
+    return doc.fields
+
+
+def inherit_continuations(docs, audit):
+    """Multi-page files: a page with no recognisable structure (e.g. transaction rows) inherits the type of the
+    preceding recognised page of the SAME file when nothing contradicts it: no other supported type has real keyword
+    support, the embedding (if active) still prefers that type and does not resemble an unsupported class."""
+    from .embed_classifier import SUPPORTED
+    by_src = {}
+    for d in docs:
+        by_src.setdefault(d.path, []).append(d)
+    for ds in by_src.values():
+        anchor = None
+        for d in ds:
+            if d.doc_type != "unknown":
+                if not d.class_info.get("continuation_of"):
+                    anchor = d
+                continue
+            if anchor is None or len(d.fields) > 2:
+                continue
+            T, ci = anchor.doc_type, d.class_info
+            kw = ci.get("keyword", {})
+            others = [v for t, v in kw.items() if t != T]
+            ok = kw.get(T, 0) >= 0.1 and (max(others) if others else 0) < 0.5
+            sims = (ci.get("semantic") or {}).get("sims")
+            if ok and sims:
+                neg = max(v for k, v in sims.items() if k.startswith("other:"))
+                ok = max(SUPPORTED, key=sims.get) == T and sims[T] >= neg + 0.05
+            if ok:
+                d.doc_type = T
+                for f in d.fields:                       # a 'balance forward' row on a later page is a carry-forward balance
+                    if f.key == "opening_balance":
+                        f.key = "balance_forward"
+                ci["continuation_of"] = anchor.doc_id
+                ci["decision"] = f"continuation of {anchor.doc_id} ({T}): no competing type and no unsupported-class match"
+                audit.log("continuation", doc_id=d.doc_id, anchor=anchor.doc_id, doc_type=T)

@@ -2,8 +2,11 @@
 
 Deliverables (ALL THREE or disqualified): (1) PPT -> Google Drive link, public view; (2) demo video -> Drive link, public view; (3) GitHub repo + README (features, setup, run).
 
-## Status (1 Nov)
-Done: ingest, OCR/extraction, visual forensics, intra+cross checks, dossier PDF/JSON, audit trail, Streamlit UI, synthetic generator + eval, README.
+## Status (1 Nov, evening)
+Done: ingest (images/PDF/ZIP), deskew, OCR, column-aware + label-free extraction (Aadhaar/PAN), embedding classifier with structural gate,
+visual forensics, intra + cross checks, dossier PDF/JSON, audit trail, Streamlit UI incl. debug tab, synthetic + held-out benchmarks.
+Next: fix A (typed-field re-OCR), PDF structure/metadata check, table extraction + running-balance check, real salary slip / PAN / form tests,
+then PPT, demo video (synthetic documents only), final README pass. Before submitting: make the repo public or add the organisers.
 
 ## Schedule
 | Day | Goal |

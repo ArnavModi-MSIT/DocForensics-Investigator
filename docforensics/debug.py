@@ -1,4 +1,5 @@
 """Read-only explanation of what the pipeline 'saw' for a page (does not change any result)."""
+import re
 from .extract import DOC_TYPES, EXPECTED, MIN_FIELDS, _best_label, keyword_hits
 from .ocr import group_lines
 from .embed_classifier import status
@@ -28,7 +29,7 @@ def explain(doc):
                 key, sc = _best_label(" ".join(w.text for w in ln[:n]))
                 if key:
                     near = f"{key} ({sc:.0f})"
-        lines.append({"text": " ".join(w.text for w in ln),
+        lines.append({"text": re.sub(r"\b\d{4} \d{4} (\d{4})\b", r"XXXX XXXX \1", " ".join(w.text for w in ln)),
                       "ocr_conf": round(sum(w.conf for w in ln) / len(ln), 2),
                       "field": hit.key if hit else "", "matched_by": hit.match if hit else "",
                       "label_score": (hit.label_sim if hit else ""), "note": near})

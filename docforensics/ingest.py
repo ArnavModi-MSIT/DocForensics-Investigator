@@ -117,6 +117,21 @@ def deskew(img, audit=None, doc_id="", min_angle=0.3, min_gain=1.03):
     return img, (round(angle, 2) if applied else 0.0)
 
 
+def _pdf_born_digital(path, max_image_cover=0.35):
+    """Per page: True when the page has a real text layer and raster images (logos, stamps) cover only a small part
+    of it. A scanned/photographed PDF page is one big image, so its image coverage is high."""
+    try:
+        import pymupdf
+        out = []
+        for pg in pymupdf.open(path):
+            area = max(1.0, pg.rect.width * pg.rect.height)
+            cover = sum(max(0.0, (i["bbox"][2] - i["bbox"][0]) * (i["bbox"][3] - i["bbox"][1])) for i in pg.get_image_info()) / area
+            out.append(len(pg.get_text().strip()) >= 40 and cover < max_image_cover)
+        return out
+    except Exception:
+        return []
+
+
 def ingest(paths, workdir, audit):
     """Create Document objects; one per page. Stores normalised page PNG."""
     os.makedirs(workdir, exist_ok=True)
@@ -129,13 +144,15 @@ def ingest(paths, workdir, audit):
         except Exception as e:                                  # unsupported / corrupt / encrypted
             audit.log("input_skipped", name=os.path.basename(p), reason=f"{type(e).__name__}: {e}"[:160])
             continue
+        bd = _pdf_born_digital(p) if os.path.splitext(p)[1].lower() == ".pdf" else []
         for i, img in enumerate(pages):
             doc_id = base if len(pages) == 1 else f"{base}_p{i+1}"
             out = os.path.join(workdir, f"{doc_id}.png")
             img, skew = deskew(img, audit, doc_id)          # normalised page used by every later stage
             img.save(out)
             d = Document(doc_id=doc_id, path=p, sha256=digest, image_path=out,
-                         width=img.width, height=img.height, skew_deg=skew)
+                         width=img.width, height=img.height, skew_deg=skew,
+                         born_digital=bool(bd[i]) if i < len(bd) else False)
             docs.append(d)
             audit.log("ingest", doc_id=doc_id, source=os.path.basename(p), sha256=digest,
                       size=[img.width, img.height])

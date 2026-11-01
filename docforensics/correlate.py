@@ -7,9 +7,9 @@ from .schema import Finding
 
 REQUIRED = {
     "application_form": ["name", "dob", "id_number", "declared_income"],
-    "id_card": ["name", "dob", "id_number"],
+    "id_card": [],
     "salary_slip": ["name", "gross", "deductions", "net_pay"],
-    "bank_statement": ["name", "account_no", "salary_credit"],
+    "bank_statement": ["name", "account_no"],
 }
 PAN_RE = re.compile(r"^[A-Z]{5}[0-9]{4}[A-Z]$")
 
@@ -45,7 +45,7 @@ def check_intra(docs):
                            [{"doc_id": d.doc_id, "field": None, "value": None, "bbox": None} for d in unknown[:12]],
                            method="document classification"))
     for d in docs:
-        if d in unknown:
+        if d in unknown or d.class_info.get("continuation_of"):
             continue
         # missing required fields
         for key in REQUIRED.get(d.doc_type, []):
@@ -54,6 +54,12 @@ def check_intra(docs):
                                    "observed", f"Expected field '{key}' for a {d.doc_type} was not extracted "
                                    f"(absent, illegible or OCR failure). Verify manually.", [{"doc_id": d.doc_id, "field": key, "value": None, "bbox": None}],
                                    method="schema completeness"))
+        # Aadhaar number checksum (Verhoeff): a failing number cannot be a genuine Aadhaar
+        if d.get("aadhaar_no") and d.facts.get("aadhaar_checksum_ok") is False:
+            out.append(Finding(nid(), "intra", f"Aadhaar number fails its checksum in {d.doc_id}", "high", 0.9, "inconsistency",
+                               "The 12-digit number does not satisfy the Verhoeff check digit that every issued Aadhaar number carries "
+                               "(or starts with 0/1). It is mistyped, misread by OCR, or fabricated. Verify with the original card.",
+                               [_ref(d, "aadhaar_no")], method="Verhoeff checksum"))
         # PAN-like format
         f = d.get("id_number")
         if f and not PAN_RE.match(str(f.value)):
@@ -96,7 +102,8 @@ def check_cross(docs):
     # identity-like fields
     spec = {"name": ("Applicant name", "text"), "dob": ("Date of birth", "exact"),
             "id_number": ("ID number", "exact"), "address": ("Address", "text"),
-            "employer": ("Employer", "text"), "account_no": ("Account number", "exact")}
+            "employer": ("Employer", "text"), "account_no": ("Account number", "exact"),
+            "aadhaar_no": ("Aadhaar number", "exact")}
     for key, (label, mode) in spec.items():
         have = [d for d in docs if d.get(key)]
         if len(have) < 2:
@@ -138,7 +145,7 @@ def check_cross(docs):
                                metrics={"similarity": sim, "odd_one_out": who if majority else None},
                                method=f"cross-document {mode} match"))
     # income consistency: declared vs payslip net vs bank salary credit
-    by = {d.doc_type: d for d in docs}
+    by = {d.doc_type: d for d in docs if not d.class_info.get("continuation_of")}
     form, slip, bank = by.get("application_form"), by.get("salary_slip"), by.get("bank_statement")
     evid = []
     if slip and slip.get("net_pay") and isinstance(slip.get("net_pay").value, float):

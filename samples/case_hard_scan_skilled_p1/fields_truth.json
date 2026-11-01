@@ -1,0 +1,33 @@
+{
+  "application_form": {
+    "name": "Ananya Verma",
+    "dob": "22/07/1991",
+    "id_number": "FGHIJ5678K",
+    "address": "House 7, Block C, Dwarka Delhi 110075",
+    "employer": "Zenith Retail Solutions Pvt Ltd",
+    "declared_income": "Rs. 115,000"
+  },
+  "id_card": {
+    "name": "Ananya Verma",
+    "dob": "22/07/1991",
+    "id_number": "FGHIJ5678K",
+    "address": "House 7, Block C, Dwarka Delhi 110075",
+    "issue_date": "02/06/2019"
+  },
+  "salary_slip": {
+    "name": "Ananya Verma",
+    "employer": "Zenith Retail Solutions Pvt Ltd",
+    "pay_month": "October 2026",
+    "gross": "Rs. 120,000",
+    "deductions": "Rs. 5,000",
+    "net_pay": "Rs. 115,000"
+  },
+  "bank_statement": {
+    "name": "Ananya Verma",
+    "account_no": "60200987654321",
+    "period": "01/10/2026 - 31/10/2026",
+    "opening_balance": "Rs. 120,000",
+    "salary_credit": "Rs. 115,000",
+    "closing_balance": "Rs. 203,500"
+  }
+}
