@@ -85,8 +85,20 @@ def _label_protos(emb):
     return _label_cache["keys"], _label_cache["P"]
 
 
+MONTH_RE = re.compile(r"(?i)\b(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\b")
+YEAR_RE = re.compile(r"\b(19|20)\d{2}\b")
+DATE_LIKE = re.compile(r"\d{1,4}[/\-.]\d{1,2}[/\-.]\d{2,4}")
+MONTH_NUM = re.compile(r"\b\d{1,2}[/\-]\d{4}\b")
+
+
+def _bad_label(text):
+    """A label never contains digits and never has unbalanced brackets ('033 months)')."""
+    return bool(re.search(r"\d", text)) or text.count("(") != text.count(")") or text.count("[") != text.count("]")
+
+
 def _value_ok(key, raw):
-    """Type guard for semantically matched fields: the value must look like the field."""
+    """Type guard: the value must look like the field it is assigned to."""
+    raw = raw.strip()
     if key in DATE_KEYS:
         return parse_date(raw) is not None
     if key in MONEY_KEYS:
@@ -95,12 +107,20 @@ def _value_ok(key, raw):
         return len(re.sub(r"\s", "", raw)) >= 6 and any(c.isdigit() for c in raw)
     if key == "account_no":
         return sum(c.isdigit() for c in raw) >= 6
-    if key == "name":                               # a person/company name is mostly letters, not phone numbers/ids
+    if key == "period":                              # a date, a date range, or month + year
+        return bool(DATE_LIKE.search(raw) or (MONTH_RE.search(raw) and YEAR_RE.search(raw)))
+    if key == "pay_month":                           # month name, month/year or a year
+        return bool(MONTH_RE.search(raw) or MONTH_NUM.search(raw) or YEAR_RE.search(raw))
+    if key == "name":                                # person/company-like: few words, some capitalised, mostly letters
+        toks = raw.split()
         t = re.sub(r"\s", "", raw)
-        return len(t) >= 2 and sum(c.isdigit() for c in t) / len(t) < 0.2
+        return (1 <= len(toks) <= 6 and len(t) >= 2 and "@" not in raw
+                and sum(c.isdigit() for c in t) / len(t) < 0.2 and any(w[0].isupper() for w in toks))
     if key == "address":
-        return len(raw.strip()) >= 8
-    return len(raw.strip()) >= 2
+        return len(raw) >= 8 and (any(c.isdigit() for c in raw) or "," in raw)
+    if key == "employer":
+        return sum(c.isalpha() for c in raw) >= 3 and "@" not in raw
+    return len(raw) >= 2
 
 
 def semantic_extract(doc, wanted, audit):
@@ -123,7 +143,7 @@ def semantic_extract(doc, wanted, audit):
             if ln[n].text.endswith(":"):               # label continues into the next token
                 continue
             cands.append((li, n, " ".join(w.text for w in ln[:n]).strip(" :")))
-    cands = [c for c in cands if re.search(r"[A-Za-z]{3}", c[2])]
+    cands = [c for c in cands if re.search(r"[A-Za-z]{3}", c[2]) and not _bad_label(c[2])]
     if not cands:
         return []
     keys, P = _label_protos(emb)
@@ -263,6 +283,8 @@ def extract_fields(doc, audit):
         if not key:
             continue
         label_words, value_words = ln[:n], ln[n:]
+        if _bad_label(" ".join(w.text for w in label_words)):
+            continue
         # a leading ':' glued to the first value token
         if value_words and value_words[0].text == ":":
             value_words = value_words[1:]
@@ -271,6 +293,8 @@ def extract_fields(doc, audit):
         if value_words[0].text.endswith(":"):      # label continues ('Company Name:'): not a clean label/value split
             continue
         raw = " ".join(w.text for w in value_words)
+        if key in ("period", "pay_month") and not _value_ok(key, raw):
+            continue                                   # loosely typed keys: require a plausible value
         bbox = (min(w.bbox[0] for w in value_words), min(w.bbox[1] for w in value_words),
                 max(w.bbox[2] for w in value_words), max(w.bbox[3] for w in value_words))
         conf = sum(w.conf for w in value_words) / len(value_words)
