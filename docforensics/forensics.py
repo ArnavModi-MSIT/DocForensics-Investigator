@@ -16,6 +16,7 @@ from .ingest import read_gray, read_rgb
 
 # (relative floor, absolute floor) for the robust scale of each metric
 FLOORS = {"ela": (0.10, 0.10), "noise": (0.10, 0.20), "bglum": (0.0, 0.8), "inkdark": (0.0, 5.0), "stroke": (0.12, 0.25)}
+BGVAR_MAX = 6.0   # std of the page background around a field; plain paper/scans measure ~2-3, decorated card backgrounds 4-16
 FLAGGING = ("ela", "noise", "bglum", "inkdark")      # stroke is reported but not used for flagging (quantised at this DPI)
 # (weak, strong) robust-z thresholds per signal, set from the distribution of innocent vs pasted fields on the
 # synthetic benchmark (innocent max |z|: ela/noise ~6, paper tone ~1, ink darkness ~2; pasted: ink 7-12, tone 3-4.5).
@@ -34,7 +35,12 @@ def ela_map(bgr, q=90):
 def save_ela_heatmap(doc, path):
     ela = ela_map(read_rgb(doc))
     v = np.clip(ela / max(1e-6, np.percentile(ela, 99.5)) * 255, 0, 255).astype(np.uint8)
-    cv2.imwrite(path, cv2.applyColorMap(v, cv2.COLORMAP_INFERNO))
+    out = cv2.applyColorMap(v, cv2.COLORMAP_INFERNO)
+    for f in doc.fields:                                    # heat-maps show glyph edges: redact Aadhaar digits here too
+        if f.key == "aadhaar_no":
+            x0, y0, x1, y1 = f.bbox
+            cv2.rectangle(out, (x0 - 4, y0 - 4), (x0 + int((x1 - x0) * 0.68), y1 + 4), (0, 0, 0), -1)
+    cv2.imwrite(path, out)
     return path
 
 
@@ -65,6 +71,7 @@ def _metrics(gray, ela, resid, bbox, pad=8):
         "ela": float(ela[y0:y1, x0:x1][bg].mean()),
         "noise": float(resid[y0:y1, x0:x1][bg].std()),
         "bglum": float(g[bg].mean()),
+        "bgvar": float(g[bg].std()),                       # texture of the surrounding background (not used for z-scores)
         "inkdark": float(np.percentile(g[ink > 0], 10)),
         "stroke": stroke,
     }
@@ -90,8 +97,13 @@ def analyze(doc, audit, id_start=1):
         if m:
             rows.append((f, m))
     findings, table = [], []
+    n_all = len(rows)
+    rows = [(f, m) for f, m in rows if m["bgvar"] <= BGVAR_MAX]       # fields on a busy background are not comparable with plain ones
+    n_busy = n_all - len(rows)
     if len(rows) < 4:
-        audit.log("forensics", doc_id=doc.doc_id, note="too few fields for peer comparison")
+        doc.facts["forensics_reason"] = ("textured background (guilloche/watermark/gradient): fields are not comparable"
+                                         if n_busy else "too few comparable fields (need >= 4 of similar text size)")
+        audit.log("forensics", doc_id=doc.doc_id, note="not run", fields_busy_background=n_busy, fields_tested=len(rows))
         return findings, table
     n = id_start
     for i, (f, m) in enumerate(rows):

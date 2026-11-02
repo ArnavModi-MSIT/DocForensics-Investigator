@@ -166,7 +166,57 @@ def _first_cell(ws, gap=80):
 
 
 # ---------------------------------------------------------------- classification cues
-STRONG_CUES = {  # a single hit is strong evidence for the type
+# ---------------------------------------------------------------- Voter ID (EPIC): 3 letters + 7 digits, usually unlabelled
+EPIC_RE = re.compile(r"(?<![A-Z0-9])[A-Z]{3}[0-9]{7}(?![A-Z0-9])")
+
+
+def find_epic(lines):
+    out = []
+    for ln in lines:
+        for w in ln:
+            m = EPIC_RE.search(w.text.strip().upper())
+            if m:
+                out.append({"raw": m.group(0), "bbox": w.bbox, "conf": w.conf})
+    return out
+
+
+# ---------------------------------------------------------------- label-free PAN layout: NAME / FATHER'S NAME / DOB stacked
+DATE_ONLY = re.compile(r"^\d{1,2}[/\-.]\d{1,2}[/\-.]\d{2,4}$")
+_HDR = ("income", "tax", "department", "government", "india", "signature", "permanent", "account", "number", "card",
+        "election", "commission")
+
+
+def _latin_line(ln, min_conf=0.6):
+    """A line of 1-5 plain Latin words, all confidently read, that is not a card header."""
+    if not (1 <= len(ln) <= 5):
+        return None
+    if not all(re.fullmatch(r"[A-Za-z][A-Za-z.'-]*", w.text.strip()) and w.conf >= min_conf for w in ln):
+        return None
+    txt = " ".join(w.text for w in ln).lower()
+    if any(h in txt for h in _HDR):
+        return None
+    return {"raw": " ".join(w.text for w in ln), "bbox": _union(ln), "conf": _conf(ln)}
+
+
+def pan_card_fields(lines):
+    """PAN card without labels: the date alone on its line is the DOB, the Latin line just above it is the father's
+    name and the one above that is the holder's name (also covers the older layout where the number comes first).
+    Returns {key: {raw, bbox, conf}} for the keys found."""
+    di = next((i for i, ln in enumerate(lines) if len(ln) == 1 and DATE_ONLY.match(ln[0].text.strip())), None)
+    if di is None:
+        return {}
+    w = lines[di][0]
+    out = {"dob": {"raw": w.text.strip(), "bbox": w.bbox, "conf": w.conf}}
+    father = _latin_line(lines[di - 1]) if di >= 1 else None
+    name = _latin_line(lines[di - 2]) if di >= 2 else None
+    if father and name:
+        out["father_name"], out["name"] = father, name
+    return out
+
+
+# ---------------------------------------------------------------- classification cues
+STRONG_CUES = {  # two cues, or one cue plus an ID-number pattern, count as strong evidence (see extract.classify)
     "id_card": ["aadhaar", "uidai", "government of india", "unique identification", "permanent account number",
-                "income tax department"],
+                "income tax department", "election commission of india", "elector photo identity card",
+                "electoral registration officer", "driving licence", "driving license", "republic of india"],
 }

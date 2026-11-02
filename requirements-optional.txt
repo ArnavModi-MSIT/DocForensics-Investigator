@@ -1,0 +1,3 @@
+# Optional second OCR engine (local ONNX, no network/API, models bundled). Without it the app runs on Tesseract alone.
+rapidocr>=3.0
+onnxruntime>=1.18

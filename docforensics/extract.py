@@ -14,8 +14,9 @@ DOC_TYPES = {
 
 # ---- label dictionary per field key (fuzzy matched) -------------------------
 LABELS = {
-    "name": ["applicant name", "name", "account holder", "employee name", "holder name"],
-    "dob": ["date of birth", "dob", "birth date"],
+    "name": ["applicant name", "name", "account holder", "employee name", "holder name", "electors name", "elector name"],
+    "dob": ["date of birth", "date of birth / age", "date of birth age", "date of birth/age", "dob", "birth date"],
+    "father_name": ["fathers name", "father name", "father's name", "husbands name", "husband name"],
     "id_number": ["id number", "pan", "id no", "pan number"],
     "address": ["address", "residential address"],
     "employer": ["employer", "company", "organisation"],
@@ -42,7 +43,7 @@ MONEY_KEYS = {"declared_income", "gross", "deductions", "net_pay",
 
 EXPECTED = {   # fields that genuinely belong to each type (used as structural evidence)
     "application_form": {"name", "dob", "id_number", "address", "employer", "declared_income"},
-    "id_card": {"name", "dob", "id_number", "aadhaar_no", "address", "issue_date"},
+    "id_card": {"name", "father_name", "dob", "id_number", "aadhaar_no", "epic_no", "address", "issue_date"},
     "salary_slip": {"name", "employer", "pay_month", "gross", "deductions", "net_pay"},
     "bank_statement": {"name", "account_no", "period", "opening_balance", "salary_credit", "closing_balance",
                        "currency", "branch", "ifsc", "account_type"},
@@ -102,6 +103,9 @@ def _bad_label(text):
     return bool(re.search(r"\d", text)) or text.count("(") != text.count(")") or text.count("[") != text.count("]")
 
 
+NOT_A_NAME = {"officer", "registration", "electoral", "constituency", "assembly", "parliamentary", "authority"}
+
+
 def _value_ok(key, raw):
     """Type guard: the value must look like the field it is assigned to."""
     raw = raw.strip()
@@ -117,9 +121,11 @@ def _value_ok(key, raw):
         return bool(DATE_LIKE.search(raw) or (MONTH_RE.search(raw) and YEAR_RE.search(raw)))
     if key == "pay_month":                           # month name, month/year or a year
         return bool(MONTH_RE.search(raw) or MONTH_NUM.search(raw) or (YEAR_RE.search(raw) and re.search(r"[A-Za-z]{3}", raw)))
-    if key == "name":                                # person/company-like: few words, some capitalised, mostly letters
+    if key in ("name", "father_name"):               # person/company-like: few words, some capitalised, mostly letters
         toks = raw.split()
         t = re.sub(r"\s", "", raw)
+        if any(re.sub(r"\W", "", w).lower() in NOT_A_NAME for w in toks):       # 'Registration Officer, 40 - NEW DELHI (GEN)'
+            return False
         return (1 <= len(toks) <= 6 and len(t) >= 2 and "@" not in raw
                 and sum(c.isdigit() for c in t) / len(t) < 0.2 and any(w[0].isupper() for w in toks))
     if key == "address":
@@ -146,7 +152,7 @@ def semantic_extract(doc, wanted, audit):
         return []
     taken = [f.bbox for f in doc.fields]
     cands = []    # (label_words, value_words, label_text)
-    for ln in group_lines(doc.words):
+    for ln in _lines(doc):
         cells = split_cells(ln)
         for ci, cell in enumerate(cells):
             for n in range(1, min(4, len(cell)) + 1):
@@ -179,20 +185,10 @@ def semantic_extract(doc, wanted, audit):
     for k, (sim, lw, vw) in best.items():
         raw = " ".join(w.text for w in vw)
         bb = _union(vw)
-        if k == "ifsc":
-            m = re.search(r"[A-Z]{4}0[A-Z0-9]{6}", raw.upper())
-            if not m:
-                continue
-            raw = m.group(0)
-        if not _value_ok(k, raw) or _overlaps(bb, [f.bbox for f in doc.fields]):
+        fin = finalize_value(k, raw)
+        if fin is None or _overlaps(bb, [f.bbox for f in doc.fields]):
             continue
-        val = raw
-        if k in DATE_KEYS:
-            val = parse_date(raw) or raw
-        elif k in MONEY_KEYS:
-            val = parse_money(raw)
-        elif k in ("id_number", "ifsc"):
-            val = re.sub(r"\s", "", raw).upper()
+        raw, val = fin
         f = Field(key=k, label=" ".join(w.text for w in lw), raw=raw, value=val, bbox=bb,
                   conf=round(sum(w.conf for w in vw) / len(vw), 3), match="semantic", label_sim=round(sim, 3))
         doc.fields.append(f)
@@ -212,8 +208,10 @@ def classify(doc, audit):
     low = text.lower()
     kw = {t: round(len(keyword_hits(low, kws)) / len(kws), 2) for t, kws in DOC_TYPES.items()}
     from .id_patterns import STRONG_CUES
-    for t, cues in STRONG_CUES.items():           # e.g. 'Aadhaar', 'Government of India' on an ID card
-        if keyword_hits(low, cues):
+    for t, cues in STRONG_CUES.items():           # one cue alone is not enough (a Form 16 also says 'Income Tax Department')
+        n_cues = len(keyword_hits(low, cues))
+        has_id_pattern = bool({f.key for f in doc.fields} & {"aadhaar_no", "epic_no"}) or any(f.match == "pattern" and f.key == "id_number" for f in doc.fields)
+        if n_cues >= 2 or (n_cues == 1 and has_id_pattern):
             kw[t] = max(kw[t], 0.8)
     found = {f.key for f in doc.fields}
     cov = {t: len(found & EXPECTED[t]) for t in EXPECTED}
@@ -225,7 +223,9 @@ def classify(doc, audit):
         guess = max(hybrid, key=hybrid.get)
         neg = max((t for t in sims if t.startswith("other:")), key=sims.get)
         if sims[neg] > sims[guess] + NEG_MARGIN and kw[guess] < 0.5:
-            reason = f"semantically closer to '{neg}' ({sims[neg]:.2f}) than to '{guess}' ({sims[guess]:.2f}) and keyword evidence is weak"
+            from .embed_classifier import CATEGORY_NAMES
+            reason = (f"semantically closer to '{CATEGORY_NAMES.get(neg, neg)}' ({sims[neg]:.2f}) than to "
+                      f"'{CATEGORY_NAMES.get(guess, guess)}' ({sims[guess]:.2f}) and keyword evidence is weak")
         else:
             cand = guess
         sem_ok = sims[guess] >= sims[neg] + NEG_MARGIN   # page clearly resembles a supported type
@@ -254,16 +254,34 @@ def classify(doc, audit):
     doc.best_guess = max(SUPPORTED, key=sem["sims"].get) if sem else guess     # display: embedding's own top pick
     doc.doc_type = cand or "unknown"
     doc.type_conf = round(ev, 2)
-    doc.class_info = {"keyword": kw, "expected_fields_found": cov, "semantic": sem, "decision": reason or (f"accepted as {cand}" + (f" (strong keyword + semantic evidence with {cov[cand]} field(s))" if strong and cov[cand] < MIN_FIELDS else ""))}
+    from .embed_classifier import category_from_sims
+    doc.class_info = {"keyword": kw, "expected_fields_found": cov, "semantic": sem, "category": (category_from_sims(sem["sims"]) if sem else None), "decision": reason or (f"accepted as {cand}" + ((f" (strong keyword + semantic evidence with {cov[cand]} field(s))" if sem else f" (strong keyword evidence with {cov[cand]} field(s), no embedding model)") if strong and cov[cand] < MIN_FIELDS else ""))}
     audit.log("classify", doc_id=doc.doc_id, doc_type=doc.doc_type, best_guess=guess, keyword=kw,
               expected_fields_found=cov, semantic=(sem or {}).get("sims"), decision=doc.class_info["decision"])
 
 
+_MON = r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*"
+DATE_PATTERNS = [
+    r"\d{1,2} ?[/\-.] ?\d{1,2} ?[/\-.] ?\d{2,4}",           # '14- 03.1998': OCR spacing and mixed separators
+    r"\d{4} ?[/\-.] ?\d{1,2} ?[/\-.] ?\d{1,2}",
+    r"\d{1,2}[ \-/.]*" + _MON + r"[ \-/.,]*\d{2,4}",
+]
+
+
 def parse_date(s):
-    s = s.strip().replace(" ", "")
-    for fmt in ("%d/%m/%Y", "%d-%m-%Y", "%Y-%m-%d", "%d.%m.%Y", "%d/%m/%y"):
+    t = s.strip()
+    if re.search(_MON, t, re.I):                       # 14-MAR-1994, 14 March 1994, 14/Mar/94
+        n = re.sub(r"[\s\-/.,]+", " ", t).strip().title().replace("Sept ", "Sep ")
+        for fmt in ("%d %b %Y", "%d %B %Y", "%d %b %y", "%d %B %y"):
+            try:
+                return datetime.strptime(n, fmt).strftime("%Y-%m-%d")
+            except ValueError:
+                pass
+        return None
+    t = re.sub(r"[/\-.]", "/", t.replace(" ", ""))        # one separator, so mixed '14-03.1998' parses
+    for fmt in ("%d/%m/%Y", "%Y/%m/%d", "%d/%m/%y"):
         try:
-            return datetime.strptime(s, fmt).strftime("%Y-%m-%d")
+            return datetime.strptime(t, fmt).strftime("%Y-%m-%d")
         except ValueError:
             pass
     return None
@@ -271,11 +289,61 @@ def parse_date(s):
 
 def parse_money(s):
     t = re.sub(r"(?i)rs\.?|inr|₹|,|\s", "", s)
-    t = t.replace("O", "0").replace("l", "1") if re.fullmatch(r"[0-9OlL.]+", t) else t
     try:
         return float(t)
     except ValueError:
+        pass
+    if re.fullmatch(r"[0-9OlIL.]+", t) and any(c.isdigit() for c in t):      # OCR repair only when plain parsing failed
+        try:
+            return float(t.replace("O", "0").replace("l", "1").replace("I", "1").replace("L", "1"))
+        except ValueError:
+            pass
+    return None
+
+
+def _junk_tail(post):
+    """What may follow a value: nothing, or a few short non-numeric OCR fragments separated by spaces ('Rs. 5,000 i i')."""
+    if post == "":
+        return True
+    if not post[0].isspace():                          # '$577.3K', '14/03/1994x': the value runs into other text
+        return False
+    toks = post.split()
+    def junk(t):                                        # short fragment; a digit is tolerated only inside symbol noise ('«7')
+        return len(t) <= 3 and (not any(c.isdigit() for c in t) or any(not c.isalnum() for c in t))
+    return len(toks) <= 3 and all(junk(t) for t in toks)
+
+
+def finalize_value(key, raw):
+    """Single validation/normalisation step used by EVERY extraction pass. The value must START the string; only short
+    trailing OCR junk is cut (never numbers taken from the middle of other text). Parses and applies the type guard.
+    Returns (clean_raw, value) or None."""
+    raw = raw.strip()
+    if key in DATE_KEYS:
+        for pat in DATE_PATTERNS:
+            m = re.match(pat, raw, re.I)
+            if m and _junk_tail(raw[m.end():]) and parse_date(m.group(0)):
+                return m.group(0), parse_date(m.group(0))
         return None
+    if key in MONEY_KEYS:
+        m = re.match(r"(?i)(?:rs\.?|inr|₹)?\s*[0-9OlI][0-9OlI,]*(?:\.[0-9]{1,2})?", raw)
+        if m and any(c.isdigit() for c in m.group(0)) and _junk_tail(raw[m.end():]) and parse_money(m.group(0)) is not None:
+            return m.group(0).strip(), parse_money(m.group(0))
+        return None
+    if key == "ifsc":
+        m = re.search(r"[A-Z]{4}0[A-Z0-9]{6}", raw.upper())
+        return (m.group(0), m.group(0)) if m else None
+    if key == "id_number":
+        parts = raw.split(None, 1)
+        first = parts[0].strip(",.;:") if parts else ""
+        rest = raw[len(parts[0]):] if parts else ""
+        if (len(re.sub(r"[^A-Za-z0-9]", "", first)) >= 6 and any(c.isdigit() for c in first) and first.count("-") < 2
+                and _junk_tail(rest)):
+            return first, first.upper()
+        joined = re.sub(r"\s", "", raw)                  # spaced digit groups (12-digit style IDs)
+        return (raw, joined.upper()) if _value_ok(key, raw) and re.fullmatch(r"[0-9 ]{10,}", raw) else None
+    if key == "account_no":
+        return (raw, re.sub(r"\s", "", raw)) if _value_ok(key, raw) and re.fullmatch(r"[0-9 ]{6,}", raw) else None
+    return (raw, raw) if _value_ok(key, raw) else None
 
 
 def _best_label(label_text):
@@ -292,6 +360,20 @@ def _best_label(label_text):
             if sc >= need and sc > bs:
                 best, bs = key, sc
     return (best, bs) if best else (None, 0)
+
+
+def _lines(doc, min_conf=0.45):
+    """Visual lines with leading OCR noise removed. Very-low-confidence words (e.g. Devanagari read by an English OCR)
+    at the START of a line are dropped so that a real label such as 'Name:' is again the first word; words later in the
+    line, which may be genuine but poorly read values, are always kept."""
+    out = []
+    for ln in group_lines(doc.words):
+        i = 0
+        while i < len(ln) and (ln[i].conf < min_conf or not (re.search(r"[A-Za-z0-9]", ln[i].text) or ln[i].conf >= 0.6)):
+            i += 1
+        if i < len(ln):
+            out.append(ln[i:])
+    return out
 
 
 def split_cells(ln, factor=2.5):
@@ -329,12 +411,12 @@ def extract_cells(doc, audit):
     have = {f.key for f in doc.fields}
     taken = [f.bbox for f in doc.fields]
     added = []
-    for ln in group_lines(doc.words):
+    for ln in _lines(doc):
         cells = split_cells(ln)
         for ci, cell in enumerate(cells):
             for j in range(len(cell)):
                 best = (None, 0, 0)
-                for n in range(1, min(4, len(cell) - j) + 1):
+                for n in range(1, min(5, len(cell) - j) + 1):
                     txt = " ".join(w.text for w in cell[j:j + n]).strip(" :")
                     if not re.search(r"[A-Za-z]{3}", txt) or _bad_label(txt):
                         continue
@@ -354,20 +436,12 @@ def extract_cells(doc, audit):
                     continue
                 raw = " ".join(w.text for w in vw)
                 bb = _union(vw)
-                if key == "ifsc":
-                    m = re.search(r"[A-Z]{4}0[A-Z0-9]{6}", raw.upper())
-                    if not m:
-                        continue
-                    raw = m.group(0)
-                if not _value_ok(key, raw) or _overlaps(bb, taken):
+                fin = finalize_value(key, raw)
+                if fin is None or _overlaps(bb, taken):
+                    if fin is None and key in DATE_KEYS | MONEY_KEYS:
+                        doc.facts.setdefault("unparsed", []).append({"key": key, "raw": raw[:40]})
                     continue
-                val = raw
-                if key in DATE_KEYS:
-                    val = parse_date(raw) or raw
-                elif key in MONEY_KEYS:
-                    val = parse_money(raw)
-                elif key in ("id_number", "ifsc"):
-                    val = re.sub(r"\s", "", raw).upper()
+                raw, val = fin
                 f = Field(key=key, label=" ".join(w.text for w in cell[j:j + n]).strip(" :,;"), raw=raw, value=val, bbox=bb,
                           conf=round(sum(w.conf for w in vw) / len(vw), 3), match="fuzzy-cell", label_sim=round(float(sc), 1))
                 doc.fields.append(f)
@@ -389,7 +463,7 @@ def extract_id_patterns(doc, audit):
     aadhaar_no (kept separate from the PAN-style id_number so different ID kinds are never compared),
     id_number (PAN pattern), name (line above DOB), address (up to the PIN code). The Aadhaar number is stored
     masked in `raw`; the digits stay in `value` for matching, and the Verhoeff checksum result in doc.facts."""
-    from .id_patterns import find_aadhaar, find_pan, name_above_dob, address_to_pin
+    from .id_patterns import find_aadhaar, find_pan, find_epic, pan_card_fields, name_above_dob, address_to_pin
     lines = group_lines(doc.words)
     have = {f.key for f in doc.fields}
     added = []
@@ -404,10 +478,26 @@ def extract_id_patterns(doc, audit):
             add("aadhaar_no", "Aadhaar number", mask_aadhaar(a["digits"]), a["digits"], a)
             doc.facts["aadhaar_checksum_ok"] = bool(a["checksum_ok"])
             break
+    if "epic_no" not in have:                    # Voter ID number: kept separate from PAN/Aadhaar so ID kinds are never compared
+        for e in find_epic(lines):
+            add("epic_no", "EPIC pattern", e["raw"], e["raw"], e)
+            break
     if "id_number" not in have:
         for pan in find_pan(lines):
             add("id_number", "PAN pattern", pan["raw"], pan["raw"], pan)
             break
+    if any(f.key == "id_number" and f.match == "pattern" for f in doc.fields):      # PAN card without labels
+        lay = pan_card_fields(_lines(doc))
+        for key in ("name", "father_name", "dob"):
+            hit = lay.get(key)
+            if not hit or key in have:
+                continue
+            if key == "dob":
+                fin = finalize_value("dob", hit["raw"])
+                if fin:
+                    add("dob", "date on its own line", fin[0], fin[1], hit, 0.8)
+            elif _value_ok("name", hit["raw"]):
+                add(key, "stacked layout", hit["raw"], hit["raw"], hit, 0.8)
     if "name" not in have:
         n = name_above_dob(lines)
         if n and _value_ok("name", n["raw"]):
@@ -422,12 +512,12 @@ def extract_id_patterns(doc, audit):
 
 
 def extract_fields(doc, audit):
-    lines = group_lines(doc.words)
+    lines = _lines(doc)
     fields = []
     for ln in lines:
         # label = best-matching leading words of the line (colon optional: OCR often drops it)
         best = (None, 0, 0)  # key, score, n_words
-        for n in range(1, min(4, len(ln) - 1) + 1):
+        for n in range(1, min(5, len(ln) - 1) + 1):
             cand = " ".join(w.text for w in ln[:n])
             key, sc = _best_label(cand)
             if key and (sc > best[1] or (sc == best[1] and n > best[2])):
@@ -445,20 +535,18 @@ def extract_fields(doc, audit):
             continue
         if value_words[0].text.endswith(":"):      # label continues ('Company Name:'): not a clean label/value split
             continue
-        raw = " ".join(w.text for w in value_words)
-        if key in ("period", "pay_month", "currency", "ifsc", "branch", "account_type") and not _value_ok(key, raw):
-            continue                                   # loosely typed keys: require a plausible value
+        raw0 = " ".join(w.text for w in value_words)
+        fin = finalize_value(key, raw0)
+        if fin is None:
+            if key in DATE_KEYS | MONEY_KEYS | {"id_number", "account_no"}:     # label found but value unreadable: report, do not store
+                doc.facts.setdefault("unparsed", []).append({"key": key, "raw": raw0[:40]})
+            continue
+        raw, val = fin
+        if raw != raw0:
+            doc.facts.setdefault("ocr_cleaned", []).append({"key": key, "original": raw0[:40], "cleaned": raw})
         bbox = (min(w.bbox[0] for w in value_words), min(w.bbox[1] for w in value_words),
                 max(w.bbox[2] for w in value_words), max(w.bbox[3] for w in value_words))
         conf = sum(w.conf for w in value_words) / len(value_words)
-        val = raw
-        if key in DATE_KEYS:
-            val = parse_date(raw) or raw
-        elif key in MONEY_KEYS:
-            m = parse_money(raw)
-            val = m if m is not None else raw
-        elif key == "id_number":
-            val = re.sub(r"\s", "", raw).upper()
         fields.append(Field(key=key, label=" ".join(w.text for w in label_words),
                             raw=raw, value=val, bbox=bbox, conf=round(conf, 3),
                             match="fuzzy", label_sim=round(float(sc), 1)))
@@ -476,6 +564,26 @@ def extract_fields(doc, audit):
     return doc.fields
 
 
+def assign_file_categories(docs, audit):
+    """File-level category: pages of the same source file vote (weighted by text amount and how decisive each page is).
+    Gives every page `class_info['file_category']`, so an unsupported file is described ('Corporate financial report, 0.73')
+    instead of only being called 'unknown'. Needs the semantic model; without it nothing is added."""
+    from .embed_classifier import category_from_pages
+    groups = {}
+    for d in docs:
+        groups.setdefault(d.path, []).append(d)
+    for path, ds in groups.items():
+        rows = [((d.class_info.get("semantic") or {}).get("sims"), min(len(d.words), 400)) for d in ds if len(d.words) >= 10]
+        rows = [r for r in rows if r[0]]
+        if not rows:
+            continue
+        cat = category_from_pages([r[0] for r in rows], [r[1] for r in rows])
+        for d in ds:
+            d.class_info["file_category"] = cat
+        audit.log("categorise", file=os.path.basename(path), label=cat["label"], confidence=cat["confidence"],
+                  pages_agree=cat["pages_agree"], top=[(t["name"], t["confidence"]) for t in cat["top"]])
+
+
 def inherit_continuations(docs, audit):
     """Multi-page files: a page with no recognisable structure (e.g. transaction rows) inherits the type of the
     preceding recognised page of the SAME file when nothing contradicts it: no other supported type has real keyword
@@ -491,7 +599,11 @@ def inherit_continuations(docs, audit):
                 if not d.class_info.get("continuation_of"):
                     anchor = d
                 continue
-            if anchor is None or len(d.fields) > 2:
+            if anchor is None:
+                continue
+            same_id = any(f.key in ("epic_no", "aadhaar_no", "id_number") and anchor.get(f.key) is not None
+                          and str(anchor.get(f.key).value) == str(f.value) for f in d.fields)      # the back of a card repeats the number
+            if len(d.fields) > 2 and not same_id:
                 continue
             T, ci = anchor.doc_type, d.class_info
             kw = ci.get("keyword", {})
@@ -501,11 +613,14 @@ def inherit_continuations(docs, audit):
             if ok and sims:
                 neg = max(v for k, v in sims.items() if k.startswith("other:"))
                 ok = max(SUPPORTED, key=sims.get) == T and sims[T] >= neg + 0.05
+            if same_id:
+                ok = True
             if ok:
                 d.doc_type = T
                 for f in d.fields:                       # a 'balance forward' row on a later page is a carry-forward balance
                     if f.key == "opening_balance":
                         f.key = "balance_forward"
                 ci["continuation_of"] = anchor.doc_id
-                ci["decision"] = f"continuation of {anchor.doc_id} ({T}): no competing type and no unsupported-class match"
+                ci["decision"] = (f"continuation of {anchor.doc_id} ({T}): same ID number on both pages" if same_id else
+                                  f"continuation of {anchor.doc_id} ({T}): no competing type and no unsupported-class match")
                 audit.log("continuation", doc_id=d.doc_id, anchor=anchor.doc_id, doc_type=T)

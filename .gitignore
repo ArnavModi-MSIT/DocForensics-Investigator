@@ -5,3 +5,5 @@ models/
 .env
 *.log
 .streamlit/secrets.toml
+.venv/
+samples/

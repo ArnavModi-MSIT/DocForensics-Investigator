@@ -60,5 +60,28 @@ if __name__ == "__main__":
     good_fmt = f"{good[:4]} {good[4:8]} {good[8:]}"
     bad = good[:-1] + str((int(good[-1]) + 1) % 10)
     bad_fmt = f"{bad[:4]} {bad[4:8]} {bad[8:]}"
-    run("valid", good_fmt)
-    run("corrupted", bad_fmt)
+    v = run("valid", good_fmt)
+    c = run("corrupted", bad_fmt)
+    fails = []
+    for tag, r in (("valid", v), ("corrupted", c)):
+        if [d.doc_type for d in r["docs"]] != ["id_card", "id_card"]:
+            fails.append(f"{tag}: pages not both recognised as id_card")
+        front, back = r["docs"]
+        for key in ("name", "dob", "aadhaar_no"):
+            if not front.get(key):
+                fails.append(f"{tag}: front missing {key}")
+        for key in ("address", "aadhaar_no"):
+            if not back.get(key):
+                fails.append(f"{tag}: back missing {key}")
+        blob = open(r["json"], encoding="utf-8").read()
+        for digits in (good, bad):
+            if digits in blob.replace(" ", ""):
+                fails.append(f"{tag}: full Aadhaar digits leaked into dossier.json")
+    if any("checksum" in f.title for f in v["findings"]):
+        fails.append("valid: unexpected checksum finding")
+    if sum("checksum" in f.title for f in c["findings"]) != 2:
+        fails.append("corrupted: expected a checksum finding on both pages")
+    print("\nID-CARD TEST:", "PASSED" if not fails else "FAILED")
+    for f in fails:
+        print("   FAIL:", f)
+    sys.exit(1 if fails else 0)

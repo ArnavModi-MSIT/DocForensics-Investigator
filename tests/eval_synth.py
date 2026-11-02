@@ -26,8 +26,8 @@ def eval_case(case):
     det = []
     for t in truth:
         key = KEY[t["label"]]
-        want = "visual" if t["kind"] == "visual_patch" else None
-        ok = any(any(x["doc_id"] == t["doc"] and x["field"] == key for x in f.refs) and (want is None or f.kind == want)
+        kinds = ("visual",) if t["kind"] == "visual_patch" else ("cross", "intra")      # the RIGHT kind of finding must exist
+        ok = any(any(x["doc_id"] == t["doc"] and x["field"] == key for x in f.refs) and f.kind in kinds
                  for f in r["findings"])
         det.append({**t, "detected": ok})
     fe_ok = fe_n = 0
@@ -44,6 +44,34 @@ def eval_case(case):
     return {"case": case, "findings": [f"{f.fid} {f.title}" for f in r["findings"]], "n_findings": len(r["findings"]),
             "truth": len(truth), "detected": sum(x["detected"] for x in det), "detail": det,
             "extract_ok": fe_ok, "extract_n": fe_n, "extract_miss": miss, "cls_ok": cls_ok, "cls_n": len(r["docs"])}
+
+
+def kind_of(case):
+    if "skilled" in case:
+        return "skilled"
+    if "clean" in case:
+        return "clean"
+    return "forged"          # tampered / naive
+
+
+def check(res, min_extract=0.90):
+    """Regression gate. clean: no findings at all; forged: every injected issue found with the right finding kind;
+    all: classification perfect, extraction >= 90%. Skilled forgeries are a KNOWN limitation (not required to be
+    detected) but must not produce a pile of unrelated findings."""
+    fails = []
+    for r in res:
+        k = kind_of(r["case"])
+        if r["cls_ok"] != r["cls_n"]:
+            fails.append(f"{r['case']}: classification {r['cls_ok']}/{r['cls_n']}")
+        if r["extract_n"] and r["extract_ok"] / r["extract_n"] < min_extract:
+            fails.append(f"{r['case']}: extraction {r['extract_ok']}/{r['extract_n']} below {min_extract:.0%}")
+        if k == "clean" and r["n_findings"] != 0:
+            fails.append(f"{r['case']}: {r['n_findings']} false positive(s) {r['findings']}")
+        if k == "forged" and r["detected"] != r["truth"]:
+            fails.append(f"{r['case']}: detected {r['detected']}/{r['truth']} injected issues")
+        if k == "skilled" and r["n_findings"] > 3:
+            fails.append(f"{r['case']}: {r['n_findings']} unrelated findings on a consistent forgery")
+    return fails
 
 
 def main():
@@ -86,7 +114,11 @@ def main():
                 print(f"   extraction: {m}")
     os.makedirs(os.path.join(ROOT, "output"), exist_ok=True)
     json.dump(res, open(os.path.join(ROOT, "output", "eval.json"), "w"), indent=2)
-    return 0
+    failures = check(res)
+    print("\nEXPECTATIONS:", "ALL PASSED" if not failures else f"{len(failures)} FAILED")
+    for f in failures:
+        print("   FAIL:", f)
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 import os, io, re, zipfile
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 from .schema import Document
 from .audit import sha256_file
 
@@ -14,16 +14,23 @@ def load_pages(path, dpi=200):
         import pymupdf
         doc = pymupdf.open(path)
         pages = []
-        for p in doc:
+        for k, p in enumerate(doc):
+            if k >= MAX_PDF_PAGES:
+                break
             pix = p.get_pixmap(dpi=dpi)
             pages.append(Image.frombytes("RGB", (pix.width, pix.height), pix.samples))
         return pages
     if ext in IMG_EXT:
-        return [Image.open(path).convert("RGB")]
+        img = ImageOps.exif_transpose(Image.open(path)).convert("RGB")     # phone photos carry an orientation flag
+        if max(img.size) > MAX_SIDE:                                      # bound memory/time (e.g. 12 MP+ photos)
+            r = MAX_SIDE / max(img.size)
+            img = img.resize((int(img.width * r), int(img.height * r)), Image.LANCZOS)
+        return [img]
     raise ValueError(f"Unsupported file type: {ext}")
 
 
 MAX_ZIP_FILES, MAX_FILE_BYTES, MAX_TOTAL_BYTES = 200, 50 << 20, 300 << 20
+MAX_SIDE, MAX_PDF_PAGES = 5000, 60          # longest image side in px; pages rendered per PDF
 SUPPORTED = IMG_EXT | {".pdf"}
 
 
@@ -65,6 +72,11 @@ def expand_inputs(paths, workdir, audit):
                 skipped.append({"name": name, "reason": "archive limit reached"}); continue
             flat = re.sub(r"[^A-Za-z0-9_.-]", "_", "__".join(parts))
             target = os.path.join(dest, flat)
+            n_dup = 1
+            while os.path.exists(target):                       # 'a/b.jpg' and 'a__b.jpg' must never overwrite each other
+                stem, ext_ = os.path.splitext(flat)
+                target = os.path.join(dest, f"{stem}__{n_dup}{ext_}")
+                n_dup += 1
             with zf.open(info) as src, open(target, "wb") as dst:
                 data = src.read(MAX_FILE_BYTES + 1)             # bounded read (header size can lie)
                 if len(data) > MAX_FILE_BYTES:
@@ -129,13 +141,13 @@ def _pdf_born_digital(path, max_image_cover=0.35):
             out.append(len(pg.get_text().strip()) >= 40 and cover < max_image_cover)
         return out
     except Exception:
-        return []
+        return []          # callers treat unknown as raster (pixel forensics run); logged by the caller if needed
 
 
 def ingest(paths, workdir, audit):
     """Create Document objects; one per page. Stores normalised page PNG."""
     os.makedirs(workdir, exist_ok=True)
-    docs = []
+    docs, used_ids = [], set()
     for p in paths:
         digest = sha256_file(p)
         base = os.path.splitext(os.path.basename(p))[0]
@@ -147,6 +159,12 @@ def ingest(paths, workdir, audit):
         bd = _pdf_born_digital(p) if os.path.splitext(p)[1].lower() == ".pdf" else []
         for i, img in enumerate(pages):
             doc_id = base if len(pages) == 1 else f"{base}_p{i+1}"
+            if doc_id in used_ids:                              # same stem from different files (scan.jpg + scan.png)
+                doc_id = f"{doc_id}-{digest[:6]}"
+            k_ = 2
+            while doc_id in used_ids:
+                doc_id, k_ = f"{doc_id.split('~')[0]}~{k_}", k_ + 1
+            used_ids.add(doc_id)
             out = os.path.join(workdir, f"{doc_id}.png")
             img, skew = deskew(img, audit, doc_id)          # normalised page used by every later stage
             img.save(out)

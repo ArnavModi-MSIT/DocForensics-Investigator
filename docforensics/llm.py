@@ -10,6 +10,19 @@ SYSTEM = ("You are a document-fraud analyst assistant. You receive structured fi
           "manipulation (indicators, not proof), and list what should be verified next. Max 180 words.")
 
 
+def _what_it_is(unk):
+    """'Semantic analysis: it most resembles a Corporate financial report (...)' when the model was available."""
+    from .embed_classifier import describe
+    cats = {}
+    for d in unk:
+        cat = d.class_info.get("file_category") or d.class_info.get("category")
+        if cat:
+            cats[describe(cat)] = cats.get(describe(cat), 0) + 1
+    if not cats:
+        return ""
+    return "Semantic analysis: it most resembles " + "; ".join(cats) + ", which is outside the supported types. "
+
+
 def template_summary(case_id, docs, findings):
     n = {"high": 0, "medium": 0, "low": 0}
     for f in findings:
@@ -18,13 +31,17 @@ def template_summary(case_id, docs, findings):
     if unk and len(unk) == len(docs):
         return (f"Case {case_id}: none of the {len(docs)} submitted page(s) was recognised as a supported document type "
                 f"(application form, ID card, salary slip, bank statement), so no forensic or cross-document analysis was run. "
-                f"Reason for {unk[0].doc_id}: {unk[0].class_info.get('decision', 'unrecognised')}.")
+                f"{_what_it_is(unk)}Reason for {unk[0].doc_id}: {unk[0].class_info.get('decision', 'unrecognised')}.")
     rec = [d for d in docs if d.doc_type != "unknown"]
     ran = [d for d in rec if d.facts.get("forensics") == "run"]
     not_ran = [d for d in rec if d.facts.get("forensics") != "run"]
     cov = (f" Visual forensics ran on {len(ran)} of {len(rec)} recognised page(s)" +
            (f"; it could not run on {len(not_ran)} ({'; '.join(sorted({str(d.facts.get('forensics', '?')) for d in not_ran}))})" if not_ran else "") + ".")
     if not findings or all(f.kind == "missing" and f.fid.startswith("N-") for f in findings):
+        if rec and not ran:                       # pixel forensics never ran: do not claim anything about visual anomalies
+            return (f"Case {case_id}: {len(docs)} documents analysed; no content inconsistencies were detected by the content and "
+                    f"cross-document checks." + cov + " No visual-tampering check was possible, so this is not evidence of authenticity; "
+                    "verify against the originals.")
         return (f"Case {case_id}: {len(docs)} documents analysed; no content inconsistencies or visual anomalies were detected." + cov +
                 " Absence of findings does not prove authenticity.")
     top = sorted(findings, key=lambda f: ({"high": 0, "medium": 1, "low": 2}[f.severity], -f.confidence))[:4]
@@ -34,9 +51,10 @@ def template_summary(case_id, docs, findings):
             f"Visual findings are indicators of possible alteration, not proof; confirm against originals." + cov)
 
 
-def llm_summary(case_id, docs, findings):
+def llm_summary(case_id, docs, findings, use_llm=False):
+    """The LLM summary is OPT-IN per run: it sends finding text (names, numbers, dates from the documents) to an external API."""
     key = os.environ.get("ANTHROPIC_API_KEY")
-    if not key:
+    if not use_llm or not key:
         return template_summary(case_id, docs, findings), "template"
     try:
         import anthropic

@@ -2,7 +2,12 @@
 import re
 from .extract import DOC_TYPES, EXPECTED, MIN_FIELDS, _best_label, keyword_hits
 from .ocr import group_lines
-from .embed_classifier import status
+from .embed_classifier import status, describe
+
+
+def _cat_short(c):
+    return f"{c['label']} {c['confidence']:.2f}" if c else "-"
+
 
 
 def explain(doc):
@@ -29,11 +34,13 @@ def explain(doc):
                 key, sc = _best_label(" ".join(w.text for w in ln[:n]))
                 if key:
                     near = f"{key} ({sc:.0f})"
-        lines.append({"text": re.sub(r"\b\d{4} \d{4} (\d{4})\b", r"XXXX XXXX \1", " ".join(w.text for w in ln)),
+        lines.append({"text": re.sub(r"\b\d{4}\s?\d{4}\s?(\d{4})\b", r"XXXX XXXX \1", " ".join(w.text for w in ln)),
                       "ocr_conf": round(sum(w.conf for w in ln) / len(ln), 2),
                       "field": hit.key if hit else "", "matched_by": hit.match if hit else "",
                       "label_score": (hit.label_sim if hit else ""), "note": near})
     return {"predicted": doc.doc_type, "best_guess": doc.best_guess, "confidence": doc.type_conf,
             "recognised": doc.doc_type != "unknown", "decision": info.get("decision", ""),
             "types": types, "other_classes": others, "lines": lines,
-            "n_words": len(doc.words), "n_fields": len(doc.fields), "embedding": status()}
+            "n_words": len(doc.words), "n_fields": len(doc.fields), "embedding": status(),
+            "category": _cat_short(doc.class_info.get("category")), "file_category": describe(doc.class_info.get("file_category")),
+            "ocr_engine": doc.facts.get("ocr_engine", "?"), "ocr_conf": doc.facts.get("ocr_mean_conf")}

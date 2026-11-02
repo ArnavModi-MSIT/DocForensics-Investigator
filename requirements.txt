@@ -1,11 +1,13 @@
-numpy
-opencv-python-headless
-pillow
-pytesseract
-pymupdf
-rapidfuzz
-reportlab
-streamlit
-pandas
-anthropic   # optional: LLM-written explanations (set ANTHROPIC_API_KEY)
-fastembed        # optional: semantic page classification (downloads ~130MB model on first run; falls back to keywords if absent)
+numpy>=1.26
+opencv-python-headless>=4.8
+pillow>=10.0
+pytesseract>=0.3.10        # also needs the Tesseract binary (TESSERACT_CMD or PATH)
+pymupdf>=1.24.3            # AGPL-3.0, see README
+rapidfuzz>=3.0
+reportlab>=4.0
+streamlit>=1.50
+pandas>=2.0
+fastembed>=0.3             # optional: semantic classification; ~70 MB model downloaded on first use
+anthropic>=0.30            # optional: LLM summary (opt-in)
+pytest>=7.0
+# last tested with: numpy 2.2, opencv 5.0, pillow 12, pymupdf 1.28, rapidfuzz 3.14, reportlab 5.0, streamlit 1.65, fastembed 0.9

@@ -6,6 +6,8 @@ and produces an evidence-mapped investigation dossier (PDF + JSON) with a full a
 
 > Visual findings are **indicators** of possible alteration, not proof of fraud. All bundled sample data is fictional.
 
+For reviewers: **[ARCHITECTURE.md](ARCHITECTURE.md)** explains how stages 1-4 work, what is tested, the gaps, and open questions.
+
 ## Pipeline
 `Submission -> Page normalisation -> OCR -> Field extraction -> Classification -> Visual forensics -> Contextual checks -> Cross-document correlation -> Evidence mapping -> Dossier`
 
@@ -13,23 +15,26 @@ and produces an evidence-mapped investigation dossier (PDF + JSON) with a full a
 |---|---|---|
 | Ingest | `ingest.py` | Images, PDFs (scanned or generated), ZIP bundles (one zip = one case, safe unpacking). SHA-256 per source, per-page IDs, born-digital PDF detection |
 | Page normalisation | `ingest.py` | Deskew (projection-profile, +/-8 deg), applied only when tilt is significant; angle logged |
-| OCR | `ocr.py` | Tesseract word boxes + confidences |
+| OCR | `ocr.py` | Tesseract word boxes + confidences; on poorly read pages (busy backgrounds, photos) it automatically retries with optional local RapidOCR and classic preprocessing variants and keeps the best reading |
 | Field extraction | `extract.py`, `id_patterns.py` | Fuzzy label dictionary, column-aware label:value cells (labels mid-line), embedding-based label matching for unseen labels, label-free patterns (Aadhaar number with Verhoeff checksum, PAN, name above DOB, address to PIN code). Every field keeps location, confidence and how it was matched |
 | Classification | `extract.py`, `embed_classifier.py` | Embeddings (bge-small via fastembed) + whole-word keywords, veto when a page resembles an unsupported class (research paper, resume, invoice), structural gate (>= 3 expected fields, or strong evidence), multi-page continuation. Falls back to keywords + structure if no model |
 | Visual forensics | `forensics.py` | Per-field ELA, grain noise, paper tone, ink darkness, compared with fields of similar text size on the **same page** (leave-one-out robust z-score), after flattening page lighting. Skipped for born-digital PDFs and when too few comparable fields exist - and the dossier says so |
 | Contextual checks | `correlate.py` | Payslip arithmetic, ID formats, Aadhaar checksum, date logic, completeness |
-| Cross-document | `correlate.py` | Entity matching with odd-one-out detection, income reconciliation (declared vs payslip vs bank) |
+| Categories | `embed_classifier.py` | Every page gets a semantic category with a confidence score (16 classes incl. corporate financial report, resume, contract, invoice ...); files of unsupported types are described instead of just called "unknown" |
+| Cross-document | `correlate.py` | Per-field comparators (names with initials/order, addresses by PIN, employer suffixes, masked numbers), odd-one-out detection, income reconciliation (declared vs payslip gross/net vs bank, across all payslips) |
 | Corroboration | `correlate.py` | A content inconsistency on a field that also shows visual evidence is raised in severity |
 | Summary | `llm.py` | Optional Claude summary grounded only in produced findings; deterministic fallback |
-| Dossier + audit | `dossier.py`, `audit.py` | Annotated pages, PDF/JSON, append-only JSONL audit log |
+| Dossier + audit | `dossier.py`, `audit.py` | Annotated pages, PDF/JSON, hash-chained JSONL audit log |
 
 Every finding carries `refs` = (document, field, value, bounding box) so it traces to the exact region of the source.
 Findings are `potential_manipulation` (visual indicator), `inconsistency` (content conflict) or `observed`.
 
-**Supported document types:** application form, ID card (incl. Aadhaar-style, PAN pattern), salary slip, bank statement.
+**Supported document types:** application form, ID card (Aadhaar, PAN, Voter ID/EPIC layouts), salary slip, bank statement.
 
 ## Setup & run
-Python 3.10+ and the Tesseract binary (`apt install tesseract-ocr`, or the Windows installer from UB-Mannheim; common
+**Windows quick start:** double-click `start.cmd` (or run it in a terminal). It creates a virtual environment, installs dependencies, generates the fictional samples, downloads the semantic model once, and opens the app. `start.cmd test`, `start.cmd eval`, `start.cmd cli <file|folder|zip>` and `start.cmd help` are also available. Tesseract OCR must be installed separately (see below).
+
+Python 3.10 (recommended and what `start.cmd` picks automatically via the `py` launcher; 3.11-3.13 also work) and the Tesseract binary (`apt install tesseract-ocr`, or the Windows installer from UB-Mannheim; common
 install paths are auto-detected, or set `TESSERACT_CMD`).
 ```
 pip install -r requirements.txt
@@ -38,10 +43,13 @@ python synth/generate.py                             # fictional baseline cases 
 python synth/generate.py --hard                      # held-out benchmark cases
 streamlit run app.py                                 # UI (upload images / PDFs / a ZIP, or pick a sample)
 python -m docforensics.pipeline samples/case_tampered --out output/case_tampered     # CLI
-python tests/eval_synth.py                           # benchmark; DOCFOR_EMBED=off to compare without the model
-python tests/test_id_cards.py                        # fictional Aadhaar-style card test
+pytest -q                                            # unit + end-to-end regression tests (exit code != 0 on regression)
+python tests/eval_synth.py                           # full benchmark with pass/fail gates; DOCFOR_EMBED=off to compare without the model
+python tests/test_id_cards.py                        # fictional Aadhaar-style card test (asserts)
 ```
-Optional: `ANTHROPIC_API_KEY` for an LLM-written summary (model via `DOCFOR_MODEL`). Without the embedding model the system
+**OCR engines:** `pip install -r requirements-optional.txt` (`start.cmd` does this automatically and only warns if it fails) installs `rapidocr` + `onnxruntime`, a local second engine (works on Python 3.13+; models are bundled); nothing is sent anywhere. Pages Tesseract reads with mean confidence < 0.60 (or < 8 words) are re-read with RapidOCR, then with preprocessing variants if still poor, and the best reading wins (the engine used is recorded per page in the audit log and `doc.facts['ocr_engine']`). `DOCFOR_OCR=tesseract` disables retries, `DOCFOR_OCR=rapid` tries RapidOCR first, `DOCFOR_OCR_RETRY_CONF` changes the threshold. Without RapidOCR everything still works on Tesseract alone.
+
+Optional LLM summary is **opt-in per run** (UI checkbox, or `--llm` on the CLI) and needs `ANTHROPIC_API_KEY` (model via `DOCFOR_MODEL`). When enabled, finding text (names, numbers, dates taken from the documents) is sent to an external API. Without it a deterministic summary is used. Without the embedding model the system
 still runs on keywords + structure. The UI's *Classification & OCR debug* tab shows exactly what was read and why a page
 was accepted or rejected.
 
@@ -64,9 +72,10 @@ are recognised and extracted; a sales report, a resume and a research paper are 
 ## Capability matrix
 | Capability | Status |
 |---|---|
+| Label-free Indian ID layouts: Aadhaar (checksum), PAN stacked layout, Voter ID (EPIC); back of a card linked to its front by the repeated ID number | Implemented |
 | Images, PDFs, ZIP bundles; multi-document cases; multi-page continuation | Implemented |
 | Deskew, lighting flattening | Implemented (perspective correction planned) |
-| Printed-text OCR, field confidence and boxes | Implemented (Tesseract) |
+| Printed-text OCR, field confidence and boxes | Implemented (Tesseract; optional local RapidOCR second engine for hard pages) |
 | Column-aware and label-free extraction, semantic label matching | Implemented |
 | Classification (embeddings + keywords + structure, unsupported-class veto) | Implemented (4 types) |
 | ELA / noise / tone / ink-darkness tamper indicators | Implemented (peer-relative) |
@@ -89,9 +98,11 @@ are recognised and extracted; a sales report, a resume and a research paper are 
 - Thresholds were tuned on synthetic data; validate on real documents before any production use.
 
 ## Privacy
-- No real documents are in this repository; samples are fictional. `output/` and `models/` are git-ignored.
-- Aadhaar numbers are shown and exported masked (`XXXX XXXX 1234`); full digits are kept in memory only for matching.
+- No real documents are in this repository. The sample cases are fictional and are not stored in git: `synth/generate.py` (run by `start.cmd` on first start, and by the e2e test if missing) recreates them deterministically. `output/` and `models/` are git-ignored.
+- Aadhaar numbers are masked (`XXXX XXXX 1234`) in extracted fields, the dossier JSON/PDF tables, the OCR debug view, and the **evidence images and ELA heat-maps (first 8 digits blacked out)**. Full digits are kept in memory only for matching. The normalised page images written to the local, git-ignored `output/` folder are unredacted copies of the user's own input.
+- The optional LLM summary is off by default and sends finding text to an external API only when explicitly enabled for a run.
+- The audit log is hash-chained per run (`prev`/`hash`, final digest printed in the dossier); it is tamper-evident for a run but is rewritten if the same case folder is re-run.
 
 ## Licences
-Tesseract (Apache-2.0), OpenCV (Apache-2.0), fastembed / bge-small (Apache-2.0 / MIT), PyMuPDF (AGPL-3.0 - fine for this
+Tesseract (Apache-2.0), RapidOCR + PaddleOCR ONNX models (Apache-2.0, optional), ONNX Runtime (MIT), OpenCV (Apache-2.0), fastembed / bge-small (Apache-2.0 / MIT), PyMuPDF (AGPL-3.0 - fine for this
 prototype, review before commercial use), others permissive.
