@@ -42,6 +42,9 @@ class Document:
     words: list = field(default_factory=list)
     fields: list = field(default_factory=list)
     status: str = "ingested"
+    sections: list = field(default_factory=list)    # structure.py: headings + content blocks (dicts)
+    tables: list = field(default_factory=list)      # structure.py: detected tables with rows, columns and checks (dicts)
+    pdf: dict = field(default_factory=dict)         # pdf_layer.py: spans (font, size, draw order), drawings, images of a born-digital page (not serialised)
 
     def get(self, key) -> Optional[Field]:
         for f in self.fields:

@@ -30,15 +30,17 @@ def template_summary(case_id, docs, findings):
     unk = [d for d in docs if d.doc_type == "unknown"]
     if unk and len(unk) == len(docs):
         return (f"Case {case_id}: none of the {len(docs)} submitted page(s) was recognised as a supported document type "
-                f"(application form, ID card, salary slip, bank statement), so no forensic or cross-document analysis was run. "
+                f"(application form, ID card, salary slip, bank statement, employment confirmation), so field extraction, pixel forensics and cross-document analysis were not run (signature marks are still looked for). "
                 f"{_what_it_is(unk)}Reason for {unk[0].doc_id}: {unk[0].class_info.get('decision', 'unrecognised')}.")
     rec = [d for d in docs if d.doc_type != "unknown"]
     ran = [d for d in rec if d.facts.get("forensics") == "run"]
-    not_ran = [d for d in rec if d.facts.get("forensics") != "run"]
-    cov = (f" Visual forensics ran on {len(ran)} of {len(rec)} recognised page(s)" +
-           (f"; it could not run on {len(not_ran)} ({'; '.join(sorted({str(d.facts.get('forensics', '?')) for d in not_ran}))})" if not_ran else "") + ".")
+    pdfd = [d for d in rec if d.born_digital]
+    not_ran = [d for d in rec if d.facts.get("forensics") != "run" and not d.born_digital]
+    cov = (f" Pixel-level visual forensics ran on {len(ran)} of {len(rec)} recognised page(s)" +
+           (f"; PDF structure checks (fonts, overlays, hidden text, file history) ran on {len(pdfd)} generated PDF page(s), where pixel analysis does not apply" if pdfd else "") +
+           (f"; visual checks could not run on {len(not_ran)} ({'; '.join(sorted({str(d.facts.get('forensics', '?')) for d in not_ran}))})" if not_ran else "") + ".")
     if not findings or all(f.kind == "missing" and f.fid.startswith("N-") for f in findings):
-        if rec and not ran:                       # pixel forensics never ran: do not claim anything about visual anomalies
+        if rec and not ran and not pdfd:          # no visual check of any kind ran: do not claim anything about visual anomalies
             return (f"Case {case_id}: {len(docs)} documents analysed; no content inconsistencies were detected by the content and "
                     f"cross-document checks." + cov + " No visual-tampering check was possible, so this is not evidence of authenticity; "
                     "verify against the originals.")

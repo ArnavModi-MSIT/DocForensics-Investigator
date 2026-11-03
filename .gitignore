@@ -7,3 +7,5 @@ models/
 .streamlit/secrets.toml
 .venv/
 samples/
+.pytest_cache/
+.deps_ok

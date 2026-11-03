@@ -5,8 +5,8 @@ Deliverables (ALL THREE or disqualified): (1) PPT -> Google Drive link, public v
 ## Status (2 Nov, night)
 Done: ingest (images/PDF/ZIP), deskew, OCR engine layer (Tesseract baseline + optional local RapidOCR rescue for poorly read pages, no API),
 column-aware + label-free extraction (Aadhaar/PAN/Voter ID), embedding classifier with structural gate and semantic category + confidence for every page/file,
-visual forensics, intra checks, per-field cross-document comparators (initials, PIN-based addresses, employer suffixes, gross/net income logic),
-dossier PDF/JSON, audit trail, Streamlit UI incl. debug tab, synthetic + held-out benchmarks, Windows starter (`start.cmd`).
+section + table detection with running-balance/total/component checks, layout label, duplicate/misplaced-information checks, contextual rules (PAN/name, dates, age, statement internals, payslip vs bank), visual forensics (+ typography, JPEG grid, photo, signature), intra checks, per-field cross-document comparators (initials, PIN-based addresses, employer suffixes, gross/net income logic),
+dossier PDF/JSON, audit trail, Streamlit UI with one tab per pipeline stage (10 tabs), synthetic + held-out benchmarks, Windows starter (`start.cmd`).
 Next: typed-field re-OCR, PDF structure/metadata check, table extraction + running-balance check, real salary slip / PAN / form tests,
 then PPT, demo video (synthetic documents only), final README pass. Before submitting: make the repo public or add the organisers.
 

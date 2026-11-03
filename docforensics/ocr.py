@@ -218,6 +218,10 @@ def _poor(words):
 
 
 def run_ocr(doc, audit):
+    if doc.born_digital and doc.words and doc.facts.get("ocr_engine") == "pdf-text-layer":      # exact text from the PDF itself
+        audit.log("ocr", doc_id=doc.doc_id, engine="pdf-text-layer", n_words=len(doc.words), mean_conf=1.0,
+                  candidates={"pdf-text-layer": [len(doc.words), 1.0]})
+        return doc.words
     ensure_tesseract()
     mode = _mode()
     bgr = cv2.imread(doc.image_path, cv2.IMREAD_COLOR)

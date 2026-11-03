@@ -157,6 +157,7 @@ def ingest(paths, workdir, audit):
             audit.log("input_skipped", name=os.path.basename(p), reason=f"{type(e).__name__}: {e}"[:160])
             continue
         bd = _pdf_born_digital(p) if os.path.splitext(p)[1].lower() == ".pdf" else []
+        file_meta = None
         for i, img in enumerate(pages):
             doc_id = base if len(pages) == 1 else f"{base}_p{i+1}"
             if doc_id in used_ids:                              # same stem from different files (scan.jpg + scan.png)
@@ -166,11 +167,26 @@ def ingest(paths, workdir, audit):
                 doc_id, k_ = f"{doc_id.split('~')[0]}~{k_}", k_ + 1
             used_ids.add(doc_id)
             out = os.path.join(workdir, f"{doc_id}.png")
-            img, skew = deskew(img, audit, doc_id)          # normalised page used by every later stage
+            born = bool(bd[i]) if i < len(bd) else False
+            if born:
+                skew = 0.0                                  # generated page: never rotate it (text-layer coordinates must match the picture)
+            else:
+                img, skew = deskew(img, audit, doc_id)      # normalised page used by every later stage
             img.save(out)
             d = Document(doc_id=doc_id, path=p, sha256=digest, image_path=out,
-                         width=img.width, height=img.height, skew_deg=skew,
-                         born_digital=bool(bd[i]) if i < len(bd) else False)
+                         width=img.width, height=img.height, skew_deg=skew, born_digital=born)
+            if born:
+                from .pdf_layer import read_page, read_meta
+                lay = read_page(p, i) if os.environ.get("DOCFOR_PDF_TEXT", "auto") != "off" else None     # off: read born-digital pages by OCR like scans
+                if lay and lay["words"]:                    # the text layer IS the text: exact, no OCR needed
+                    d.words = lay.pop("words")
+                    d.pdf = lay
+                    file_meta = file_meta or read_meta(p)
+                    d.pdf["meta"] = file_meta
+                    d.facts["ocr_engine"] = "pdf-text-layer"
+                    d.facts["ocr_mean_conf"] = 1.0
+                elif lay is not None:
+                    d.born_digital = False                  # text layer unreadable: treat as an image and OCR it
             docs.append(d)
             audit.log("ingest", doc_id=doc_id, source=os.path.basename(p), sha256=digest,
                       size=[img.width, img.height])

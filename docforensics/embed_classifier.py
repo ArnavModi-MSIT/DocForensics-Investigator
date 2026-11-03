@@ -9,22 +9,29 @@ import os, re, sys, zlib
 import numpy as np
 
 MODEL_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "models"))
-SUPPORTED = ["application_form", "id_card", "salary_slip", "bank_statement"]
+SUPPORTED = ["application_form", "id_card", "salary_slip", "bank_statement", "employment_letter"]
 
 # Reference descriptions. "other:*" types are negative classes for unsupported pages.
 PROTOTYPES = {
     "application_form": [
         "Loan application form. Applicant name, date of birth, ID number, address, employer, declared monthly income.",
-        "Credit application with applicant details and a declaration of income, signed by the applicant."],
+        "Credit application with applicant details and a declaration of income, signed by the applicant.",
+        "Personal credit application. Applicant profile, employment and credit details, employer, monthly gross salary, salary account number, credit amount requested, repayment term, applicant declaration."],
     "id_card": [
         "National identity card. Name, date of birth, ID number, address, issue date.",
-        "Government issued identification card of the holder with identity number and date of issue."],
+        "Government issued identification card of the holder with identity number and date of issue.",
+        "Self-declared identity record. Subject details: declared name, declared date of birth, identifier, residential address on file, issuance and declaration, issued date, review due date."],
     "salary_slip": [
         "Salary slip for the month. Employee name, employer, gross earnings, total deductions, net pay.",
-        "Payslip showing earnings and deductions breakdown and the net salary paid."],
+        "Payslip showing earnings and deductions breakdown and the net salary paid.",
+        "Salary statement for the payroll period. Payroll identification, employee name, employee ID, payment date, earnings and deductions, gross pay, total deductions, net pay take-home."],
     "bank_statement": [
         "Bank account statement. Account holder, account number, statement period, opening balance, salary credit, closing balance.",
-        "Statement of account listing credits, debits and running balance for a period."],
+        "Statement of account listing credits, debits and running balance for a period.",
+        "Account transaction statement. Account ownership, account holder, account number, statement date, transaction activity with date, description, credit, debit, balance, closing balance."],
+    "employment_letter": [
+        "Employment and income confirmation issued by the employer. Employee full name, employee ID, employer, employment type, employment start date, monthly gross salary, annualized gross salary, period confirmed.",
+        "Employment verification letter confirming that the named employee works for the company, with joining date, designation, salary and signed by the HR department."],
     "other:research_paper": [
         "Abstract. Introduction. Related work. Methodology. Experiments and results. Conclusion. References. A research paper on machine learning."],
     "other:resume": [
@@ -48,7 +55,12 @@ PROTOTYPES = {
     "other:utility_bill": [
         "Electricity, gas, water or telephone bill. Consumer number, billing period, meter reading, units consumed, amount due, due date."],
     "other:certificate": [
-        "Certificate or marksheet issued by a school or university. This is to certify that the student has passed, grade, marks obtained, seat number, degree awarded."],
+        "Certificate or marksheet issued by a school or university. This is to certify that the student has passed, grade, marks obtained, seat number, degree awarded.",
+        "Certificate of completion. This is to certify that the named person has successfully completed the course or training programme, issued on the date, certificate ID, authorized signatory, director.",
+        "Certificate of participation, appreciation or achievement presented to the named person for participating in or winning the event, hackathon, competition or workshop, organised by, signature of the organiser.",
+        "Certificate of Participation. This is to certify that the named person from the college or institute has participated in the challenge, contest or event. Place, date, signed by the chief officer or head.",
+        "Certificate of Appreciation, Merit or Excellence. This certificate is awarded to the participant in recognition of their contribution to the programme. Name and designation of the signatory, date, place.",
+        "Internship, experience or bonafide certificate. This is to certify that the person worked as an intern or employee in the department from date to date. HR manager, signature, seal."],
     "other:medical_report": [
         "Medical or laboratory report. Patient name, doctor, diagnosis, test results with reference ranges, prescription, hospital."],
     "other:presentation_brochure": [
@@ -57,11 +69,11 @@ PROTOTYPES = {
 
 # Human-readable names for every class (supported types and the broader category list).
 CATEGORY_NAMES = {
-    "application_form": "Application form", "id_card": "ID card", "salary_slip": "Salary slip", "bank_statement": "Bank statement",
+    "application_form": "Application form", "id_card": "ID card", "salary_slip": "Salary slip", "bank_statement": "Bank statement", "employment_letter": "Employment confirmation",
     "other:research_paper": "Research paper", "other:resume": "Resume / CV", "other:invoice": "Invoice / bill",
     "other:article_letter": "Letter / article / prose document", "other:financial_report": "Corporate financial report",
     "other:business_report": "Business / sales report", "other:contract": "Contract / agreement / policy",
-    "other:tax_form": "Tax form / certificate", "other:utility_bill": "Utility bill", "other:certificate": "Academic certificate / marksheet",
+    "other:tax_form": "Tax form / certificate", "other:utility_bill": "Utility bill", "other:certificate": "Certificate (completion / participation / academic)",
     "other:medical_report": "Medical / lab report", "other:presentation_brochure": "Presentation / brochure",
 }
 CAT_TEMP = float(os.environ.get("DOCFOR_CAT_TEMP", "0.03"))   # softmax temperature turning cosine scores into a confidence
