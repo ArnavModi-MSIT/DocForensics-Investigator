@@ -79,7 +79,6 @@ python tests/test_id_cards.py                        # fictional Aadhaar-style c
 
 Optional LLM summary is **opt-in per run** (UI checkbox, or `--llm` on the CLI) and needs `ANTHROPIC_API_KEY` (model via `DOCFOR_MODEL`). When enabled, finding text (names, numbers, dates taken from the documents) is sent to an external API. Without it a deterministic summary is used. Without the embedding model the system
 still runs on keywords + structure. The UI has three tabs: **Dossier** (verdict banner, summary, downloads, findings with zoomed evidence, why it needs a look, suggested check and a reviewer-decision form, cross-document comparison, areas requiring verification), **Documents** (annotated page, extracted fields, tables; classification, OCR and forensic details are collapsed under "How this page was processed") and **Audit & history** (chain status, runs, reviewer decisions, processing log).
-was accepted or rejected.
 
 ## Results (synthetic benchmark - self-generated, treat as evidence the pipeline works, not as real-world accuracy)
 Clean pages never produced a false alarm, and classification was correct on every case.
