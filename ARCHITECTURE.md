@@ -391,3 +391,15 @@ PDF and JSON are organised as: 7.1 Document Overview (source file, type, size, p
 
 ### 14.7 Image checks (`forensics_clone.py`)
 *Copy-move.* Source blocks (16 px, every 4 px) are matched against target blocks at every pixel by hashed low-frequency DCT features; pairs that share one shift vector are grouped; the group must cover a compact area and the two areas must correlate in their noise residual taken on flat pixels only (text edges are identical for identical glyphs and would otherwise make repeated text look cloned). Tested: a pasted area at an off-grid shift is found raw and after JPEG quality 95-98; repeated text with independent noise and clean pages give nothing; a 22-case benchmark and the real files show no new findings. Limits: copies recompressed below about quality 92 lose their noise and are missed; resized or rotated copies are not found; born-digital pages are skipped. Findings are low severity observations, medium and `potential_manipulation` only when a region holds an extracted field. *Image metadata:* editor named in Software / PNG text, or modification time later than capture time; most scans carry no metadata and nothing is reported.
+
+### 14.8 Layout variants from a third set of generated PDFs (5 Nov 2026)
+Three fictional PDFs (a bank statement and two payslips, one with its net pay changed) exposed layout gaps that the earlier sets did not. Fixes, all generic:
+- **Diagonal text is not part of the reading order.** Rotated lines (watermarks such as "SYNTHETIC TEST DATA") are read from the PDF but excluded from the words used for line grouping, headings and tables (`pdf_layer._rotated_lines`); they are kept in `pdf["rotated_text"]`. Before, a watermark word with a huge box could join a table row.
+- **Label variants.** A bare "Gross" is a gross-pay label; a bracketed note after a label ("Deductions (PF+Tax)", "Bank A/C (last 4)") belongs to the label, not to the value; a bracket without letters ("(10,000)") stays a negative amount.
+- **Masked account numbers** ("XXXX XXXX 4821") are accepted as a field and compared by their visible digits.
+- **Title-line fields:** the pay month from "Salary Slip for October 2026" and the statement period from "Account Statement: 01-Oct-2026 to 31-Oct-2026".
+- **Dates printed without a year** ("31-Oct") take the year of the statement period, so the payroll credit gets a date; a bare "SAL ..." narration counts as a payroll credit.
+- **New cross-document check:** two payslips of one employee and month must show the same net pay, gross and deductions (`correlate._same_month_slips`).
+- **Corroboration:** a visual finding that sits on a value that also breaks an exact check gains confidence once (+0.10), then only +0.02 per further finding.
+- **Dossier front page:** counts findings about the documents separately from coverage notes.
+Tests: `tests/test_layout_variants.py`. Known gap: a statement that prints no debit column leaves withdrawals unreadable, so only the rows with a printed credit are checked (reported as a coverage note).

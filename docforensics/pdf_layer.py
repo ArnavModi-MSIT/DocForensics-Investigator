@@ -36,6 +36,30 @@ def _rgb(c):
     return c if len(c) == 3 else ((c[0],) * 3 if len(c) == 1 else None)
 
 
+def _rotated_lines(pg, min_angle=0.08):
+    """[(bbox_pt, text)] of text lines whose direction is not horizontal (|sin| > min_angle)."""
+    found = []
+    try:
+        for blk in pg.get_text("dict").get("blocks", ()):
+            for ln in blk.get("lines", ()):
+                dx, dy = ln.get("dir", (1.0, 0.0))
+                if abs(dy) > min_angle:
+                    txt = " ".join(sp.get("text", "") for sp in ln.get("spans", ())).strip()
+                    if txt:
+                        found.append((tuple(float(v) for v in ln["bbox"]), txt))
+    except Exception:
+        pass
+    return found
+
+
+def _in_rotated(box, text, rotated, tol=3.0):
+    """True when the word box sits inside a rotated line's box and its text belongs to that line."""
+    for bb, txt in rotated:
+        if text in txt and box[0] >= bb[0] - tol and box[1] >= bb[1] - tol and box[2] <= bb[2] + tol and box[3] <= bb[3] + tol:
+            return True
+    return False
+
+
 def read_page(path, index):
     """Everything the PDF says about page `index`: words (as schema.Word in page-image pixels), spans (text with font, size,
     colour, draw order), drawings (filled / stroked shapes with draw order) and images. Returns None when the page cannot be read."""
@@ -46,10 +70,12 @@ def read_page(path, index):
     except Exception:
         return None
     out = {"words": [], "spans": [], "drawings": [], "images": [], "page_pt": [pg.rect.width, pg.rect.height]}
+    rotated = _rotated_lines(pg)                           # diagonal / vertical text (watermarks such as "SAMPLE" or "COPY") is not part of the reading order
+    out["rotated_text"] = [t for _, t in rotated]
     try:
         for x0, y0, x1, y1, t, *_ in pg.get_text("words"):
             t = t.strip()
-            if t:
+            if t and not _in_rotated((x0, y0, x1, y1), t, rotated):
                 out["words"].append(Word(t, _word_px((x0, y0, x1, y1)), 1.0))
     except Exception:
         return None

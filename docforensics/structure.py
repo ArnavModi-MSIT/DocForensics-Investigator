@@ -178,8 +178,36 @@ def _anchors(num_cols, money_words, h):
     return anchors
 
 
+# ----------------------------------------------------------------------------------------------- dates printed without a year
+_MONTHS = {m: i + 1 for i, m in enumerate(["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"])}
+
+
+def _year_hint(doc):
+    """Year of the statement, taken from its period / pay month field: statements often print '05-Oct' without a year."""
+    for key in ("period", "pay_month", "doc_date", "issue_date"):
+        f = doc.get(key) if hasattr(doc, "get") else None
+        m = re.search(r"(?:19|20)\d{2}", str(getattr(f, "raw", "") or ""))
+        if m:
+            return int(m.group(0))
+    return None
+
+
+def _day_month(txt, year):
+    """'05-Oct' / '5 October' -> 'YYYY-MM-DD' using the statement's year; None when no year is known or the text is not a day and month."""
+    if not year:
+        return None
+    m = re.fullmatch(r"\s*(\d{1,2})[-/. ]+([A-Za-z]{3,9})\.?\s*", txt or "")
+    if not m or m.group(2)[:3].lower() not in _MONTHS:
+        return None
+    try:
+        import datetime as _dt
+        return _dt.date(year, _MONTHS[m.group(2)[:3].lower()], int(m.group(1))).isoformat()
+    except ValueError:
+        return None
+
+
 # ----------------------------------------------------------------------------------------------- transactions
-def _build_transactions(hdr, body, page_w):
+def _build_transactions(hdr, body, page_w, year_hint=None):
     cells = hdr["cells"]
     h = hdr["h"]
     num_cols = [c for c in cells if c["kind"] in NUMERIC]
@@ -223,7 +251,7 @@ def _build_transactions(hdr, body, page_w):
             kind = col["kind"] or "other"
             vals.setdefault(kind, []).extend(ws)
         date_txt = " ".join(w.text for w in sorted(vals.get("date", []), key=lambda w: w.bbox[0]))
-        iso = parse_date(date_txt) if date_txt else None
+        iso = (parse_date(date_txt) or _day_month(date_txt, year_hint)) if date_txt else None
         has_amt = any(k in vals for k in NUMERIC)
         first_x = ln_sorted[0].bbox[0]
         if iso or has_amt:
@@ -514,7 +542,7 @@ def detect_structure(doc, audit=None):
             nxt = headers[n + 1]["y"] if n + 1 < len(headers) else 1e9
             body = [ln for ln, m in zip(lines, metrics) if m["y0"] >= hdr["bottom"] - 2 and m["y0"] < nxt - 2
                     and not any(id(w) in band_ids for w in ln)]
-            t = (_build_transactions(hdr, body, doc.width) if hdr["kind"] == "transactions"
+            t = (_build_transactions(hdr, body, doc.width, _year_hint(doc)) if hdr["kind"] == "transactions"
                  else _build_components(hdr, body, doc.width))
             if t:
                 t["tid"] = f"T{len(doc.tables) + 1}"
@@ -533,8 +561,8 @@ def detect_structure(doc, audit=None):
 
 
 # ----------------------------------------------------------------------------------------------- fields derived from tables
-PAYROLL_RE = re.compile(r"(?i)\b(payroll|salary|wages?|stipend|remuneration|pay\s*credit|sal\s*cr)\b")
-PAYER_RE = re.compile(r"(?i)^\W*(payroll|salary|wages?|stipend|remuneration|pay\s*credit|sal\s*cr)\W*(credit(ed)?|payment|deposit)?\W*(from|by|-|:|\|)?\s*")
+PAYROLL_RE = re.compile(r"(?i)\b(payroll|salary|sal|wages?|stipend|remuneration|pay\s*credit|sal\s*cr)\b")
+PAYER_RE = re.compile(r"(?i)^\W*(payroll|salary|sal|wages?|stipend|remuneration|pay\s*credit|sal\s*cr)\W*(credit(ed)?|payment|deposit)?\W*(from|by|-|:|\|)?\s*")
 
 
 def derive_table_fields(doc, audit=None):

@@ -37,11 +37,12 @@ LABELS = {
     "case_ref": ["case reference", "case no", "case number", "application reference"],
     "doc_date": ["submitted", "signed", "generated", "date submitted", "submitted on", "signed on", "generated on"],
     "issue_date": ["issue date", "date of issue", "issued date"],
-    "gross": ["gross earnings", "gross salary", "gross pay"],
+    "gross": ["gross", "gross earnings", "gross salary", "gross pay", "gross amount", "total gross", "gross total"],
     "deductions": ["total deductions", "deductions"],
     "net_pay": ["net pay", "net salary", "take home", "net pay / take home"],
     "pay_month": ["pay month", "month", "salary month", "payroll period", "period confirmed", "salary period"],
-    "account_no": ["account number", "account no", "a/c no", "salary account number", "salary account no", "salary account"],
+    "account_no": ["account number", "account no", "a/c no", "salary account number", "salary account no", "salary account", "bank a/c", "bank account",
+                   "bank account number", "bank account no"],
     "period": ["statement period", "statement date", "period"],
     "opening_balance": ["opening balance", "balance forward", "balance brought forward", "balance b/f"],
     "salary_credit": ["salary credit", "salary credited"],
@@ -143,7 +144,7 @@ def _value_ok(key, raw):
     if key == "employment_type":
         return sum(c.isalpha() for c in raw) >= 4 and "@" not in raw
     if key == "account_no":
-        return sum(c.isdigit() for c in raw) >= 6
+        return sum(c.isdigit() for c in raw) >= 6 or _masked_number(raw) is not None
     if key == "period":                              # a date, a date range, or month + year
         return bool(DATE_LIKE.search(raw) or (MONTH_RE.search(raw) and YEAR_RE.search(raw)))
     if key == "pay_month":                           # month name, month/year or a year
@@ -414,6 +415,14 @@ LABEL_GUARD_KEYS = {"name", "father_name", "employer", "address", "branch", "acc
                     "term", "currency"}
 
 
+def _masked_number(raw):
+    """'XXXX XXXX 4821' / '****4821' -> 'XXXXXXXX4821' (mask characters plus 3 to 8 visible digits); None when it is not a masked number."""
+    compact = re.sub(r"[\s-]", "", (raw or "").strip())
+    if re.fullmatch(r"(?i)[X*\u2022#]{2,}\d{3,8}", compact):
+        return re.sub(r"[*\u2022#]", "X", compact.upper())
+    return None
+
+
 def looks_like_label(raw):
     """True when `raw` is itself a field label ('DATE OF BIRTH', 'MONTHLY GROSS SALARY'). In grid layouts the text next to or under a
     label is often another label; it must never be stored as the value."""
@@ -452,6 +461,9 @@ def finalize_value(key, raw):
         joined = re.sub(r"\s", "", raw)                  # spaced digit groups (12-digit style IDs)
         return (raw, joined.upper()) if _value_ok(key, raw) and re.fullmatch(r"[0-9 ]{10,}", raw) else None
     if key == "account_no":
+        masked = _masked_number(raw)
+        if masked:                                       # statements and slips often print only the last digits ('XXXX XXXX 4821')
+            return raw, masked
         return (raw, re.sub(r"\s", "", raw)) if _value_ok(key, raw) and re.fullmatch(r"[0-9 ]{6,}", raw) else None
     if key in ("employee_id", "case_ref"):                  # first token only; the rest must be short OCR junk
         parts = raw.split(None, 1)
@@ -676,6 +688,46 @@ def mask_aadhaar(digits):
     return "XXXX XXXX " + d[-4:] if len(d) == 12 else "XXXX"
 
 
+_MON = r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?"
+_DT = r"(?:\d{1,2}[-/. ](?:" + _MON + r"|\d{1,2})[-/. ,]*\d{2,4})"
+TITLE_MONTH = re.compile(r"(?i)\b(?:salary\s+slip|pay\s*slip|salary\s+statement|pay\s+statement|payroll)\b[\s:,\-]*(?:for|of|month of)?[\s:,\-]*"
+                         r"(?P<v>" + _MON + r"\s*,?\s*(?:19|20)\d{2})")
+TITLE_RANGE = re.compile(r"(?i)\bstatement\b[\s:,\-]*(?:period|date)?[\s:,\-]*(?P<v>" + _DT + r"\s*(?:to|-|\u2013|\u2014)\s*" + _DT + r")")
+
+
+def extract_context_fields(doc, audit):
+    """Fields stated inside a title line rather than next to a label: 'Salary Slip for October 2026' (pay month) and
+    'Account Statement: 01-Oct-2026 to 31-Oct-2026' (statement period). Only added when no labelled field of that key exists."""
+    have = {f.key for f in doc.fields}
+    added = []
+    for ln in _lines(doc):
+        text = " ".join(w.text for w in ln)
+        for key, rx in (("pay_month", TITLE_MONTH), ("period", TITLE_RANGE)):
+            if key in have:
+                continue
+            m = rx.search(text)
+            if not m:
+                continue
+            raw = m.group("v").strip()
+            if not _value_ok(key, raw):
+                continue
+            pos, ws = 0, []
+            for w in ln:                                          # words overlapping the matched span
+                lo, hi = pos, pos + len(w.text)
+                if hi > m.start("v") and lo < m.end("v"):
+                    ws.append(w)
+                pos = hi + 1
+            if not ws:
+                continue
+            bbox = (min(w.bbox[0] for w in ws), min(w.bbox[1] for w in ws), max(w.bbox[2] for w in ws), max(w.bbox[3] for w in ws))
+            doc.fields.append(Field(key=key, label="title line", raw=raw, value=raw, bbox=bbox,
+                                    conf=round(sum(w.conf for w in ws) / len(ws), 3), match="title", label_sim=100.0))
+            have.add(key)
+            added.append(key)
+    if added:
+        audit.log("context_fields", doc_id=doc.doc_id, added=added)
+
+
 def extract_id_patterns(doc, audit):
     """Label-free extraction for Indian ID documents (see id_patterns.py). Adds, only when missing:
     aadhaar_no (kept separate from the PAN-style id_number so different ID kinds are never compared),
@@ -732,6 +784,20 @@ def extract_id_patterns(doc, audit):
     return added
 
 
+def _split_qualifier(words):
+    """(qualifier_words, rest): a bracketed note right after a label ('(PF+Tax)', '(last 4)', '(INR)') is part of the label, not of the value.
+    Brackets without letters ('(10,000)' = negative amount) stay in the value."""
+    if not words or not words[0].text.startswith("("):
+        return [], words
+    for i in range(min(len(words), 5)):
+        if ")" in words[i].text:
+            inner = " ".join(w.text for w in words[:i + 1])
+            if re.search(r"[A-Za-z]{2}", inner) and words[i].text.rstrip(".,:;").endswith(")"):
+                return list(words[:i + 1]), list(words[i + 1:])
+            break
+    return [], words
+
+
 def extract_fields(doc, audit):
     lines = _lines(doc)
     fields = []
@@ -749,6 +815,9 @@ def extract_fields(doc, audit):
         label_words, value_words = ln[:n], ln[n:]
         if _bad_label(" ".join(w.text for w in label_words)):
             continue
+        qual, rest = _split_qualifier(value_words)                 # 'Deductions (PF+Tax) 10,000': the bracket belongs to the label
+        if qual and rest:
+            label_words, value_words = label_words + qual, rest
         # a leading ':' glued to the first value token
         if value_words and value_words[0].text == ":":
             value_words = value_words[1:]
@@ -788,6 +857,7 @@ def extract_fields(doc, audit):
     extract_stacked(doc, audit)
     extract_cells(doc, audit)
     extract_id_patterns(doc, audit)
+    extract_context_fields(doc, audit)
     doc.status = "extracted"
     audit.log("extract", doc_id=doc.doc_id, fields=[f.key for f in doc.fields])
     return doc.fields

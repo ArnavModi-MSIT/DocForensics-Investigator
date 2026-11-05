@@ -24,6 +24,12 @@ def group_of(f):
     return {"intra": "inconsistencies", "visual": "visual", "cross": "cross"}.get(f.kind, "inconsistencies")
 
 
+def _finding_counts(findings):
+    notes = sum(1 for f in findings if group_of(f) == "notes")
+    real = len(findings) - notes
+    return (f"{real} finding(s) about the documents" + (f" and {notes} coverage note(s) (fields that could not be read, checks that did not apply)" if notes else "") + ".")
+
+
 def processing_summary(docs, findings, corr):
     """Short facts about what ran: pages, how the text was read, fields, tables, checks."""
     rec = [d for d in docs if d.doc_type != "unknown"]
@@ -41,7 +47,7 @@ def processing_summary(docs, findings, corr):
              f"Visual forensics: pixel-level checks on {len(pix)} page(s), PDF structure checks on {len(pdf)} generated PDF page(s).",
              f"Cross-document: {len(m)} field(s) compared across documents ({cnt('agree')} agree, {cnt('differ')} differ, {cnt('single')} in one document only, "
              f"{cnt('unverifiable')} could not be compared); {len((corr or {}).get('links', []))} document pair(s) linked by shared identifiers.",
-             f"{len(findings)} finding(s) in total."]
+             _finding_counts(findings)]
     return lines
 
 

@@ -134,11 +134,12 @@ Everything here is fictional; no real document or personal data is committed.
 | `demo_data/case_clean` | application form, ID card, salary slip, bank statement (images) | consistent case, no substantive finding |
 | `demo_data/case_tampered` | the same case with planted edits (`truth.json` lists where) | date-of-birth and net-pay patches (potential alteration), arithmetic, name/ID/DOB/income mismatches across documents |
 | `demo_data/case_scan_tampered` | the tampered case after a scan-like degradation | same findings through noisier images |
+| `demo_data/pdf_slips_and_bank` | born-digital PDFs generated separately with another AI tool: a bank statement and two payslips of the same month, one with the net pay changed (each file says it is a fictional test fixture) | net pay in a different font, payslip arithmetic that does not balance, the two payslips disagreeing, neither net pay matching the bank salary credit, a statement running balance that does not reconcile; a diagonal watermark is ignored when reading |
 | `demo_data/pdf_payslip_clean` / `pdf_payslip_patched` | born-digital PDF payslip, clean and with the net pay overpainted | patch and font change reported as a potential alteration plus the arithmetic inconsistency; pixel forensics reported as not applicable |
 
 `python synth/make_demo.py` rebuilds these folders. Run the CLI on one (`python -m docforensics.pipeline demo_data/case_tampered --out output/case_tampered`) or upload the files in the UI.
 
-**Sample investigation dossier:** `docs/sample_dossier/case_tampered/dossier.pdf` (plus `dossier.json`, the hash-chained `audit.jsonl` and the `evidence/` crops) and `docs/sample_dossier/pdf_payslip_patched/`. Verify an audit log with `python -m docforensics.audit verify docs/sample_dossier/case_tampered/audit.jsonl`.
+**Sample investigation dossier:** `docs/sample_dossier/case_tampered/dossier.pdf` (plus `dossier.json`, the hash-chained `audit.jsonl` and the `evidence/` crops) `docs/sample_dossier/pdf_payslip_patched/` and `docs/sample_dossier/pdf_slips_and_bank/`. Verify an audit log with `python -m docforensics.audit verify docs/sample_dossier/case_tampered/audit.jsonl`.
 
 ## Known limitations
 - **Skilled forgeries are not detected by pixel forensics.** If font, ink and paper tone are matched and all numbers stay

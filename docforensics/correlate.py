@@ -293,12 +293,50 @@ def _amount_checks(docs, nid, skip_declared=False):
     return out
 
 
+_MON3 = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+
+
+def _month_key(raw):
+    """'October 2026' / 'Oct-2026' -> '2026-10'; None when no month and year can be read."""
+    m = re.search(r"(?i)\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b", str(raw or ""))
+    y = re.search(r"\b(19|20)\d{2}\b", str(raw or ""))
+    return f"{y.group(0)}-{_MON3.index(m.group(1).lower()) + 1:02d}" if m and y else None
+
+
+def _same_month_slips(docs, nid):
+    """Two payslips of the same employee for the same month must show the same pay. A copy with one amount changed is exactly this."""
+    out, groups = [], {}
+    for d in docs:
+        if d.doc_type != "salary_slip":
+            continue
+        month = _month_key(d.get("pay_month").raw if d.get("pay_month") else None)
+        who = (d.get("employee_id").value if d.get("employee_id") else None) or (d.get("id_number").value if d.get("id_number") else None) \
+            or (d.get("name").value if d.get("name") else None)
+        if month and who:
+            groups.setdefault((str(who).upper(), month), []).append(d)
+    for (who, month), ds in groups.items():
+        if len(ds) < 2:
+            continue
+        for key, label in (("net_pay", "net pay"), ("gross", "gross pay"), ("deductions", "deductions")):
+            have = [(d, _num(d, key)) for d in ds if _num(d, key) is not None]
+            if len(have) < 2:
+                continue
+            hi, lo = max(have, key=lambda x: x[1]), min(have, key=lambda x: x[1])
+            if hi[1] - lo[1] > max(1.0, 0.01 * hi[1]):
+                out.append(Finding(nid(), "cross", f"Payslips for the same employee and month show different {label}", "high", 0.9, "inconsistency",
+                                   "; ".join(f"{d.doc_id}: {v:,.0f}" for d, v in have) + f" (employee {who}, {month}). Two payslips for one month should agree; "
+                                   f"either one was changed or they come from different sources. This is a data conflict to verify with the employer, not proof of fraud.",
+                                   [_ref(d, key) for d, _ in have], metrics={key: [v for _, v in have], "difference": round(hi[1] - lo[1], 2)},
+                                   method="same-month payslip comparison"))
+    return out
+
+
 def _income_checks(docs, nid):
     """Declared income vs payslips vs bank credits, across ALL payslips / statement pages (not one per type).
     People often declare GROSS monthly income while the bank shows NET credit, so a declared amount is only flagged
     HIGH when it exceeds even the largest amount any document shows; against net-only evidence it is flagged as a
     medium 'verify' item that names the gross/net possibility."""
-    out = []
+    out = _same_month_slips(docs, nid)
     slips = [(d, _num(d, "net_pay"), _num(d, "gross")) for d in docs if d.doc_type == "salary_slip" and _num(d, "net_pay") is not None]
     credits = _payroll_credits(docs)
     forms = [d for d in docs if d.doc_type == "application_form" and _num(d, "declared_income") is not None]
@@ -398,6 +436,6 @@ def corroborate(visual, others):
             o.explanation += f" Corroborated by visual evidence ({', '.join(h.fid for h in hit)}) on the same field."
             o.metrics["corroborated_by"] = [h.fid for h in hit]
             for h in hit:
-                h.confidence = round(min(0.98, h.confidence + 0.03), 2)
+                h.confidence = round(min(0.9, h.confidence + (0.02 if h.metrics.get("corroborated_by") else 0.10)), 2)   # two independent lines of evidence; the first one counts most
                 h.metrics.setdefault("corroborated_by", []).append(o.fid)
     return others
