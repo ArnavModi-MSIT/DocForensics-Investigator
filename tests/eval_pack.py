@@ -1,4 +1,4 @@
-"""Score the system against an organiser-style ground-truth pack (synthetic documents with planted findings).
+"""Score the system against a ground-truth pack (synthetic documents with planted findings).
 
     python -m tests.eval_pack [PACK_DIR] [--cases A,B,C,D] [--keep]
 

@@ -187,7 +187,7 @@ STANDARDS = [
      "Each source file is hashed (SHA-256) at ingest; originals are never modified (analysis uses derived copies, recorded in the log); every step is written to a hash-chained audit log with archived run history.",
      "No acquisition or custody control before upload: the system only sees the copy it is given. No write protection or collection records for the original device or system."),
     ("ISO/IEC 27041 (suitability and adequacy of investigative methods)",
-     "Methods are documented (ARCHITECTURE.md), tested on a synthetic benchmark and an organiser test pack with an answer key, and limitations are stated openly (skilled forgeries, tuning on synthetic data).",
+     "Methods are documented (ARCHITECTURE.md), tested on a synthetic benchmark and a separately generated synthetic test pack with an answer key, and limitations are stated openly (skilled forgeries, tuning on synthetic data).",
      "No formal validation study, no measured error rates on real documents, no independent testing."),
     ("ISO/IEC 27042 (analysis and interpretation of digital evidence)",
      "Findings separate a data inconsistency, a potential alteration and an observation; each has a confidence level, possible explanations and a suggested check; nothing is called fraud; the pipeline is deterministic and repeatable.",

@@ -93,12 +93,12 @@ Clean pages never produced a false alarm, and classification was correct on ever
 Field extraction: about 95-100%. The remaining errors are OCR slips on IDs, which can cause false content mismatches.
 Thresholds were tuned on this synthetic data, so expect lower numbers on real documents.
 
-### Organiser-style test pack (blind, never used for tuning before the first run)
+### Second synthetic test pack (generated separately with another AI tool; not supplied by the organisers)
 `python -m tests.eval_pack PACK_DIR` scores a pack with an answer key (`GROUND_TRUTH.json`, kept out of the uploaded folders).
-On the supplied synthetic pack (case A clean control, B edited salary, C two cross-document mismatches, D noisy scanned identity):
+On this pack (case A clean control, B edited salary, C two cross-document mismatches, D noisy scanned identity):
 108/108 source fields located with the right text, 5/5 planted findings found with evidence boxes (IoU 0.99-1.00), 0 substantive findings on the
 two clean controls. B-03 is reported as a *potential alteration* (observation), B-01/B-02/C-01/C-02 as *inconsistencies*, never as fraud.
-The first blind run, before the stacked-layout and text-layer work, scored 0/5 with false HIGH findings on the clean control; that is why the pack is now part of the regression checks.
+The first blind run, before the stacked-layout and text-layer work, scored 0/5 with false HIGH findings on the clean control; the pack was used to drive those fixes, so it now serves as a regression check and no longer as a held-out test.
 
 Real files used for checking behaviour (not part of the benchmark, not in this repo): a bank statement and an Aadhaar card
 are recognised and extracted; a sales report, a resume and a research paper are rejected.
@@ -163,7 +163,7 @@ We draw on ISO/IEC 27037, 27041, 27042, NIST SP 800-86 and the OWASP Machine Lea
 | Framework | What we do | What we do not do |
 |---|---|---|
 | ISO/IEC 27037 (collecting and preserving digital evidence) | SHA-256 of every source file at ingest; originals never modified (derived copies only); hash-chained audit log, archived run history | No acquisition or custody control before upload; the system only sees the copy it is given |
-| ISO/IEC 27041 (suitability of investigative methods) | Documented methods, synthetic benchmark plus an organiser test pack with an answer key, limitations stated | No formal validation study or error rates on real documents |
+| ISO/IEC 27041 (suitability of investigative methods) | Documented methods, synthetic benchmark plus a separately generated synthetic test pack with an answer key, limitations stated | No formal validation study or error rates on real documents |
 | ISO/IEC 27042 (analysis and interpretation) | Inconsistency / potential alteration / observation kept apart, confidence levels, possible explanations, suggested checks, never "fraud"; deterministic and repeatable | Confidence is not a calibrated probability |
 | NIST SP 800-86 (forensics in incident response) | Collection, examination, analysis, reporting phases map to ingest, extraction and forensic checks, contextual and cross-document analysis, dossier | Live-system and volatile data are out of scope |
 | OWASP ML Top 10 | No training or hosted model (theft, poisoning, inversion, membership inference do not apply); embedding model checked against recorded SHA-256 values and logged; hash-chained audit and review logs; Claude summary off by default | Adversarial inputs are not tested; recorded hashes come from our own first download, not a publisher signature; bundled RapidOCR models not separately pinned; the optional summary sends finding text to an external API |

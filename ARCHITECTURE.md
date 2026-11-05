@@ -354,9 +354,9 @@ Five independent reviews were received. We reproduced each claimed defect before
 **Added 2 Nov (Indian ID layouts):** Voter ID (EPIC) and unlabelled PAN layouts, `father_name` field, bilingual-label tolerance (leading low-confidence OCR noise is dropped before label matching, never values), same-ID back-of-card continuation, and a texture rule so decorated card backgrounds are not judged by peer-relative pixel forensics (a genuine PAN specimen had been flagged before this rule). Tested with mock OCR lines and a fictional specimen; real Voter ID and PAN scans still need to be re-run by the team.
 
 
-## 14. Organiser test pack: what failed, what changed (3 Nov 2026)
+## 14. Second synthetic test pack: what failed, what changed (3 Nov 2026)
 
-The first blind run of an organiser-style pack (5 born-digital PDFs per case, stacked "label above value" layout) scored 0/5 planted findings and raised false HIGH findings on the clean control. Root causes and fixes:
+The first blind run of a separately generated synthetic pack (not from the organisers; 5 born-digital PDFs per case, stacked "label above value" layout) scored 0/5 planted findings and raised false HIGH findings on the clean control. Root causes and fixes:
 
 | Cause | Fix |
 |---|---|
