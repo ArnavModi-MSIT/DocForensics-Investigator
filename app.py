@@ -108,7 +108,7 @@ def finding_card(f, expanded=False):
         if cp and os.path.exists(cp):
             left, right = st.columns([3, 2])
             left.image(cp)
-            right.markdown(f"**Why it needs a look**  \n{ev['why']}\n\n**Suggested check**  \n{ev['check']}")
+            right.markdown(f"**Why it needs a look**  \n{ev['why']}\n\n**Suggested check**  \n{ev['check']}\n\n**Possible explanations**  \n" + "  \n".join("• " + x for x in ev.get("explanations", [])))
         elif ev:
             st.markdown(f"**Why it needs a look:** {ev['why']}  \n**Suggested check:** {ev['check']}")
         if ev:

@@ -46,10 +46,15 @@ def template_summary(case_id, docs, findings):
                     "verify against the originals.")
         return (f"Case {case_id}: {len(docs)} documents analysed; no content inconsistencies or visual anomalies were detected." + cov +
                 " Absence of findings does not prove authenticity.")
-    top = sorted(findings, key=lambda f: ({"high": 0, "medium": 1, "low": 2}[f.severity], -f.confidence))[:4]
+    real = [f for f in findings if f.kind != "missing"]                       # coverage notes are counted separately, as in the dossier overview
+    notes = len(findings) - len(real)
+    n = {"high": 0, "medium": 0, "low": 0}
+    for f in real:
+        n[f.severity] += 1
+    top = sorted(real, key=lambda f: ({"high": 0, "medium": 1, "low": 2}[f.severity], -f.confidence))[:4]
     lines = "; ".join(f"{f.fid} {f.title}" for f in top)
-    return (f"Case {case_id}: {len(docs)} documents analysed; {len(findings)} findings "
-            f"({n['high']} high, {n['medium']} medium, {n['low']} low). Most significant: {lines}. "
+    return (f"Case {case_id}: {len(docs)} documents analysed; {len(real)} finding(s) about the documents "
+            f"({n['high']} high, {n['medium']} medium, {n['low']} low)" + (f" and {notes} coverage note(s)" if notes else "") + f". Most significant: {lines}. "
             f"Visual findings are indicators of possible alteration, not proof; confirm against originals." + cov)
 
 

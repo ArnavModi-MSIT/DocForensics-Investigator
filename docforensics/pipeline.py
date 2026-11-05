@@ -1,13 +1,15 @@
 import argparse, glob, json, os, shutil, time
 from .audit import AuditTrail, new_run_id, archive_previous, verify_chain, verify_file, load_history, append_history, sha256_file
 from .schema import Finding
-from .ingest import ingest, expand_inputs
+from .ingest import ingest, expand_inputs, read_gray
 from .ocr import run_ocr
 from .extract import classify, extract_fields, inherit_continuations, assign_file_categories, post_classify, issuer_as_employer
 from .structure import detect_structure, derive_table_fields, table_findings, save_structure_overlay
 from .forensics import analyze, save_ela_heatmap
 from .forensics_ext import analyze_ext, analyze_signature_only, save_regions_overlay
-from .pdf_forensics import analyze_pdf_docs
+from .pdf_forensics import analyze_pdf_docs, analyze_pdf_file
+from .pdf_layer import read_meta
+from .forensics_clone import analyze_clone, image_meta_findings
 from .pdf_layer import restore_pdf_geometry
 from .linkage import build_correlation, linkage_findings
 from .evidence import build_evidence
@@ -31,6 +33,10 @@ def run_case(paths, outdir, case_id=None, progress=None, use_llm=False):
     open(audit_path, "w").close()          # truncate (do not delete) the live log; the archive and case_history.json keep the past
     audit = AuditTrail(audit_path, run_id)
     audit.log("case_start", case_id=case_id, n_inputs=len(paths), run_id=run_id, earlier_runs=len(earlier_runs))
+    from .embed_classifier import status as _embed_status
+    _es = _embed_status()
+    audit.log("embedding_model", backend=_es["backend"], active=_es["active"], integrity=(_es.get("integrity") or {}).get("status"),
+              integrity_detail=(_es.get("integrity") or {}).get("detail"), model_files=(_es.get("integrity") or {}).get("files"))
     work = os.path.join(outdir, "pages")
     say("Ingesting documents")
     paths, skipped = expand_inputs(paths, work, audit)
@@ -66,8 +72,21 @@ def run_case(paths, outdir, case_id=None, progress=None, use_llm=False):
         if d.doc_type != "unknown":
             say(f"Typography, image regions, signatures: {d.doc_id}")
             visual += analyze_ext(d, audit, id_start=len(visual) + 1)
+            cf, creg, cnote = analyze_clone(d, read_gray(d), audit, id_start=len(visual) + 1)             # duplicated (copy-move) regions on scans and photos
+            visual += cf
+            d.facts["clone"] = cnote
+            d.facts["regions"] = (d.facts.get("regions") or []) + creg
         else:
             visual += analyze_signature_only(d, audit, id_start=len(visual) + 1)           # unsupported page: signature marks only
+    seen_files = set()
+    for d in docs:                            # file-level history: image metadata (EXIF / PNG text) and the metadata of scanned PDFs (born-digital PDFs are handled below)
+        if d.doc_type == "unknown" or d.path in seen_files:
+            continue
+        seen_files.add(d.path)
+        if d.path.lower().endswith(".pdf") and not d.born_digital:
+            visual += analyze_pdf_file([x for x in docs if x.path == d.path], read_meta(d.path), len(visual) + 1)
+        elif not d.path.lower().endswith(".pdf"):
+            visual += image_meta_findings(d, len(visual) + 1)
     say("PDF structure checks")
     visual += analyze_pdf_docs([d for d in docs if d.doc_type != "unknown"], audit, id_start=len(visual) + 1)
     for d in docs:                            # ELA map for every page so the UI can always show it

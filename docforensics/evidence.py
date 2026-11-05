@@ -42,6 +42,30 @@ def guidance(f):
     return label, why, check
 
 
+def potential_explanations(f):
+    """Possible, non-exclusive explanations for a finding. They are hypotheses for the reviewer, never conclusions."""
+    m, k, t = (f.method or "").lower(), f.kind, f.title.lower()
+    if "arithmetic" in m or "balance" in m or "total" in m or "component" in m:
+        return ["A typing or calculation error when the document was produced", "One figure edited after the document was produced", "A different version of the statement mixed with this one"]
+    if "income reconciliation" in m or "payer" in m:
+        return ["Timing: the payslip was corrected or reissued after the bank credit", "Net pay shown before an adjustment that the bank reflects", "A figure on the payslip or in the bank record was changed"]
+    if "case reference" in m or "linkage" in m:
+        return ["A document from another application was added by mistake", "A clerical error in the reference", "A reference altered to attach the document to this case"]
+    if k == "cross":
+        return ["A typing error in one of the documents", "The documents were produced at different times or are different versions", "A value in one document was changed", "A document of another person was mixed in"]
+    if "signature" in m:
+        return ["The copy is unsigned or signed electronically with a typed name", "The signature is faint or lost in compression", "A signature image added after the page was produced"]
+    if "pdf structure" in m or "pdf metadata" in m:
+        return ["A legitimate correction re-issued by the issuer", "A design element (badge, highlight) that looks like a patch", "A value overwritten after the document was generated"]
+    if k == "visual":
+        return ["Scanning, compression or lighting artefacts", "A value overwritten or pasted in after printing", "Different fonts or printers used legitimately on the same page"]
+    if k == "missing":
+        return ["Poor capture, faint print or an unusual layout", "The information is genuinely absent from the document"]
+    if "duplicate" in m:
+        return ["A second party or column (for example year-to-date) printed next to the first", "The page or row was copied or overwritten"]
+    return ["An OCR or typing error", "The document does not follow the layout this check assumes", "The value was changed"]
+
+
 def _crop(doc, ref, color):
     try:
         im = Image.open(doc.image_path).convert("RGB")
@@ -111,5 +135,5 @@ def build_evidence(docs, findings, outdir, max_crops=4):
         if crops:
             rel = os.path.join("evidence", f"{f.fid}.png")
             _montage(crops, caps, color).save(os.path.join(outdir, rel))
-        out[f.fid] = {"label": label, "why": why, "check": check, "crop": rel.replace(os.sep, "/") if rel else None, "regions": len(crops)}
+        out[f.fid] = {"label": label, "why": why, "check": check, "explanations": potential_explanations(f), "crop": rel.replace(os.sep, "/") if rel else None, "regions": len(crops)}
     return out

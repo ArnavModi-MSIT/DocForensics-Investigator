@@ -117,7 +117,7 @@ corrupt member, junk files), and real files: a bank statement, an Aadhaar card, 
 
 ## 4. Stage 2: Document Classification (`extract.py::classify`, `embed_classifier.py`)
 
-**Supported types:** `application_form`, `id_card`, `salary_slip`, `bank_statement`. Anything else must come out as `unknown`.
+**Supported types:** `application_form`, `id_card`, `salary_slip`, `bank_statement`, `employment_letter`. Anything else must come out as `unknown`.
 
 **Design principle.** Keywords alone cannot separate a document *about* applications from an application form
 (a research paper on a job app was classified as an application form in testing). So acceptance needs
@@ -146,7 +146,7 @@ corrupt member, junk files), and real files: a bank statement, an Aadhaar card, 
 `class_info` (keyword scores, expected fields found per type, semantic similarities, and a human-readable `decision` reason). The Streamlit tab
 The *Document Classification* and *OCR & Information Extraction* tabs of the UI (one tab per pipeline stage) show all of this per page.
 
-**Semantic category with confidence (added 2 Nov 2026).** Every page, supported or not, gets a ranked category from the same embedding model, over a wider list than the four supported types: ID card, application form, salary slip, bank statement plus corporate financial report, business/sales report, resume, research paper, invoice/bill, contract/policy, tax form, utility bill, academic certificate, medical/lab report, presentation/brochure, letter/article. Confidence = softmax(cosine / T) over all classes (T = `DOCFOR_CAT_TEMP`, 0.03): a *relative* score showing how clearly the best class beats the others, not a calibrated probability (clear documents score ~0.95-1.0, ambiguous ones 0.3-0.7). At **file level** the pages of one source file vote: per-page probability vectors averaged, weighted by text amount and by how decisive each page is, and the result states how many pages agree ("Business / sales report, confidence 0.39; 8 of 15 pages agree"). This does not change which documents are analysed: `doc_type` stays `unknown` for unsupported pages (the field gate is unchanged); the category only *describes* them in the summary, finding C-001, the dossier table and the debug tab. A page that looks like a supported type but fails the field gate is labelled "not confirmed by fields". Without the embedding model no category is produced.
+**Semantic category with confidence (added 2 Nov 2026).** Every page, supported or not, gets a ranked category from the same embedding model, over a wider list than the five supported types: ID card, application form, salary slip, bank statement, employment letter plus corporate financial report, business/sales report, resume, research paper, invoice/bill, contract/policy, tax form, utility bill, academic certificate, medical/lab report, presentation/brochure, letter/article. Confidence = softmax(cosine / T) over all classes (T = `DOCFOR_CAT_TEMP`, 0.03): a *relative* score showing how clearly the best class beats the others, not a calibrated probability (clear documents score ~0.95-1.0, ambiguous ones 0.3-0.7). At **file level** the pages of one source file vote: per-page probability vectors averaged, weighted by text amount and by how decisive each page is, and the result states how many pages agree ("Business / sales report, confidence 0.39; 8 of 15 pages agree"). This does not change which documents are analysed: `doc_type` stays `unknown` for unsupported pages (the field gate is unchanged); the category only *describes* them in the summary, finding C-001, the dossier table and the debug tab. A page that looks like a supported type but fails the field gate is labelled "not confirmed by fields". Without the embedding model no category is produced.
 
 **Tunables** (environment variables): `DOCFOR_MIN_FIELDS` (3), `DOCFOR_STRONG_KW` (0.75), `DOCFOR_KW_WEIGHT` (0.2), `DOCFOR_NEG_MARGIN` (0.03).
 
@@ -157,7 +157,7 @@ The *Document Classification* and *OCR & Information Extraction* tabs of the UI 
   a real bank statement rejected (gate too strict for real layouts), a sales report producing stray fields (value guards).
 
 **Gaps**
-- **Only four types.** Cheques, PAN cards as a distinct type, utility bills, Form 16, passports and others are not modelled.
+- **Only five types.** Cheques, PAN cards as a distinct type, utility bills, Form 16, passports and others are not modelled.
 - **Prototype texts and thresholds were tuned on small sets** (synthetic + about five real files). Cosine scores from this model are compressed (unrelated text is about 0.52 to 0.56), so margins of a few hundredths matter; these have not been validated on a large real corpus.
 - Only the first page text is classified from a single signal family (text). No layout or visual model is used: logos, colours and card shapes are ignored.
 - Only English is understood. Hindi or multilingual documents depend on English labels appearing.
@@ -198,7 +198,7 @@ needs a date or month+year, `pay_month` a month name or month/year, `name` mostl
 - **Tables outside the two supported layouts are not extracted** (see section 6; the old statement 'continuation page' handling remains).
 - **OCR slips** on IDs, dates and amounts remain the main source of false content mismatches. Planned fix: re-read typed fields with character-restricted, upscaled OCR.
 - **Hindi/multilingual text and vertical text** (e.g. Aadhaar issue/print dates along the card edge) are not read; Hindi lines add junk that we filter heuristically.
-- **Label dictionary is hand-written** for four document types plus synonyms; unseen labels depend on the embedding rescue.
+- **Label dictionary is hand-written** for five document types plus synonyms; unseen labels depend on the embedding rescue.
 - Unlabelled names are found for the Aadhaar-style layout (line above DOB) and the stacked PAN layout. Other card layouts (driving licence, passport) are not handled specifically.
 - Multi-line values other than addresses (e.g. multi-line employer names) are cut at the line end.
 - Pass ordering is greedy; an early wrong match can block a later correct one for the same key.
@@ -250,7 +250,7 @@ expose these fields, the page classification reason, deskew angle and whether fo
 - **Structure is heuristic and layout-specific:** tables are recognised for bank-statement transaction layouts (date / description / withdrawal / deposit / balance) and earnings-deductions slips only; other tables (invoices, loan schedules, multi-level headers, merged cells) are not extracted. A table that continues on a page without a repeated header is not picked up. Sections are flat (no nesting) and depend on headings being larger, capitalised or set apart. A heading drawn as a logo can become a stray section. Single-column amounts with Cr/Dr suffixes are parsed but not checked.
 - **Missing / duplicated / misplaced information:** missing = required fields per type, unreadable values, unverifiable comparisons, unreadable table rows; duplicated and misplaced information are detected by the heuristics above, not by a general model, and only for the field kinds listed there.
 - Relationships across pages are modelled only for statement balances (carried balance, TOTAL row); nothing else (e.g. page numbering, repeated headers) is cross-checked.
-- Field relationships are hard-coded rules for four types; there is no generic schema language.
+- Field relationships are hard-coded rules for five types; there is no generic schema language.
 - Cross-document matching assumes the documents in a case belong to one person; mixed cases can create spurious "mismatch" findings.
 - OCR slips can produce high-severity false mismatches (the explanation includes the similarity so a reviewer can see it is a near-match).
 
@@ -385,3 +385,9 @@ Per run: `audit.jsonl` (live) and `history/<run id>.jsonl` (archived copy of the
 
 ### 14.5 UI
 Three tabs (Dossier, Documents, Audit & history) replace the earlier one-tab-per-stage layout; the per-stage detail (classification evidence, OCR notes, structure overlays, ELA maps, typography table) is kept for the selected document under a collapsed technical section.
+
+### 14.6 Dossier sections follow the brief (7.1 to 7.6)
+PDF and JSON are organised as: 7.1 Document Overview (source file, type, size, page, processing status, hash); 7.2 Extracted Information (value, read confidence, location, structure); 7.3 Contextual Analysis (field-level inconsistencies; missing, duplicated and misplaced information; conflicting information across documents; cross-document discrepancies); 7.4 Visual Forensic Findings (regions and potential alterations; font, alignment and structure; image manipulation; signatures, each with what was checked); 7.5 Evidence and Traceability (table of documents with hashes, associated extracted information, region, status, confidence; highlighted pages); 7.6 Investigation Summary (anomaly table, supporting evidence, potential explanations, areas requiring verification, limitations); appendices A (capabilities) and B (audit trail). `evidence.potential_explanations` supplies hypotheses per finding; `report.py` supplies source info, processing status, contextual lists, visual groups and the anomaly table.
+
+### 14.7 Image checks (`forensics_clone.py`)
+*Copy-move.* Source blocks (16 px, every 4 px) are matched against target blocks at every pixel by hashed low-frequency DCT features; pairs that share one shift vector are grouped; the group must cover a compact area and the two areas must correlate in their noise residual taken on flat pixels only (text edges are identical for identical glyphs and would otherwise make repeated text look cloned). Tested: a pasted area at an off-grid shift is found raw and after JPEG quality 95-98; repeated text with independent noise and clean pages give nothing; a 22-case benchmark and the real files show no new findings. Limits: copies recompressed below about quality 92 lose their noise and are missed; resized or rotated copies are not found; born-digital pages are skipped. Findings are low severity observations, medium and `potential_manipulation` only when a region holds an extracted field. *Image metadata:* editor named in Software / PNG text, or modification time later than capture time; most scans carry no metadata and nothing is reported.

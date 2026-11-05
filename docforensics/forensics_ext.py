@@ -601,7 +601,7 @@ def save_regions_overlay(doc, path):
     im = Image.open(doc.image_path).convert("RGB")
     redact_ids(doc, im)
     d = ImageDraw.Draw(im)
-    col = {"photo": (200, 0, 200), "signature": (0, 160, 200), "grid": (240, 140, 0), "patch": (220, 0, 0)}
+    col = {"photo": (200, 0, 200), "signature": (0, 160, 200), "grid": (240, 140, 0), "patch": (220, 0, 0), "clone": (150, 0, 220)}
     for r in doc.facts.get("regions", []):
         c = col.get(r["kind"], (0, 0, 0))
         d.rectangle(r["bbox"], outline=c, width=4)

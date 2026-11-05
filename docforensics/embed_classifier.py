@@ -127,7 +127,7 @@ def describe(cat):
     return t + ")"
 
 
-_state = {"emb": None, "loaded": False, "error": "", "proto": None}
+_state = {"emb": None, "loaded": False, "error": "", "proto": None, "integrity": None}
 
 
 class _Stub:
@@ -146,6 +146,11 @@ class _Fast:
         from fastembed import TextEmbedding
         self.m = TextEmbedding(model_name="BAAI/bge-small-en-v1.5", cache_dir=MODEL_DIR)
         self.name = "fastembed:BAAI/bge-small-en-v1.5"
+        if os.environ.get("DOCFOR_MODEL_VERIFY", "on").lower() != "off":
+            from .model_integrity import verify_model_dir
+            _state["integrity"] = verify_model_dir(MODEL_DIR)
+            if _state["integrity"]["status"] == "mismatch":                 # a changed model file is never loaded silently
+                raise RuntimeError("model integrity check failed: " + _state["integrity"]["detail"])
 
     def embed(self, texts):
         v = np.array(list(self.m.embed(texts)), dtype=float)
@@ -186,7 +191,7 @@ def get_embedder():
 
 def status():
     e = get_embedder()
-    return {"active": e is not None, "backend": e.name if e else None, "detail": _state["error"]}
+    return {"active": e is not None, "backend": e.name if e else None, "detail": _state["error"], "integrity": _state.get("integrity")}
 
 
 def semantic_scores(text):

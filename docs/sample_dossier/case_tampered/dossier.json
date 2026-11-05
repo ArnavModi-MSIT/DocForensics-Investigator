@@ -1,0 +1,3540 @@
+{
+  "case_id": "case_tampered",
+  "audit_digest": "432981265a7f117da7838bb584450f6145101acadbd46769a19b3e2f8951bc51",
+  "summary": "Case case_tampered: 4 documents analysed; 9 finding(s) about the documents (6 high, 3 medium, 0 low). Most significant: V-001 Possible alteration of 'Date of Birth' in id_card; V-002 Possible alteration of 'Net Pay' in salary_slip; C-001 Salary slip arithmetic does not balance in salary_slip; X-002 Date of birth mismatch: application_form vs id_card. Visual findings are indicators of possible alteration, not proof; confirm against originals. Pixel-level visual forensics ran on 4 of 4 recognised page(s).",
+  "summary_source": "template",
+  "documents": [
+    {
+      "doc_id": "application_form",
+      "source": {
+        "file": "application_form.jpg",
+        "file_type": "JPG",
+        "file_bytes": 221341,
+        "page": 1,
+        "pages_in_file": 1,
+        "page_px": [
+          1000,
+          1300
+        ]
+      },
+      "processing_status": "recognised as application form; read by OCR (tesseract, mean confidence 0.95); 6 field(s); pixel-level forensics ran",
+      "type": "application_form",
+      "type_conf": 0.8,
+      "sha256": "b65f9da544765c44dc9e452ee5f7bda31330c41f41c3541042faebeca3df5108",
+      "size": [
+        1000,
+        1300
+      ],
+      "decision": "accepted as application_form",
+      "structure": {
+        "layout": {
+          "label": "label-value form",
+          "evidence": [
+            "6 labelled field(s)",
+            "0 label-free field(s)",
+            "1 heading(s)"
+          ],
+          "hierarchy": {
+            "sections": 1,
+            "headed_sections": 1,
+            "fields": 6,
+            "tables": 0,
+            "table_rows": 0,
+            "table_cells": 0
+          }
+        },
+        "sections": [
+          {
+            "sid": "S1",
+            "title": "LOAN APPLICATION FORM",
+            "kind": "other",
+            "bbox": [
+              60,
+              78,
+              937,
+              1227
+            ],
+            "n_lines": 8,
+            "fields": [
+              "name",
+              "dob",
+              "id_number",
+              "address",
+              "employer",
+              "declared_income"
+            ],
+            "tables": [],
+            "has_heading": true
+          }
+        ],
+        "tables": []
+      },
+      "visual_ext": {
+        "typography": "run on 5 fields",
+        "grid": "run on 266 tiles; dominant grid 100%",
+        "photo": "not an ID card",
+        "signature": "no signature label on the page",
+        "regions": []
+      },
+      "best_guess": "application_form",
+      "category_page": {
+        "top": [
+          {
+            "key": "application_form",
+            "name": "Application form",
+            "confidence": 0.887,
+            "cosine": 0.705
+          },
+          {
+            "key": "id_card",
+            "name": "ID card",
+            "confidence": 0.044,
+            "cosine": 0.615
+          },
+          {
+            "key": "bank_statement",
+            "name": "Bank statement",
+            "confidence": 0.021,
+            "cosine": 0.592
+          }
+        ],
+        "label": "Application form",
+        "confidence": 0.887,
+        "key": "application_form",
+        "margin": 0.09
+      },
+      "category_file": {
+        "top": [
+          {
+            "key": "application_form",
+            "name": "Application form",
+            "confidence": 0.887,
+            "cosine": 0.705
+          },
+          {
+            "key": "id_card",
+            "name": "ID card",
+            "confidence": 0.044,
+            "cosine": 0.615
+          },
+          {
+            "key": "bank_statement",
+            "name": "Bank statement",
+            "confidence": 0.021,
+            "cosine": 0.592
+          }
+        ],
+        "label": "Application form",
+        "confidence": 0.887,
+        "key": "application_form",
+        "margin": 0.09,
+        "pages_agree": [
+          1,
+          1
+        ]
+      },
+      "skew_deg": 0.0,
+      "born_digital": false,
+      "forensics": "run",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Applicant Name:",
+          "raw": "Rohan Mehta",
+          "value": "Rohan Mehta",
+          "confidence": 0.96,
+          "bbox": [
+            433,
+            195,
+            612,
+            216
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "dob",
+          "label": "Date of Birth:",
+          "raw": "14/03/1994",
+          "value": "1994-03-14",
+          "confidence": 0.96,
+          "bbox": [
+            433,
+            281,
+            590,
+            304
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "id_number",
+          "label": "ID Number:",
+          "raw": "ABCDE1234F",
+          "value": "ABCDE1234F",
+          "confidence": 0.91,
+          "bbox": [
+            430,
+            366,
+            613,
+            386
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "address",
+          "label": "Address:",
+          "raw": "Flat 12, Sector 21, Noida UP 201301",
+          "value": "Flat 12, Sector 21, Noida UP 201301",
+          "confidence": 0.96,
+          "bbox": [
+            433,
+            450,
+            937,
+            475
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "employer",
+          "label": "Employer:",
+          "raw": "Nimbus Analytics Pvt Ltd",
+          "value": "Nimbus Analytics Pvt Ltd",
+          "confidence": 0.96,
+          "bbox": [
+            433,
+            535,
+            776,
+            562
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "declared_income",
+          "label": "Declared Monthly Income:Rs.",
+          "raw": "85,000",
+          "value": 85000.0,
+          "confidence": 0.96,
+          "bbox": [
+            484,
+            621,
+            578,
+            645
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 95.8
+        }
+      ]
+    },
+    {
+      "doc_id": "bank_statement",
+      "source": {
+        "file": "bank_statement.jpg",
+        "file_type": "JPG",
+        "file_bytes": 222854,
+        "page": 1,
+        "pages_in_file": 1,
+        "page_px": [
+          1000,
+          1300
+        ]
+      },
+      "processing_status": "recognised as bank statement; read by OCR (tesseract, mean confidence 0.95); 6 field(s); pixel-level forensics ran",
+      "type": "bank_statement",
+      "type_conf": 0.7,
+      "sha256": "4805d814c8f5b1227d892269d353734ec1e40126da239b4932963af886ece4ec",
+      "size": [
+        1000,
+        1300
+      ],
+      "decision": "accepted as bank_statement",
+      "structure": {
+        "layout": {
+          "label": "label-value form",
+          "evidence": [
+            "6 labelled field(s)",
+            "0 label-free field(s)",
+            "1 heading(s)"
+          ],
+          "hierarchy": {
+            "sections": 1,
+            "headed_sections": 1,
+            "fields": 6,
+            "tables": 0,
+            "table_rows": 0,
+            "table_cells": 0
+          }
+        },
+        "sections": [
+          {
+            "sid": "S1",
+            "title": "BANK ACCOUNT STATEMENT",
+            "kind": "account_details",
+            "bbox": [
+              60,
+              78,
+              779,
+              1227
+            ],
+            "n_lines": 8,
+            "fields": [
+              "name",
+              "account_no",
+              "period",
+              "opening_balance",
+              "salary_credit",
+              "closing_balance"
+            ],
+            "tables": [],
+            "has_heading": true
+          }
+        ],
+        "tables": []
+      },
+      "visual_ext": {
+        "typography": "run on 6 fields",
+        "grid": "run on 258 tiles; dominant grid 100%",
+        "photo": "not an ID card",
+        "signature": "no signature label on the page",
+        "regions": []
+      },
+      "best_guess": "bank_statement",
+      "category_page": {
+        "top": [
+          {
+            "key": "bank_statement",
+            "name": "Bank statement",
+            "confidence": 0.955,
+            "cosine": 0.74
+          },
+          {
+            "key": "id_card",
+            "name": "ID card",
+            "confidence": 0.017,
+            "cosine": 0.62
+          },
+          {
+            "key": "application_form",
+            "name": "Application form",
+            "confidence": 0.012,
+            "cosine": 0.609
+          }
+        ],
+        "label": "Bank statement",
+        "confidence": 0.955,
+        "key": "bank_statement",
+        "margin": 0.12
+      },
+      "category_file": {
+        "top": [
+          {
+            "key": "bank_statement",
+            "name": "Bank statement",
+            "confidence": 0.955,
+            "cosine": 0.74
+          },
+          {
+            "key": "id_card",
+            "name": "ID card",
+            "confidence": 0.017,
+            "cosine": 0.62
+          },
+          {
+            "key": "application_form",
+            "name": "Application form",
+            "confidence": 0.012,
+            "cosine": 0.609
+          }
+        ],
+        "label": "Bank statement",
+        "confidence": 0.955,
+        "key": "bank_statement",
+        "margin": 0.12,
+        "pages_agree": [
+          1,
+          1
+        ]
+      },
+      "skew_deg": 0.0,
+      "born_digital": false,
+      "forensics": "run",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Account Holder:",
+          "raw": "Rohan Mehra",
+          "value": "Rohan Mehra",
+          "confidence": 0.96,
+          "bbox": [
+            433,
+            195,
+            613,
+            216
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "account_no",
+          "label": "Account Number:",
+          "raw": "50100234567891",
+          "value": "50100234567891",
+          "confidence": 0.91,
+          "bbox": [
+            432,
+            281,
+            677,
+            301
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "period",
+          "label": "Statement Period",
+          "raw": "01/10/2026 - 31/10/2026",
+          "value": "01/10/2026 - 31/10/2026",
+          "confidence": 0.94,
+          "bbox": [
+            432,
+            366,
+            779,
+            389
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "opening_balance",
+          "label": "Opening Balance",
+          "raw": "Rs. 120,000",
+          "value": 120000.0,
+          "confidence": 0.96,
+          "bbox": [
+            433,
+            451,
+            596,
+            475
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "salary_credit",
+          "label": "Salary Credit:",
+          "raw": "Rs. 58,000",
+          "value": 58000.0,
+          "confidence": 0.96,
+          "bbox": [
+            433,
+            536,
+            578,
+            560
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "closing_balance",
+          "label": "Closing Balance:",
+          "raw": "Rs. 146,500",
+          "value": 146500.0,
+          "confidence": 0.96,
+          "bbox": [
+            433,
+            621,
+            596,
+            645
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        }
+      ]
+    },
+    {
+      "doc_id": "id_card",
+      "source": {
+        "file": "id_card.jpg",
+        "file_type": "JPG",
+        "file_bytes": 112492,
+        "page": 1,
+        "pages_in_file": 1,
+        "page_px": [
+          1000,
+          1300
+        ]
+      },
+      "processing_status": "recognised as id card; read by OCR (tesseract, mean confidence 0.949); 5 field(s); pixel-level forensics ran",
+      "type": "id_card",
+      "type_conf": 0.75,
+      "sha256": "c47d6e90089bbd980f1da359e2d94fcad602e96f19be86a52a5624711e7862d2",
+      "size": [
+        1000,
+        1300
+      ],
+      "decision": "accepted as id_card",
+      "structure": {
+        "layout": {
+          "label": "label-value form",
+          "evidence": [
+            "5 labelled field(s)",
+            "0 label-free field(s)",
+            "1 heading(s)"
+          ],
+          "hierarchy": {
+            "sections": 1,
+            "headed_sections": 1,
+            "fields": 5,
+            "tables": 0,
+            "table_rows": 0,
+            "table_cells": 0
+          }
+        },
+        "sections": [
+          {
+            "sid": "S1",
+            "title": "NATIONAL IDENTITY CARD",
+            "kind": "personal_details",
+            "bbox": [
+              60,
+              78,
+              937,
+              1227
+            ],
+            "n_lines": 7,
+            "fields": [
+              "name",
+              "dob",
+              "id_number",
+              "address",
+              "issue_date"
+            ],
+            "tables": [],
+            "has_heading": true
+          }
+        ],
+        "tables": []
+      },
+      "visual_ext": {
+        "typography": "run on 5 fields",
+        "grid": "run on 298 tiles; dominant grid 100%",
+        "photo": "no photo-shaped continuous-tone region located (busy background, no photo, or photo too small)",
+        "signature": "no signature label on the page",
+        "regions": []
+      },
+      "best_guess": "id_card",
+      "category_page": {
+        "top": [
+          {
+            "key": "id_card",
+            "name": "ID card",
+            "confidence": 0.973,
+            "cosine": 0.704
+          },
+          {
+            "key": "application_form",
+            "name": "Application form",
+            "confidence": 0.013,
+            "cosine": 0.574
+          },
+          {
+            "key": "other:certificate",
+            "name": "Certificate (completion / participation / academic)",
+            "confidence": 0.005,
+            "cosine": 0.543
+          }
+        ],
+        "label": "ID card",
+        "confidence": 0.973,
+        "key": "id_card",
+        "margin": 0.13
+      },
+      "category_file": {
+        "top": [
+          {
+            "key": "id_card",
+            "name": "ID card",
+            "confidence": 0.973,
+            "cosine": 0.704
+          },
+          {
+            "key": "application_form",
+            "name": "Application form",
+            "confidence": 0.013,
+            "cosine": 0.574
+          },
+          {
+            "key": "other:certificate",
+            "name": "Certificate (completion / participation / academic)",
+            "confidence": 0.005,
+            "cosine": 0.543
+          }
+        ],
+        "label": "ID card",
+        "confidence": 0.973,
+        "key": "id_card",
+        "margin": 0.13,
+        "pages_agree": [
+          1,
+          1
+        ]
+      },
+      "skew_deg": 0.0,
+      "born_digital": false,
+      "forensics": "run",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Name:",
+          "raw": "Rohan Mehta",
+          "value": "Rohan Mehta",
+          "confidence": 0.96,
+          "bbox": [
+            433,
+            195,
+            612,
+            216
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "dob",
+          "label": "Date of Birth:",
+          "raw": "14/03/1990",
+          "value": "1990-03-14",
+          "confidence": 0.96,
+          "bbox": [
+            434,
+            285,
+            590,
+            308
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "id_number",
+          "label": "ID Number:",
+          "raw": "ABCDE1284F",
+          "value": "ABCDE1284F",
+          "confidence": 0.91,
+          "bbox": [
+            430,
+            366,
+            613,
+            386
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "address",
+          "label": "Address:",
+          "raw": "Flat 12, Sector 21, Noida UP 201301",
+          "value": "Flat 12, Sector 21, Noida UP 201301",
+          "confidence": 0.959,
+          "bbox": [
+            433,
+            450,
+            937,
+            475
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "issue_date",
+          "label": "Issue Date:",
+          "raw": "02/06/2019",
+          "value": "2019-06-02",
+          "confidence": 0.96,
+          "bbox": [
+            432,
+            536,
+            590,
+            559
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        }
+      ]
+    },
+    {
+      "doc_id": "salary_slip",
+      "source": {
+        "file": "salary_slip.jpg",
+        "file_type": "JPG",
+        "file_bytes": 114180,
+        "page": 1,
+        "pages_in_file": 1,
+        "page_px": [
+          1000,
+          1300
+        ]
+      },
+      "processing_status": "recognised as salary slip; read by OCR (tesseract, mean confidence 0.952); 6 field(s); pixel-level forensics ran",
+      "type": "salary_slip",
+      "type_conf": 0.79,
+      "sha256": "7ef5677dede75362fe9af6a8bad261d6728c7f0e56a747f112a404d3cece87a1",
+      "size": [
+        1000,
+        1300
+      ],
+      "decision": "accepted as salary_slip",
+      "structure": {
+        "layout": {
+          "label": "label-value form",
+          "evidence": [
+            "6 labelled field(s)",
+            "0 label-free field(s)",
+            "1 heading(s)"
+          ],
+          "hierarchy": {
+            "sections": 1,
+            "headed_sections": 1,
+            "fields": 6,
+            "tables": 0,
+            "table_rows": 0,
+            "table_cells": 0
+          }
+        },
+        "sections": [
+          {
+            "sid": "S1",
+            "title": "SALARY SLIP",
+            "kind": "other",
+            "bbox": [
+              60,
+              78,
+              776,
+              1227
+            ],
+            "n_lines": 8,
+            "fields": [
+              "name",
+              "employer",
+              "pay_month",
+              "gross",
+              "deductions",
+              "net_pay"
+            ],
+            "tables": [],
+            "has_heading": true
+          }
+        ],
+        "tables": []
+      },
+      "visual_ext": {
+        "typography": "run on 6 fields",
+        "grid": "run on 300 tiles; dominant grid 100%",
+        "photo": "not an ID card",
+        "signature": "no signature label on the page",
+        "regions": []
+      },
+      "best_guess": "salary_slip",
+      "category_page": {
+        "top": [
+          {
+            "key": "salary_slip",
+            "name": "Salary slip",
+            "confidence": 0.891,
+            "cosine": 0.689
+          },
+          {
+            "key": "employment_letter",
+            "name": "Employment confirmation",
+            "confidence": 0.041,
+            "cosine": 0.597
+          },
+          {
+            "key": "application_form",
+            "name": "Application form",
+            "confidence": 0.016,
+            "cosine": 0.569
+          }
+        ],
+        "label": "Salary slip",
+        "confidence": 0.891,
+        "key": "salary_slip",
+        "margin": 0.092
+      },
+      "category_file": {
+        "top": [
+          {
+            "key": "salary_slip",
+            "name": "Salary slip",
+            "confidence": 0.891,
+            "cosine": 0.689
+          },
+          {
+            "key": "employment_letter",
+            "name": "Employment confirmation",
+            "confidence": 0.041,
+            "cosine": 0.597
+          },
+          {
+            "key": "application_form",
+            "name": "Application form",
+            "confidence": 0.016,
+            "cosine": 0.569
+          }
+        ],
+        "label": "Salary slip",
+        "confidence": 0.891,
+        "key": "salary_slip",
+        "margin": 0.092,
+        "pages_agree": [
+          1,
+          1
+        ]
+      },
+      "skew_deg": 0.0,
+      "born_digital": false,
+      "forensics": "run",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Employee Name:",
+          "raw": "Rohan Mehta",
+          "value": "Rohan Mehta",
+          "confidence": 0.96,
+          "bbox": [
+            433,
+            195,
+            612,
+            216
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "employer",
+          "label": "Employer:",
+          "raw": "Nimbus Analytics Pvt Ltd",
+          "value": "Nimbus Analytics Pvt Ltd",
+          "confidence": 0.955,
+          "bbox": [
+            433,
+            280,
+            776,
+            307
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "pay_month",
+          "label": "Pay Month:",
+          "raw": "October 2026",
+          "value": "October 2026",
+          "confidence": 0.96,
+          "bbox": [
+            432,
+            365,
+            620,
+            386
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "gross",
+          "label": "Gross Earnings:",
+          "raw": "Rs. 95,000",
+          "value": 95000.0,
+          "confidence": 0.95,
+          "bbox": [
+            433,
+            451,
+            578,
+            475
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "deductions",
+          "label": "Total Deductions:",
+          "raw": "Rs. 37,000",
+          "value": 37000.0,
+          "confidence": 0.96,
+          "bbox": [
+            433,
+            536,
+            578,
+            560
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        },
+        {
+          "key": "net_pay",
+          "label": "Net Pay:",
+          "raw": "Rs. 85,000",
+          "value": 85000.0,
+          "confidence": 0.96,
+          "bbox": [
+            432,
+            625,
+            579,
+            648
+          ],
+          "matched_by": "fuzzy",
+          "label_score": 100.0
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "fid": "V-001",
+      "kind": "visual",
+      "title": "Possible alteration of 'Date of Birth' in id_card",
+      "severity": "high",
+      "confidence": 0.98,
+      "status": "potential_manipulation",
+      "explanation": "The value region of 'Date of Birth' ('14/03/1990') differs statistically from the other fields of the same page in: bglum (z=+3.0), inkdark (z=+11.4). Such a pattern is typical of text that was edited or pasted after the page was first scanned/compressed. This is an indicator, not proof; verify against the original document.",
+      "refs": [
+        {
+          "doc_id": "id_card",
+          "field": "dob",
+          "value": "14/03/1990",
+          "bbox": [
+            434,
+            285,
+            590,
+            308
+          ]
+        }
+      ],
+      "metrics": {
+        "ela": {
+          "value": 0.433,
+          "peer_median": 0.166,
+          "z": 2.7
+        },
+        "noise": {
+          "value": 1.336,
+          "peer_median": 2.048,
+          "z": -1.5
+        },
+        "bglum": {
+          "value": 238.707,
+          "peer_median": 236.313,
+          "z": 3.0
+        },
+        "inkdark": {
+          "value": 63.0,
+          "peer_median": 6.0,
+          "z": 11.4
+        },
+        "stroke": {
+          "value": 2.739,
+          "peer_median": 1.91,
+          "z": 3.3
+        },
+        "corroborated_by": [
+          "X-002"
+        ]
+      },
+      "method": "peer-relative ELA/noise/background/stroke analysis",
+      "confidence_level": "high",
+      "group": "visual"
+    },
+    {
+      "fid": "V-002",
+      "kind": "visual",
+      "title": "Possible alteration of 'Net Pay' in salary_slip",
+      "severity": "high",
+      "confidence": 0.98,
+      "status": "potential_manipulation",
+      "explanation": "The value region of 'Net Pay' ('Rs. 85,000') differs statistically from the other fields of the same page in: noise (z=-4.5), bglum (z=+4.5), inkdark (z=+10.5). Such a pattern is typical of text that was edited or pasted after the page was first scanned/compressed. This is an indicator, not proof; verify against the original document.",
+      "refs": [
+        {
+          "doc_id": "salary_slip",
+          "field": "net_pay",
+          "value": "Rs. 85,000",
+          "bbox": [
+            432,
+            625,
+            579,
+            648
+          ]
+        }
+      ],
+      "metrics": {
+        "ela": {
+          "value": 0.274,
+          "peer_median": 0.206,
+          "z": 0.7
+        },
+        "noise": {
+          "value": 0.949,
+          "peer_median": 2.335,
+          "z": -4.5
+        },
+        "bglum": {
+          "value": 239.57,
+          "peer_median": 235.943,
+          "z": 4.5
+        },
+        "inkdark": {
+          "value": 58.7,
+          "peer_median": 6.0,
+          "z": 10.5
+        },
+        "stroke": {
+          "value": 2.739,
+          "peer_median": 1.91,
+          "z": 3.3
+        },
+        "corroborated_by": [
+          "C-001",
+          "X-004"
+        ]
+      },
+      "method": "peer-relative ELA/noise/background/stroke analysis",
+      "confidence_level": "high",
+      "group": "visual"
+    },
+    {
+      "fid": "C-001",
+      "kind": "intra",
+      "title": "Salary slip arithmetic does not balance in salary_slip",
+      "severity": "high",
+      "confidence": 0.98,
+      "status": "inconsistency",
+      "explanation": "Gross 95,000 - deductions 37,000 = 58,000, but Net Pay shows 85,000 (difference +27,000). Corroborated by visual evidence (V-002) on the same field.",
+      "refs": [
+        {
+          "doc_id": "salary_slip",
+          "field": "gross",
+          "value": "Rs. 95,000",
+          "bbox": [
+            433,
+            451,
+            578,
+            475
+          ]
+        },
+        {
+          "doc_id": "salary_slip",
+          "field": "deductions",
+          "value": "Rs. 37,000",
+          "bbox": [
+            433,
+            536,
+            578,
+            560
+          ]
+        },
+        {
+          "doc_id": "salary_slip",
+          "field": "net_pay",
+          "value": "Rs. 85,000",
+          "bbox": [
+            432,
+            625,
+            579,
+            648
+          ]
+        }
+      ],
+      "metrics": {
+        "corroborated_by": [
+          "V-002"
+        ]
+      },
+      "method": "arithmetic check",
+      "confidence_level": "high",
+      "group": "inconsistencies"
+    },
+    {
+      "fid": "X-001",
+      "kind": "cross",
+      "title": "Applicant name in bank_statement disagrees with 3 other document(s)",
+      "severity": "medium",
+      "confidence": 0.8,
+      "status": "inconsistency",
+      "explanation": "bank_statement: 'Rohan Mehra' vs [application_form: 'Rohan Mehta', id_card: 'Rohan Mehta', salary_slip: 'Rohan Mehta']. Values differ only slightly (similarity 90%): possible OCR slip, typo, transliteration or minor alteration.",
+      "refs": [
+        {
+          "doc_id": "bank_statement",
+          "field": "name",
+          "value": "Rohan Mehra",
+          "bbox": [
+            433,
+            195,
+            613,
+            216
+          ]
+        },
+        {
+          "doc_id": "application_form",
+          "field": "name",
+          "value": "Rohan Mehta",
+          "bbox": [
+            433,
+            195,
+            612,
+            216
+          ]
+        },
+        {
+          "doc_id": "id_card",
+          "field": "name",
+          "value": "Rohan Mehta",
+          "bbox": [
+            433,
+            195,
+            612,
+            216
+          ]
+        },
+        {
+          "doc_id": "salary_slip",
+          "field": "name",
+          "value": "Rohan Mehta",
+          "bbox": [
+            433,
+            195,
+            612,
+            216
+          ]
+        }
+      ],
+      "metrics": {
+        "similarity": 90,
+        "verdict": "near",
+        "odd_one_out": "bank_statement"
+      },
+      "method": "cross-document name comparison",
+      "confidence_level": "high",
+      "group": "cross"
+    },
+    {
+      "fid": "X-002",
+      "kind": "cross",
+      "title": "Date of birth mismatch: application_form vs id_card",
+      "severity": "high",
+      "confidence": 0.95,
+      "status": "inconsistency",
+      "explanation": "id_card: '14/03/1990' vs [application_form: '14/03/1994']. Values differ only slightly (similarity 90%): possible OCR slip, typo, transliteration or minor alteration. No majority: cannot tell which document is correct. Corroborated by visual evidence (V-001) on the same field.",
+      "refs": [
+        {
+          "doc_id": "id_card",
+          "field": "dob",
+          "value": "14/03/1990",
+          "bbox": [
+            434,
+            285,
+            590,
+            308
+          ]
+        },
+        {
+          "doc_id": "application_form",
+          "field": "dob",
+          "value": "14/03/1994",
+          "bbox": [
+            433,
+            281,
+            590,
+            304
+          ]
+        }
+      ],
+      "metrics": {
+        "similarity": 90,
+        "verdict": "near",
+        "odd_one_out": null,
+        "corroborated_by": [
+          "V-001"
+        ]
+      },
+      "method": "cross-document dob comparison",
+      "confidence_level": "high",
+      "group": "cross"
+    },
+    {
+      "fid": "X-003",
+      "kind": "cross",
+      "title": "ID number mismatch: application_form vs id_card",
+      "severity": "high",
+      "confidence": 0.9,
+      "status": "inconsistency",
+      "explanation": "id_card: 'ABCDE1284F' vs [application_form: 'ABCDE1234F']. Values differ only slightly (similarity 90%): possible OCR slip, typo, transliteration or minor alteration. No majority: cannot tell which document is correct.",
+      "refs": [
+        {
+          "doc_id": "id_card",
+          "field": "id_number",
+          "value": "ABCDE1284F",
+          "bbox": [
+            430,
+            366,
+            613,
+            386
+          ]
+        },
+        {
+          "doc_id": "application_form",
+          "field": "id_number",
+          "value": "ABCDE1234F",
+          "bbox": [
+            430,
+            366,
+            613,
+            386
+          ]
+        }
+      ],
+      "metrics": {
+        "similarity": 90,
+        "verdict": "near",
+        "odd_one_out": null
+      },
+      "method": "cross-document id_number comparison",
+      "confidence_level": "high",
+      "group": "cross"
+    },
+    {
+      "fid": "X-004",
+      "kind": "cross",
+      "title": "Salary slip net pay does not match bank payroll credit",
+      "severity": "high",
+      "confidence": 0.95,
+      "status": "inconsistency",
+      "explanation": "Net pay on salary_slip is 85,000, but the payroll credit in the bank statement (bank_statement) is 58,000 (difference +27,000). Either the payslip or the bank record is wrong; this is a data inconsistency to verify with the employer and the bank, not proof of fraud. Corroborated by visual evidence (V-002) on the same field.",
+      "refs": [
+        {
+          "doc_id": "salary_slip",
+          "field": "net_pay",
+          "value": "Rs. 85,000",
+          "bbox": [
+            432,
+            625,
+            579,
+            648
+          ]
+        },
+        {
+          "doc_id": "bank_statement",
+          "field": "salary_credit",
+          "value": "Rs. 58,000",
+          "bbox": [
+            433,
+            536,
+            578,
+            560
+          ]
+        }
+      ],
+      "metrics": {
+        "net_pay": 85000.0,
+        "bank_credit": 58000.0,
+        "difference": 27000.0,
+        "corroborated_by": [
+          "V-002"
+        ]
+      },
+      "method": "income reconciliation",
+      "confidence_level": "high",
+      "group": "cross"
+    },
+    {
+      "fid": "X-005",
+      "kind": "cross",
+      "title": "Declared income exceeds income shown in bank_statement",
+      "severity": "medium",
+      "confidence": 0.7,
+      "status": "inconsistency",
+      "explanation": "Declared monthly income 85,000 vs the highest amount in the documents, bank_statement salary credit 58,000 (47% higher). No payslip gross is available, so the declared figure may be gross while the documents show net pay or credits; verify which basis was declared.",
+      "refs": [
+        {
+          "doc_id": "application_form",
+          "field": "declared_income",
+          "value": "85,000",
+          "bbox": [
+            484,
+            621,
+            578,
+            645
+          ]
+        },
+        {
+          "doc_id": "bank_statement",
+          "field": "salary_credit",
+          "value": "Rs. 58,000",
+          "bbox": [
+            433,
+            536,
+            578,
+            560
+          ]
+        }
+      ],
+      "metrics": {},
+      "method": "income reconciliation",
+      "confidence_level": "medium",
+      "group": "cross"
+    },
+    {
+      "fid": "R-001",
+      "kind": "cross",
+      "title": "bank_statement shares no identifier with the other documents",
+      "severity": "medium",
+      "confidence": 0.6,
+      "status": "observed",
+      "explanation": "None of the identifiers that tie documents to one person or application (name, date of birth, ID number, employee ID, account number, case reference) agree between bank_statement and any other document of this case, although the other documents are linked to each other. It may belong to a different applicant or application; verify before relying on it.",
+      "refs": [
+        {
+          "doc_id": "bank_statement",
+          "field": null,
+          "value": null,
+          "bbox": null
+        }
+      ],
+      "metrics": {},
+      "method": "document linkage",
+      "confidence_level": "medium",
+      "group": "cross"
+    }
+  ],
+  "confidence_scale": "Confidence levels: high (0.80 and above), medium (0.60 to 0.79), low (below 0.60). The number is the system's own estimate of how reliable the specific check is on this evidence (for example an exact arithmetic mismatch scores high, a weak pixel signal scores low). It is not a probability that a document is forged, and it does not say which of two conflicting documents is correct.",
+  "contextual": {
+    "missing": [],
+    "duplicated": [],
+    "misplaced": []
+  },
+  "visual_groups": [
+    {
+      "key": "regions",
+      "title": "Suspicious regions and potential alterations",
+      "findings": [
+        "V-001",
+        "V-002"
+      ],
+      "checked": []
+    },
+    {
+      "key": "font_structure",
+      "title": "Font, alignment and structural inconsistencies",
+      "findings": [],
+      "checked": [
+        "application_form: typography run on 5 fields",
+        "bank_statement: typography run on 6 fields",
+        "id_card: typography run on 5 fields",
+        "salary_slip: typography run on 6 fields"
+      ]
+    },
+    {
+      "key": "image",
+      "title": "Image manipulation observations",
+      "findings": [],
+      "checked": [
+        "application_form: pixel forensics run; JPEG grid run on 266 tiles; dominant grid 100%; photo not an ID card",
+        "bank_statement: pixel forensics run; JPEG grid run on 258 tiles; dominant grid 100%; photo not an ID card",
+        "id_card: pixel forensics run; JPEG grid run on 298 tiles; dominant grid 100%; photo no photo-shaped continuous-tone region located (busy background, no photo, or photo too small)",
+        "salary_slip: pixel forensics run; JPEG grid run on 300 tiles; dominant grid 100%; photo not an ID card"
+      ]
+    },
+    {
+      "key": "signature",
+      "title": "Signature-related observations",
+      "findings": [],
+      "checked": [
+        "application_form: no signature label on the page",
+        "bank_statement: no signature label on the page",
+        "id_card: no signature label on the page",
+        "salary_slip: no signature label on the page"
+      ]
+    }
+  ],
+  "anomalies": [
+    {
+      "fid": "V-001",
+      "title": "Possible alteration of 'Date of Birth' in id_card",
+      "severity": "high",
+      "status": "potential_manipulation",
+      "confidence": "high (0.98)",
+      "documents": [
+        "id_card"
+      ]
+    },
+    {
+      "fid": "V-002",
+      "title": "Possible alteration of 'Net Pay' in salary_slip",
+      "severity": "high",
+      "status": "potential_manipulation",
+      "confidence": "high (0.98)",
+      "documents": [
+        "salary_slip"
+      ]
+    },
+    {
+      "fid": "C-001",
+      "title": "Salary slip arithmetic does not balance in salary_slip",
+      "severity": "high",
+      "status": "inconsistency",
+      "confidence": "high (0.98)",
+      "documents": [
+        "salary_slip"
+      ]
+    },
+    {
+      "fid": "X-002",
+      "title": "Date of birth mismatch: application_form vs id_card",
+      "severity": "high",
+      "status": "inconsistency",
+      "confidence": "high (0.95)",
+      "documents": [
+        "application_form",
+        "id_card"
+      ]
+    },
+    {
+      "fid": "X-004",
+      "title": "Salary slip net pay does not match bank payroll credit",
+      "severity": "high",
+      "status": "inconsistency",
+      "confidence": "high (0.95)",
+      "documents": [
+        "bank_statement",
+        "salary_slip"
+      ]
+    },
+    {
+      "fid": "X-003",
+      "title": "ID number mismatch: application_form vs id_card",
+      "severity": "high",
+      "status": "inconsistency",
+      "confidence": "high (0.90)",
+      "documents": [
+        "application_form",
+        "id_card"
+      ]
+    },
+    {
+      "fid": "X-001",
+      "title": "Applicant name in bank_statement disagrees with 3 other document(s)",
+      "severity": "medium",
+      "status": "inconsistency",
+      "confidence": "high (0.80)",
+      "documents": [
+        "application_form",
+        "bank_statement",
+        "id_card",
+        "salary_slip"
+      ]
+    },
+    {
+      "fid": "X-005",
+      "title": "Declared income exceeds income shown in bank_statement",
+      "severity": "medium",
+      "status": "inconsistency",
+      "confidence": "medium (0.70)",
+      "documents": [
+        "application_form",
+        "bank_statement"
+      ]
+    },
+    {
+      "fid": "R-001",
+      "title": "bank_statement shares no identifier with the other documents",
+      "severity": "medium",
+      "status": "observed",
+      "confidence": "medium (0.60)",
+      "documents": [
+        "bank_statement"
+      ]
+    }
+  ],
+  "standards": {
+    "note": "This system draws on the frameworks below as reference points. It does not claim compliance or certification with any of them; each row says what we do and what we do not do.",
+    "rows": [
+      {
+        "framework": "ISO/IEC 27037 (identification, collection, acquisition and preservation of digital evidence)",
+        "what_we_do": "Each source file is hashed (SHA-256) at ingest; originals are never modified (analysis uses derived copies, recorded in the log); every step is written to a hash-chained audit log with archived run history.",
+        "what_we_do_not": "No acquisition or custody control before upload: the system only sees the copy it is given. No write protection or collection records for the original device or system."
+      },
+      {
+        "framework": "ISO/IEC 27041 (suitability and adequacy of investigative methods)",
+        "what_we_do": "Methods are documented (ARCHITECTURE.md), tested on a synthetic benchmark and an organiser test pack with an answer key, and limitations are stated openly (skilled forgeries, tuning on synthetic data).",
+        "what_we_do_not": "No formal validation study, no measured error rates on real documents, no independent testing."
+      },
+      {
+        "framework": "ISO/IEC 27042 (analysis and interpretation of digital evidence)",
+        "what_we_do": "Findings separate a data inconsistency, a potential alteration and an observation; each has a confidence level, possible explanations and a suggested check; nothing is called fraud; the pipeline is deterministic and repeatable.",
+        "what_we_do_not": "Confidence levels are the system's own estimates, not calibrated probabilities; no formal competence or review process around the analyst."
+      },
+      {
+        "framework": "NIST SP 800-86 (forensic techniques in incident response)",
+        "what_we_do": "The pipeline follows its collection, examination, analysis and reporting phases: ingest and hashing; reading, extraction, structure and forensic checks; contextual and cross-document analysis; the dossier.",
+        "what_we_do_not": "It is written for incident response on live systems; volatile data, network and system sources are out of scope here."
+      },
+      {
+        "framework": "OWASP Machine Learning Security Top 10",
+        "what_we_do": "No training is done and no model is hosted, so model theft, poisoning, inversion and membership inference do not apply. Supply chain: the downloaded embedding model is checked against recorded SHA-256 values and the result is logged. Output integrity: hash-chained audit and review logs. The optional Claude summary is off by default.",
+        "what_we_do_not": "Input manipulation (documents crafted to mislead OCR or classification) is only partly mitigated (veto rule, minimum expected fields) and not tested adversarially. Recorded model hashes were taken from our own first download, not from a publisher signature. RapidOCR models are bundled in their package and not separately pinned. When the optional summary is on, finding text (document values) is sent to an external API."
+      }
+    ]
+  },
+  "processing": [
+    "4 page(s) from 4 file(s); 4 recognised as a supported type, 0 not recognised.",
+    "Text: 0 page(s) read exactly from the PDF text layer, 4 page(s) read by OCR.",
+    "23 field(s) extracted, 0 table(s) found.",
+    "Visual forensics: pixel-level checks on 4 page(s), PDF structure checks on 0 generated PDF page(s).",
+    "Cross-document: 8 field(s) compared across documents (2 agree, 3 differ, 3 in one document only, 0 could not be compared); 3 document pair(s) linked by shared identifiers.",
+    "9 finding(s) in total."
+  ],
+  "verification": [
+    {
+      "area": "Fields present in only one document",
+      "detail": "Account number, Monthly gross income, Pay month. They could not be cross-checked; confirm them against an independent source."
+    },
+    {
+      "area": "bank_statement: shares no identifier with the other documents",
+      "detail": "Confirm that it belongs to this application."
+    },
+    {
+      "area": "Issuer verification",
+      "detail": "No document was checked against the issuing organisation or a registry. Confirm identity, employment and account details with the issuers."
+    },
+    {
+      "area": "Original documents",
+      "detail": "Findings come from the submitted copies only. Compare every flagged value and region with the originals before any decision."
+    }
+  ],
+  "correlation": {
+    "matrix": [
+      {
+        "field": "Name",
+        "key": "name",
+        "verdict": "differ",
+        "entries": [
+          {
+            "doc_id": "application_form",
+            "raw": "Rohan Mehta",
+            "bbox": [
+              433,
+              195,
+              612,
+              216
+            ],
+            "field": "name"
+          },
+          {
+            "doc_id": "bank_statement",
+            "raw": "Rohan Mehra",
+            "bbox": [
+              433,
+              195,
+              613,
+              216
+            ],
+            "field": "name"
+          },
+          {
+            "doc_id": "id_card",
+            "raw": "Rohan Mehta",
+            "bbox": [
+              433,
+              195,
+              612,
+              216
+            ],
+            "field": "name"
+          },
+          {
+            "doc_id": "salary_slip",
+            "raw": "Rohan Mehta",
+            "bbox": [
+              433,
+              195,
+              612,
+              216
+            ],
+            "field": "name"
+          }
+        ]
+      },
+      {
+        "field": "Date of birth",
+        "key": "dob",
+        "verdict": "differ",
+        "entries": [
+          {
+            "doc_id": "application_form",
+            "raw": "14/03/1994",
+            "bbox": [
+              433,
+              281,
+              590,
+              304
+            ],
+            "field": "dob"
+          },
+          {
+            "doc_id": "id_card",
+            "raw": "14/03/1990",
+            "bbox": [
+              434,
+              285,
+              590,
+              308
+            ],
+            "field": "dob"
+          }
+        ]
+      },
+      {
+        "field": "ID number",
+        "key": "id_number",
+        "verdict": "differ",
+        "entries": [
+          {
+            "doc_id": "application_form",
+            "raw": "ABCDE1234F",
+            "bbox": [
+              430,
+              366,
+              613,
+              386
+            ],
+            "field": "id_number"
+          },
+          {
+            "doc_id": "id_card",
+            "raw": "ABCDE1284F",
+            "bbox": [
+              430,
+              366,
+              613,
+              386
+            ],
+            "field": "id_number"
+          }
+        ]
+      },
+      {
+        "field": "Address",
+        "key": "address",
+        "verdict": "agree",
+        "entries": [
+          {
+            "doc_id": "application_form",
+            "raw": "Flat 12, Sector 21, Noida UP 201301",
+            "bbox": [
+              433,
+              450,
+              937,
+              475
+            ],
+            "field": "address"
+          },
+          {
+            "doc_id": "id_card",
+            "raw": "Flat 12, Sector 21, Noida UP 201301",
+            "bbox": [
+              433,
+              450,
+              937,
+              475
+            ],
+            "field": "address"
+          }
+        ]
+      },
+      {
+        "field": "Employer",
+        "key": "employer",
+        "verdict": "agree",
+        "entries": [
+          {
+            "doc_id": "application_form",
+            "raw": "Nimbus Analytics Pvt Ltd",
+            "bbox": [
+              433,
+              535,
+              776,
+              562
+            ],
+            "field": "employer"
+          },
+          {
+            "doc_id": "salary_slip",
+            "raw": "Nimbus Analytics Pvt Ltd",
+            "bbox": [
+              433,
+              280,
+              776,
+              307
+            ],
+            "field": "employer"
+          }
+        ]
+      },
+      {
+        "field": "Account number",
+        "key": "account_no",
+        "verdict": "single",
+        "entries": [
+          {
+            "doc_id": "bank_statement",
+            "raw": "50100234567891",
+            "bbox": [
+              432,
+              281,
+              677,
+              301
+            ],
+            "field": "account_no"
+          }
+        ]
+      },
+      {
+        "field": "Monthly gross income",
+        "key": "amount",
+        "verdict": "single",
+        "entries": [
+          {
+            "doc_id": "salary_slip",
+            "raw": "Rs. 95,000",
+            "bbox": [
+              433,
+              451,
+              578,
+              475
+            ],
+            "field": "gross"
+          }
+        ]
+      },
+      {
+        "field": "Pay month",
+        "key": "pay_month",
+        "verdict": "single",
+        "entries": [
+          {
+            "doc_id": "salary_slip",
+            "raw": "October 2026",
+            "bbox": [
+              432,
+              365,
+              620,
+              386
+            ],
+            "field": "pay_month"
+          }
+        ]
+      }
+    ],
+    "links": [
+      {
+        "a": "application_form",
+        "b": "id_card",
+        "shared": [
+          "name"
+        ]
+      },
+      {
+        "a": "application_form",
+        "b": "salary_slip",
+        "shared": [
+          "name"
+        ]
+      },
+      {
+        "a": "id_card",
+        "b": "salary_slip",
+        "shared": [
+          "name"
+        ]
+      }
+    ],
+    "unlinked": [
+      "bank_statement"
+    ],
+    "case_codes": {},
+    "documents": [
+      "application_form",
+      "bank_statement",
+      "id_card",
+      "salary_slip"
+    ]
+  },
+  "evidence": {
+    "V-001": {
+      "label": "Potential alteration: an indicator that something may have been changed, not proof",
+      "why": "Pixels in this region behave differently from the rest of the page (compression, grain, tone, ink or typography). Edits can leave such traces, so can scanning.",
+      "check": "Look at the region at full resolution on the original capture, repeat the capture if possible, and compare with the issuer's copy.",
+      "explanations": [
+        "Scanning, compression or lighting artefacts",
+        "A value overwritten or pasted in after printing",
+        "Different fonts or printers used legitimately on the same page"
+      ],
+      "crop": "evidence/V-001.png",
+      "regions": 1
+    },
+    "V-002": {
+      "label": "Potential alteration: an indicator that something may have been changed, not proof",
+      "why": "Pixels in this region behave differently from the rest of the page (compression, grain, tone, ink or typography). Edits can leave such traces, so can scanning.",
+      "check": "Look at the region at full resolution on the original capture, repeat the capture if possible, and compare with the issuer's copy.",
+      "explanations": [
+        "Scanning, compression or lighting artefacts",
+        "A value overwritten or pasted in after printing",
+        "Different fonts or printers used legitimately on the same page"
+      ],
+      "crop": "evidence/V-002.png",
+      "regions": 1
+    },
+    "C-001": {
+      "label": "Confirmed data conflict: two values in the submitted documents contradict each other (this says nothing about intent)",
+      "why": "Figures printed on the same page do not add up, so at least one of them is wrong or was changed after the document was produced.",
+      "check": "Ask the issuer for the original or a recalculation and compare the figures with the payroll record.",
+      "explanations": [
+        "A typing or calculation error when the document was produced",
+        "One figure edited after the document was produced",
+        "A different version of the statement mixed with this one"
+      ],
+      "crop": "evidence/C-001.png",
+      "regions": 3
+    },
+    "X-001": {
+      "label": "Confirmed data conflict: two values in the submitted documents contradict each other (this says nothing about intent)",
+      "why": "Documents that describe the same person or application disagree; at most one of them can be right.",
+      "check": "Obtain the originals of the documents named, find which one matches the issuer's record, and do not assume which is correct.",
+      "explanations": [
+        "A typing error in one of the documents",
+        "The documents were produced at different times or are different versions",
+        "A value in one document was changed",
+        "A document of another person was mixed in"
+      ],
+      "crop": "evidence/X-001.png",
+      "regions": 4
+    },
+    "X-002": {
+      "label": "Confirmed data conflict: two values in the submitted documents contradict each other (this says nothing about intent)",
+      "why": "Documents that describe the same person or application disagree; at most one of them can be right.",
+      "check": "Obtain the originals of the documents named, find which one matches the issuer's record, and do not assume which is correct.",
+      "explanations": [
+        "A typing error in one of the documents",
+        "The documents were produced at different times or are different versions",
+        "A value in one document was changed",
+        "A document of another person was mixed in"
+      ],
+      "crop": "evidence/X-002.png",
+      "regions": 2
+    },
+    "X-003": {
+      "label": "Confirmed data conflict: two values in the submitted documents contradict each other (this says nothing about intent)",
+      "why": "Documents that describe the same person or application disagree; at most one of them can be right.",
+      "check": "Obtain the originals of the documents named, find which one matches the issuer's record, and do not assume which is correct.",
+      "explanations": [
+        "A typing error in one of the documents",
+        "The documents were produced at different times or are different versions",
+        "A value in one document was changed",
+        "A document of another person was mixed in"
+      ],
+      "crop": "evidence/X-003.png",
+      "regions": 2
+    },
+    "X-004": {
+      "label": "Confirmed data conflict: two values in the submitted documents contradict each other (this says nothing about intent)",
+      "why": "Records that should agree (payslip, bank statement, application, case reference) show different values.",
+      "check": "Obtain the bank's own statement and the employer's payroll or confirmation record and see which side matches the issuer's data.",
+      "explanations": [
+        "Timing: the payslip was corrected or reissued after the bank credit",
+        "Net pay shown before an adjustment that the bank reflects",
+        "A figure on the payslip or in the bank record was changed"
+      ],
+      "crop": "evidence/X-004.png",
+      "regions": 2
+    },
+    "X-005": {
+      "label": "Confirmed data conflict: two values in the submitted documents contradict each other (this says nothing about intent)",
+      "why": "Records that should agree (payslip, bank statement, application, case reference) show different values.",
+      "check": "Obtain the bank's own statement and the employer's payroll or confirmation record and see which side matches the issuer's data.",
+      "explanations": [
+        "Timing: the payslip was corrected or reissued after the bank credit",
+        "Net pay shown before an adjustment that the bank reflects",
+        "A figure on the payslip or in the bank record was changed"
+      ],
+      "crop": "evidence/X-005.png",
+      "regions": 2
+    },
+    "R-001": {
+      "label": "Observation: a note, coverage gap or weak signal, not an accusation",
+      "why": "Documents that describe the same person or application disagree; at most one of them can be right.",
+      "check": "Obtain the originals of the documents named, find which one matches the issuer's record, and do not assume which is correct.",
+      "explanations": [
+        "A document from another application was added by mistake",
+        "A clerical error in the reference",
+        "A reference altered to attach the document to this case"
+      ],
+      "crop": null,
+      "regions": 0
+    }
+  },
+  "audit": {
+    "run_id": "20261105T054413-dcf1ee",
+    "chain_ok": true,
+    "events": 56,
+    "digest": "432981265a7f117da7838bb584450f6145101acadbd46769a19b3e2f8951bc51",
+    "earlier_runs": [],
+    "review_log": "review_log.jsonl (reviewer decisions, hash-chained, anchored to this digest)"
+  },
+  "capabilities": [
+    {
+      "capability": "Ingestion: images, PDFs and ZIP bundles (one zip = one case); multi-document cases",
+      "status": "Implemented"
+    },
+    {
+      "capability": "Page normalisation: deskew (tilt up to +/-8 deg) and lighting flattening for phone photos",
+      "status": "Implemented; perspective correction planned"
+    },
+    {
+      "capability": "OCR + field extraction with field-level confidence and bounding boxes",
+      "status": "Implemented (Tesseract + optional RapidOCR; printed text, label:value layouts)"
+    },
+    {
+      "capability": "Semantic label matching (embeddings) for field labels outside the dictionary",
+      "status": "Implemented (needs embedding model; falls back to fuzzy dictionary)"
+    },
+    {
+      "capability": "Document classification: embeddings + keywords, unsupported-class veto, structural gate (>=3 expected fields)",
+      "status": "Implemented (keyword + structure fallback when no model)"
+    },
+    {
+      "capability": "Visual forensics: ELA, grain/noise, paper tone, ink darkness (peer-relative, lighting-corrected)",
+      "status": "Implemented"
+    },
+    {
+      "capability": "Contextual checks: arithmetic, formats, date logic, completeness",
+      "status": "Implemented"
+    },
+    {
+      "capability": "Cross-document entity matching (odd-one-out) and income reconciliation",
+      "status": "Implemented"
+    },
+    {
+      "capability": "Section detection; transaction and earnings/deductions tables with running-balance, page-continuity, total and component-sum checks",
+      "status": "Implemented (bank-statement and salary-slip layouts)"
+    },
+    {
+      "capability": "Evidence mapping (annotated regions), audit trail, reviewer UI, PDF/JSON dossier",
+      "status": "Implemented"
+    },
+    {
+      "capability": "Handwriting recognition",
+      "status": "Unsupported"
+    },
+    {
+      "capability": "Typography / spacing / alignment checks, JPEG block-grid consistency (inserted or replaced content), photo-region check on ID cards, signature detection with placement and background checks",
+      "status": "Implemented (heuristic; see limitations)"
+    },
+    {
+      "capability": "Born-digital PDFs: exact text layer (no OCR), font consistency of amounts, bordered patches over values, covered or hidden text, file history (revisions, dates, producer)",
+      "status": "Implemented (observations about file structure, not proof)"
+    },
+    {
+      "capability": "Duplicated (copy-move) image regions on scans and photos; image metadata (editing software, modification after capture); scanned-PDF file history",
+      "status": "Implemented (observations; copies recompressed below about JPEG quality 92 after pasting can be missed)"
+    },
+    {
+      "capability": "Signature authenticity, photo identity matching",
+      "status": "Planned"
+    },
+    {
+      "capability": "Layout-aware ML models (LayoutLM etc.), tables in other layouts, multilingual OCR",
+      "status": "Planned"
+    }
+  ],
+  "audit_trail": [
+    {
+      "ts": "2026-11-05T05:44:13+0000",
+      "event": "case_start",
+      "run": "20261105T054413-dcf1ee",
+      "case_id": "case_tampered",
+      "n_inputs": 4,
+      "run_id": "20261105T054413-dcf1ee",
+      "earlier_runs": 0,
+      "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "82e0c5478e75ee6857e3d7c56ab43e1ab53db09683155e98732885f55df61adb"
+    },
+    {
+      "ts": "2026-11-05T05:44:14+0000",
+      "event": "embedding_model",
+      "run": "20261105T054413-dcf1ee",
+      "backend": "fastembed:BAAI/bge-small-en-v1.5",
+      "active": true,
+      "integrity": "verified",
+      "integrity_detail": "5 files match the recorded SHA-256 values (revision aa8f8b060edb)",
+      "model_files": {
+        "model_optimized.onnx": "51f1bd0addd6e859e42c2c8021a5e5461385bb676a649f4b269aa445449f2431",
+        "tokenizer.json": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+        "config.json": "13582bcf2effc85b7bf3d3f5532e686bc1c9ce86bb009d10f0ec33cbe92299dd",
+        "special_tokens_map.json": "5d5b662e421ea9fac075174bb0688ee0d9431699900b90662acd44b2a350503a",
+        "tokenizer_config.json": "0b29c7bfc889e53b36d9dd3e686dd4300f6525110eaa98c76a5dafceb2029f53"
+      },
+      "prev": "82e0c5478e75ee6857e3d7c56ab43e1ab53db09683155e98732885f55df61adb",
+      "hash": "0475ffcacf2a362b2f50fb8f926fd6d8330cb308a22d2babba260c8ea8ebb97b"
+    },
+    {
+      "ts": "2026-11-05T05:44:14+0000",
+      "event": "deskew",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "application_form",
+      "estimated_angle": -0.0,
+      "gain": 1.0,
+      "applied": false,
+      "prev": "0475ffcacf2a362b2f50fb8f926fd6d8330cb308a22d2babba260c8ea8ebb97b",
+      "hash": "b591dc380b0b4a489e44207486cc731537168ff1a581acf5b993cc9d5ca48e69"
+    },
+    {
+      "ts": "2026-11-05T05:44:14+0000",
+      "event": "ingest",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "application_form",
+      "source": "application_form.jpg",
+      "sha256": "b65f9da544765c44dc9e452ee5f7bda31330c41f41c3541042faebeca3df5108",
+      "size": [
+        1000,
+        1300
+      ],
+      "prev": "b591dc380b0b4a489e44207486cc731537168ff1a581acf5b993cc9d5ca48e69",
+      "hash": "9bcbc19fa1b257b7fd2e733e81881f968697a70e3d0ce9f8cef192d1158fe894"
+    },
+    {
+      "ts": "2026-11-05T05:44:14+0000",
+      "event": "deskew",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "bank_statement",
+      "estimated_angle": -0.0,
+      "gain": 1.0,
+      "applied": false,
+      "prev": "9bcbc19fa1b257b7fd2e733e81881f968697a70e3d0ce9f8cef192d1158fe894",
+      "hash": "e11305ef59ed7571c89083dc4da763c1655f0ef89ad31a5057c356b0b85780a2"
+    },
+    {
+      "ts": "2026-11-05T05:44:14+0000",
+      "event": "ingest",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "bank_statement",
+      "source": "bank_statement.jpg",
+      "sha256": "4805d814c8f5b1227d892269d353734ec1e40126da239b4932963af886ece4ec",
+      "size": [
+        1000,
+        1300
+      ],
+      "prev": "e11305ef59ed7571c89083dc4da763c1655f0ef89ad31a5057c356b0b85780a2",
+      "hash": "adf366e151877705a93388dc164fa69b7ee6bab9950a1f8d53349bffe48bff08"
+    },
+    {
+      "ts": "2026-11-05T05:44:14+0000",
+      "event": "deskew",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "id_card",
+      "estimated_angle": -0.0,
+      "gain": 1.0,
+      "applied": false,
+      "prev": "adf366e151877705a93388dc164fa69b7ee6bab9950a1f8d53349bffe48bff08",
+      "hash": "2c049ec3805151430661945975392bd62c6e270bce69d6737530ae2e0c8c17bd"
+    },
+    {
+      "ts": "2026-11-05T05:44:15+0000",
+      "event": "ingest",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "id_card",
+      "source": "id_card.jpg",
+      "sha256": "c47d6e90089bbd980f1da359e2d94fcad602e96f19be86a52a5624711e7862d2",
+      "size": [
+        1000,
+        1300
+      ],
+      "prev": "2c049ec3805151430661945975392bd62c6e270bce69d6737530ae2e0c8c17bd",
+      "hash": "6a37d44ae9d25c78c84a0a668c424bbbc5bc00f89b733141587b141fcb457bb5"
+    },
+    {
+      "ts": "2026-11-05T05:44:15+0000",
+      "event": "deskew",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "salary_slip",
+      "estimated_angle": -0.0,
+      "gain": 1.0,
+      "applied": false,
+      "prev": "6a37d44ae9d25c78c84a0a668c424bbbc5bc00f89b733141587b141fcb457bb5",
+      "hash": "37eb066093f35b65bba7406010340088ca984ede820c2049912754ae538c3690"
+    },
+    {
+      "ts": "2026-11-05T05:44:15+0000",
+      "event": "ingest",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "salary_slip",
+      "source": "salary_slip.jpg",
+      "sha256": "7ef5677dede75362fe9af6a8bad261d6728c7f0e56a747f112a404d3cece87a1",
+      "size": [
+        1000,
+        1300
+      ],
+      "prev": "37eb066093f35b65bba7406010340088ca984ede820c2049912754ae538c3690",
+      "hash": "f6af07232952758dfbeeeffc18be954964d079b2a09730259fcfa37027c9fd28"
+    },
+    {
+      "ts": "2026-11-05T05:44:16+0000",
+      "event": "ocr",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "application_form",
+      "engine": "tesseract",
+      "n_words": 40,
+      "mean_conf": 0.95,
+      "candidates": {
+        "tesseract": [
+          40,
+          29.46
+        ]
+      },
+      "prev": "f6af07232952758dfbeeeffc18be954964d079b2a09730259fcfa37027c9fd28",
+      "hash": "71b41420f1364666b956eaed7efe8ef254504cf5115297791664963f48c76bfa"
+    },
+    {
+      "ts": "2026-11-05T05:44:16+0000",
+      "event": "extract",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "application_form",
+      "fields": [
+        "name",
+        "dob",
+        "id_number",
+        "address",
+        "employer",
+        "declared_income"
+      ],
+      "prev": "71b41420f1364666b956eaed7efe8ef254504cf5115297791664963f48c76bfa",
+      "hash": "4bda3b8ac56041edf10d9a4da0505d5426c0cfcaa941e94c414d68080c5e8865"
+    },
+    {
+      "ts": "2026-11-05T05:44:17+0000",
+      "event": "classify",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "application_form",
+      "doc_type": "application_form",
+      "best_guess": "application_form",
+      "keyword": {
+        "application_form": 1.0,
+        "id_card": 0.0,
+        "salary_slip": 0.0,
+        "bank_statement": 0.0,
+        "employment_letter": 0.25
+      },
+      "expected_fields_found": {
+        "application_form": 6,
+        "id_card": 4,
+        "salary_slip": 2,
+        "bank_statement": 1,
+        "employment_letter": 2
+      },
+      "semantic": {
+        "application_form": 0.705,
+        "id_card": 0.615,
+        "salary_slip": 0.552,
+        "bank_statement": 0.592,
+        "employment_letter": 0.571,
+        "other:research_paper": 0.517,
+        "other:resume": 0.586,
+        "other:invoice": 0.541,
+        "other:article_letter": 0.417,
+        "other:financial_report": 0.518,
+        "other:business_report": 0.503,
+        "other:contract": 0.489,
+        "other:tax_form": 0.535,
+        "other:utility_bill": 0.451,
+        "other:certificate": 0.537,
+        "other:medical_report": 0.435,
+        "other:presentation_brochure": 0.417
+      },
+      "decision": "accepted as application_form",
+      "prev": "4bda3b8ac56041edf10d9a4da0505d5426c0cfcaa941e94c414d68080c5e8865",
+      "hash": "7bdb9d27d974dd413887077c7625065b4d20f8f118b193846ee36ca9b3c9fe1b"
+    },
+    {
+      "ts": "2026-11-05T05:44:18+0000",
+      "event": "ocr",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "bank_statement",
+      "engine": "tesseract",
+      "n_words": 36,
+      "mean_conf": 0.95,
+      "candidates": {
+        "tesseract": [
+          36,
+          28.56
+        ]
+      },
+      "prev": "7bdb9d27d974dd413887077c7625065b4d20f8f118b193846ee36ca9b3c9fe1b",
+      "hash": "f07ff62f296a588bca7c03cfe51bb8313b716d38c727f1beecfa0054e4d09026"
+    },
+    {
+      "ts": "2026-11-05T05:44:18+0000",
+      "event": "extract",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "bank_statement",
+      "fields": [
+        "name",
+        "account_no",
+        "period",
+        "opening_balance",
+        "salary_credit",
+        "closing_balance"
+      ],
+      "prev": "f07ff62f296a588bca7c03cfe51bb8313b716d38c727f1beecfa0054e4d09026",
+      "hash": "4e59b42a5125421eab1226a210a93a0f64c6f45d6709f724212988cc56643d27"
+    },
+    {
+      "ts": "2026-11-05T05:44:18+0000",
+      "event": "classify",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "bank_statement",
+      "doc_type": "bank_statement",
+      "best_guess": "bank_statement",
+      "keyword": {
+        "application_form": 0.0,
+        "id_card": 0.0,
+        "salary_slip": 0.17,
+        "bank_statement": 0.8,
+        "employment_letter": 0.12
+      },
+      "expected_fields_found": {
+        "application_form": 1,
+        "id_card": 1,
+        "salary_slip": 1,
+        "bank_statement": 6,
+        "employment_letter": 1
+      },
+      "semantic": {
+        "application_form": 0.609,
+        "id_card": 0.62,
+        "salary_slip": 0.557,
+        "bank_statement": 0.74,
+        "employment_letter": 0.551,
+        "other:research_paper": 0.479,
+        "other:resume": 0.575,
+        "other:invoice": 0.565,
+        "other:article_letter": 0.414,
+        "other:financial_report": 0.57,
+        "other:business_report": 0.49,
+        "other:contract": 0.472,
+        "other:tax_form": 0.513,
+        "other:utility_bill": 0.494,
+        "other:certificate": 0.501,
+        "other:medical_report": 0.458,
+        "other:presentation_brochure": 0.398
+      },
+      "decision": "accepted as bank_statement",
+      "prev": "4e59b42a5125421eab1226a210a93a0f64c6f45d6709f724212988cc56643d27",
+      "hash": "ba72dc3ea47ef03089941bb7802b9ce718e4fb4fbc1ada3e017d26ef4d118841"
+    },
+    {
+      "ts": "2026-11-05T05:44:19+0000",
+      "event": "ocr",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "id_card",
+      "engine": "tesseract",
+      "n_words": 33,
+      "mean_conf": 0.949,
+      "candidates": {
+        "tesseract": [
+          33,
+          24.69
+        ]
+      },
+      "prev": "ba72dc3ea47ef03089941bb7802b9ce718e4fb4fbc1ada3e017d26ef4d118841",
+      "hash": "5c1314dc1134713fa6ab68c2fe7ce511953cf515a3decc7a46d712c72fd99edd"
+    },
+    {
+      "ts": "2026-11-05T05:44:19+0000",
+      "event": "extract",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "id_card",
+      "fields": [
+        "name",
+        "dob",
+        "id_number",
+        "address",
+        "issue_date"
+      ],
+      "prev": "5c1314dc1134713fa6ab68c2fe7ce511953cf515a3decc7a46d712c72fd99edd",
+      "hash": "f487fc230fd1b4ab8f0a2f66a9545572aea4c9432a6628cb55aedcf998d5569b"
+    },
+    {
+      "ts": "2026-11-05T05:44:19+0000",
+      "event": "classify",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "id_card",
+      "doc_type": "id_card",
+      "best_guess": "id_card",
+      "keyword": {
+        "application_form": 0.0,
+        "id_card": 1.0,
+        "salary_slip": 0.0,
+        "bank_statement": 0.0,
+        "employment_letter": 0.0
+      },
+      "expected_fields_found": {
+        "application_form": 4,
+        "id_card": 5,
+        "salary_slip": 1,
+        "bank_statement": 1,
+        "employment_letter": 1
+      },
+      "semantic": {
+        "application_form": 0.574,
+        "id_card": 0.704,
+        "salary_slip": 0.479,
+        "bank_statement": 0.494,
+        "employment_letter": 0.528,
+        "other:research_paper": 0.438,
+        "other:resume": 0.533,
+        "other:invoice": 0.46,
+        "other:article_letter": 0.375,
+        "other:financial_report": 0.397,
+        "other:business_report": 0.412,
+        "other:contract": 0.452,
+        "other:tax_form": 0.491,
+        "other:utility_bill": 0.406,
+        "other:certificate": 0.543,
+        "other:medical_report": 0.44,
+        "other:presentation_brochure": 0.384
+      },
+      "decision": "accepted as id_card",
+      "prev": "f487fc230fd1b4ab8f0a2f66a9545572aea4c9432a6628cb55aedcf998d5569b",
+      "hash": "afb437e3938410d5b5d8983444fa01afc7f96a9b9ac688bf1c3b5b49207e75d1"
+    },
+    {
+      "ts": "2026-11-05T05:44:20+0000",
+      "event": "ocr",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "salary_slip",
+      "engine": "tesseract",
+      "n_words": 36,
+      "mean_conf": 0.952,
+      "candidates": {
+        "tesseract": [
+          36,
+          27.66
+        ]
+      },
+      "prev": "afb437e3938410d5b5d8983444fa01afc7f96a9b9ac688bf1c3b5b49207e75d1",
+      "hash": "fd7903f42bbc49a0f77978fc3d5ee8c6ac1a855e6b84a7184008db11b5536140"
+    },
+    {
+      "ts": "2026-11-05T05:44:20+0000",
+      "event": "extract",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "salary_slip",
+      "fields": [
+        "name",
+        "employer",
+        "pay_month",
+        "gross",
+        "deductions",
+        "net_pay"
+      ],
+      "prev": "fd7903f42bbc49a0f77978fc3d5ee8c6ac1a855e6b84a7184008db11b5536140",
+      "hash": "55257176a7935c7efd2be90dfec8ee559e3dcccf997c26e8cb5b33bc76b6dc87"
+    },
+    {
+      "ts": "2026-11-05T05:44:20+0000",
+      "event": "classify",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "salary_slip",
+      "doc_type": "salary_slip",
+      "best_guess": "salary_slip",
+      "keyword": {
+        "application_form": 0.0,
+        "id_card": 0.0,
+        "salary_slip": 0.83,
+        "bank_statement": 0.0,
+        "employment_letter": 0.38
+      },
+      "expected_fields_found": {
+        "application_form": 2,
+        "id_card": 1,
+        "salary_slip": 6,
+        "bank_statement": 1,
+        "employment_letter": 3
+      },
+      "semantic": {
+        "application_form": 0.569,
+        "id_card": 0.498,
+        "salary_slip": 0.689,
+        "bank_statement": 0.551,
+        "employment_letter": 0.597,
+        "other:research_paper": 0.507,
+        "other:resume": 0.564,
+        "other:invoice": 0.557,
+        "other:article_letter": 0.407,
+        "other:financial_report": 0.518,
+        "other:business_report": 0.507,
+        "other:contract": 0.485,
+        "other:tax_form": 0.528,
+        "other:utility_bill": 0.423,
+        "other:certificate": 0.522,
+        "other:medical_report": 0.423,
+        "other:presentation_brochure": 0.427
+      },
+      "decision": "accepted as salary_slip",
+      "prev": "55257176a7935c7efd2be90dfec8ee559e3dcccf997c26e8cb5b33bc76b6dc87",
+      "hash": "12432421ca0bbef98dbafa3a33ab58f88d343aee9f01975f21e6566eefc70b9c"
+    },
+    {
+      "ts": "2026-11-05T05:44:20+0000",
+      "event": "categorise",
+      "run": "20261105T054413-dcf1ee",
+      "file": "application_form.jpg",
+      "label": "Application form",
+      "confidence": 0.887,
+      "pages_agree": [
+        1,
+        1
+      ],
+      "top": [
+        [
+          "Application form",
+          0.887
+        ],
+        [
+          "ID card",
+          0.044
+        ],
+        [
+          "Bank statement",
+          0.021
+        ]
+      ],
+      "prev": "12432421ca0bbef98dbafa3a33ab58f88d343aee9f01975f21e6566eefc70b9c",
+      "hash": "2fe1bc34ee32f49200cf3aa13536781f4905ceab9c43757399a966e6d6c6cb43"
+    },
+    {
+      "ts": "2026-11-05T05:44:20+0000",
+      "event": "categorise",
+      "run": "20261105T054413-dcf1ee",
+      "file": "bank_statement.jpg",
+      "label": "Bank statement",
+      "confidence": 0.955,
+      "pages_agree": [
+        1,
+        1
+      ],
+      "top": [
+        [
+          "Bank statement",
+          0.955
+        ],
+        [
+          "ID card",
+          0.017
+        ],
+        [
+          "Application form",
+          0.012
+        ]
+      ],
+      "prev": "2fe1bc34ee32f49200cf3aa13536781f4905ceab9c43757399a966e6d6c6cb43",
+      "hash": "35fc75e537003770e007e7fddd9c172af30be2b9bd894b15a6b992f598b6fa65"
+    },
+    {
+      "ts": "2026-11-05T05:44:20+0000",
+      "event": "categorise",
+      "run": "20261105T054413-dcf1ee",
+      "file": "id_card.jpg",
+      "label": "ID card",
+      "confidence": 0.973,
+      "pages_agree": [
+        1,
+        1
+      ],
+      "top": [
+        [
+          "ID card",
+          0.973
+        ],
+        [
+          "Application form",
+          0.013
+        ],
+        [
+          "Certificate (completion / participation / academic)",
+          0.005
+        ]
+      ],
+      "prev": "35fc75e537003770e007e7fddd9c172af30be2b9bd894b15a6b992f598b6fa65",
+      "hash": "67570f60c0dbb1a79115d4b47b83844e8fb7146cbca0774a3ca67f21aec554bd"
+    },
+    {
+      "ts": "2026-11-05T05:44:20+0000",
+      "event": "categorise",
+      "run": "20261105T054413-dcf1ee",
+      "file": "salary_slip.jpg",
+      "label": "Salary slip",
+      "confidence": 0.891,
+      "pages_agree": [
+        1,
+        1
+      ],
+      "top": [
+        [
+          "Salary slip",
+          0.891
+        ],
+        [
+          "Employment confirmation",
+          0.041
+        ],
+        [
+          "Application form",
+          0.016
+        ]
+      ],
+      "prev": "67570f60c0dbb1a79115d4b47b83844e8fb7146cbca0774a3ca67f21aec554bd",
+      "hash": "6470054a3e7b963c4593f61db696b0765d3f4bafc42a0b43ed644209c93b685a"
+    },
+    {
+      "ts": "2026-11-05T05:44:20+0000",
+      "event": "structure",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "application_form",
+      "sections": [
+        [
+          "LOAN APPLICATION FORM",
+          "other"
+        ]
+      ],
+      "tables": [],
+      "prev": "6470054a3e7b963c4593f61db696b0765d3f4bafc42a0b43ed644209c93b685a",
+      "hash": "9f7692d1b85b9c204e1e37284a258af440de387b7ecfd836727815f5a2dce07a"
+    },
+    {
+      "ts": "2026-11-05T05:44:20+0000",
+      "event": "structure",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "bank_statement",
+      "sections": [
+        [
+          "BANK ACCOUNT STATEMENT",
+          "account_details"
+        ]
+      ],
+      "tables": [],
+      "prev": "9f7692d1b85b9c204e1e37284a258af440de387b7ecfd836727815f5a2dce07a",
+      "hash": "b0ade823d70bd1040d6dbba1202b7fff19c130c53e640d51174fb78b342efaa7"
+    },
+    {
+      "ts": "2026-11-05T05:44:20+0000",
+      "event": "structure",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "id_card",
+      "sections": [
+        [
+          "NATIONAL IDENTITY CARD",
+          "personal_details"
+        ]
+      ],
+      "tables": [],
+      "prev": "b0ade823d70bd1040d6dbba1202b7fff19c130c53e640d51174fb78b342efaa7",
+      "hash": "bb3783608f1de679ddf922248a421c7d08e9323b23cff682963eafac2976f4bc"
+    },
+    {
+      "ts": "2026-11-05T05:44:20+0000",
+      "event": "structure",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "salary_slip",
+      "sections": [
+        [
+          "SALARY SLIP",
+          "other"
+        ]
+      ],
+      "tables": [],
+      "prev": "bb3783608f1de679ddf922248a421c7d08e9323b23cff682963eafac2976f4bc",
+      "hash": "9f36a53617ee7bdcfe68ed25740baf175fd18c992b04fe640b351c24128f2f23"
+    },
+    {
+      "ts": "2026-11-05T05:44:20+0000",
+      "event": "forensics",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "application_form",
+      "fields_tested": 6,
+      "flagged": [],
+      "prev": "9f36a53617ee7bdcfe68ed25740baf175fd18c992b04fe640b351c24128f2f23",
+      "hash": "5148990984a52924e3c30eac1450748a2debc4794c7a9d64b32a06d8ed3d31ef"
+    },
+    {
+      "ts": "2026-11-05T05:44:20+0000",
+      "event": "forensics",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "bank_statement",
+      "fields_tested": 6,
+      "flagged": [],
+      "prev": "5148990984a52924e3c30eac1450748a2debc4794c7a9d64b32a06d8ed3d31ef",
+      "hash": "77b1f9a7e2620d4a2f4049eeafbef978aded063bcfe196de073704c14181fce9"
+    },
+    {
+      "ts": "2026-11-05T05:44:21+0000",
+      "event": "forensics",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "id_card",
+      "fields_tested": 5,
+      "flagged": [
+        "dob"
+      ],
+      "prev": "77b1f9a7e2620d4a2f4049eeafbef978aded063bcfe196de073704c14181fce9",
+      "hash": "75634aac49f12a5067b61c1cfdea9aae1a51607f9ef706feb1c4c00019cdbcec"
+    },
+    {
+      "ts": "2026-11-05T05:44:21+0000",
+      "event": "forensics",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "salary_slip",
+      "fields_tested": 6,
+      "flagged": [
+        "net_pay"
+      ],
+      "prev": "75634aac49f12a5067b61c1cfdea9aae1a51607f9ef706feb1c4c00019cdbcec",
+      "hash": "4e7a963b8e21968e12fd2bb4ea1d9483d9cd4e878327c89e898b8ad9bf2ebc49"
+    },
+    {
+      "ts": "2026-11-05T05:44:21+0000",
+      "event": "typography",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "application_form",
+      "fields": 5,
+      "flagged": [],
+      "prev": "4e7a963b8e21968e12fd2bb4ea1d9483d9cd4e878327c89e898b8ad9bf2ebc49",
+      "hash": "c76afebf3c8e819ed8b40515961987105e52ee412aeb24356aedf40f0f8b6a15"
+    },
+    {
+      "ts": "2026-11-05T05:44:21+0000",
+      "event": "visual_ext",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "application_form",
+      "typography": "run on 5 fields",
+      "grid": "run on 266 tiles; dominant grid 100%",
+      "photo": "not an ID card",
+      "signature": "no signature label on the page",
+      "flagged": [],
+      "prev": "c76afebf3c8e819ed8b40515961987105e52ee412aeb24356aedf40f0f8b6a15",
+      "hash": "fa1f47ca57a26c0403443b7ce9c280585465fac0ac1f690df4b30717a931b726"
+    },
+    {
+      "ts": "2026-11-05T05:44:22+0000",
+      "event": "typography",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "bank_statement",
+      "fields": 6,
+      "flagged": [],
+      "prev": "fa1f47ca57a26c0403443b7ce9c280585465fac0ac1f690df4b30717a931b726",
+      "hash": "7e3feb434fbdc558d1aca22d587bcabaa75b90a5fa0e969c1f8b759ade603ac4"
+    },
+    {
+      "ts": "2026-11-05T05:44:22+0000",
+      "event": "visual_ext",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "bank_statement",
+      "typography": "run on 6 fields",
+      "grid": "run on 258 tiles; dominant grid 100%",
+      "photo": "not an ID card",
+      "signature": "no signature label on the page",
+      "flagged": [],
+      "prev": "7e3feb434fbdc558d1aca22d587bcabaa75b90a5fa0e969c1f8b759ade603ac4",
+      "hash": "e1e24d46e786d957a8253eb0df293c75b229d7cd1eff23e1ba0ec417fbe3facc"
+    },
+    {
+      "ts": "2026-11-05T05:44:23+0000",
+      "event": "typography",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "id_card",
+      "fields": 5,
+      "flagged": [],
+      "prev": "e1e24d46e786d957a8253eb0df293c75b229d7cd1eff23e1ba0ec417fbe3facc",
+      "hash": "2cce9941681456cc3ebf1444166ff6bb0cdd3d52504006dc3aee09658ab4135d"
+    },
+    {
+      "ts": "2026-11-05T05:44:23+0000",
+      "event": "visual_ext",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "id_card",
+      "typography": "run on 5 fields",
+      "grid": "run on 298 tiles; dominant grid 100%",
+      "photo": "no photo-shaped continuous-tone region located (busy background, no photo, or photo too small)",
+      "signature": "no signature label on the page",
+      "flagged": [],
+      "prev": "2cce9941681456cc3ebf1444166ff6bb0cdd3d52504006dc3aee09658ab4135d",
+      "hash": "1f522133d89b7ad064a7ca4a459a790e2b8b82dd0e8938ba4d09f90a06985d33"
+    },
+    {
+      "ts": "2026-11-05T05:44:24+0000",
+      "event": "typography",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "salary_slip",
+      "fields": 6,
+      "flagged": [],
+      "prev": "1f522133d89b7ad064a7ca4a459a790e2b8b82dd0e8938ba4d09f90a06985d33",
+      "hash": "a4a60463ed598652d0cd75bd559cf83284a813e0e357e96539e6a6a2597b7323"
+    },
+    {
+      "ts": "2026-11-05T05:44:24+0000",
+      "event": "visual_ext",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "salary_slip",
+      "typography": "run on 6 fields",
+      "grid": "run on 300 tiles; dominant grid 100%",
+      "photo": "not an ID card",
+      "signature": "no signature label on the page",
+      "flagged": [],
+      "prev": "a4a60463ed598652d0cd75bd559cf83284a813e0e357e96539e6a6a2597b7323",
+      "hash": "a953427f96665851982291bd67033fcdc83a16fb864bf4c2c105b9251ed7b8e0"
+    },
+    {
+      "ts": "2026-11-05T05:44:24+0000",
+      "event": "fields_final",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "application_form",
+      "doc_type": "application_form",
+      "source_sha256": "b65f9da544765c44dc9e452ee5f7bda31330c41f41c3541042faebeca3df5108",
+      "fields": [
+        {
+          "key": "name",
+          "raw": "Rohan Mehta",
+          "bbox": [
+            433,
+            195,
+            612,
+            216
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "dob",
+          "raw": "14/03/1994",
+          "bbox": [
+            433,
+            281,
+            590,
+            304
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "id_number",
+          "raw": "ABCDE1234F",
+          "bbox": [
+            430,
+            366,
+            613,
+            386
+          ],
+          "conf": 0.91,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "address",
+          "raw": "Flat 12, Sector 21, Noida UP 201301",
+          "bbox": [
+            433,
+            450,
+            937,
+            475
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "employer",
+          "raw": "Nimbus Analytics Pvt Ltd",
+          "bbox": [
+            433,
+            535,
+            776,
+            562
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "declared_income",
+          "raw": "85,000",
+          "bbox": [
+            484,
+            621,
+            578,
+            645
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        }
+      ],
+      "prev": "a953427f96665851982291bd67033fcdc83a16fb864bf4c2c105b9251ed7b8e0",
+      "hash": "7be676ea0d6cc9df4374ac22270bf6c1eed374f339f9a06aa066c1aac84242e6"
+    },
+    {
+      "ts": "2026-11-05T05:44:24+0000",
+      "event": "fields_final",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "bank_statement",
+      "doc_type": "bank_statement",
+      "source_sha256": "4805d814c8f5b1227d892269d353734ec1e40126da239b4932963af886ece4ec",
+      "fields": [
+        {
+          "key": "name",
+          "raw": "Rohan Mehra",
+          "bbox": [
+            433,
+            195,
+            613,
+            216
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "account_no",
+          "raw": "50100234567891",
+          "bbox": [
+            432,
+            281,
+            677,
+            301
+          ],
+          "conf": 0.91,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "period",
+          "raw": "01/10/2026 - 31/10/2026",
+          "bbox": [
+            432,
+            366,
+            779,
+            389
+          ],
+          "conf": 0.94,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "opening_balance",
+          "raw": "Rs. 120,000",
+          "bbox": [
+            433,
+            451,
+            596,
+            475
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "salary_credit",
+          "raw": "Rs. 58,000",
+          "bbox": [
+            433,
+            536,
+            578,
+            560
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "closing_balance",
+          "raw": "Rs. 146,500",
+          "bbox": [
+            433,
+            621,
+            596,
+            645
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        }
+      ],
+      "prev": "7be676ea0d6cc9df4374ac22270bf6c1eed374f339f9a06aa066c1aac84242e6",
+      "hash": "261ee5faa03c93221b63dda8871b91923c9f049575bb2b30487b1f317843cba8"
+    },
+    {
+      "ts": "2026-11-05T05:44:24+0000",
+      "event": "fields_final",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "id_card",
+      "doc_type": "id_card",
+      "source_sha256": "c47d6e90089bbd980f1da359e2d94fcad602e96f19be86a52a5624711e7862d2",
+      "fields": [
+        {
+          "key": "name",
+          "raw": "Rohan Mehta",
+          "bbox": [
+            433,
+            195,
+            612,
+            216
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "dob",
+          "raw": "14/03/1990",
+          "bbox": [
+            434,
+            285,
+            590,
+            308
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "id_number",
+          "raw": "ABCDE1284F",
+          "bbox": [
+            430,
+            366,
+            613,
+            386
+          ],
+          "conf": 0.91,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "address",
+          "raw": "Flat 12, Sector 21, Noida UP 201301",
+          "bbox": [
+            433,
+            450,
+            937,
+            475
+          ],
+          "conf": 0.959,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "issue_date",
+          "raw": "02/06/2019",
+          "bbox": [
+            432,
+            536,
+            590,
+            559
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        }
+      ],
+      "prev": "261ee5faa03c93221b63dda8871b91923c9f049575bb2b30487b1f317843cba8",
+      "hash": "ab7413d05caaf63aadb5bd8172dc83f27a0019b2267662c1aa8d326e43c1768c"
+    },
+    {
+      "ts": "2026-11-05T05:44:24+0000",
+      "event": "fields_final",
+      "run": "20261105T054413-dcf1ee",
+      "doc_id": "salary_slip",
+      "doc_type": "salary_slip",
+      "source_sha256": "7ef5677dede75362fe9af6a8bad261d6728c7f0e56a747f112a404d3cece87a1",
+      "fields": [
+        {
+          "key": "name",
+          "raw": "Rohan Mehta",
+          "bbox": [
+            433,
+            195,
+            612,
+            216
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "employer",
+          "raw": "Nimbus Analytics Pvt Ltd",
+          "bbox": [
+            433,
+            280,
+            776,
+            307
+          ],
+          "conf": 0.955,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "pay_month",
+          "raw": "October 2026",
+          "bbox": [
+            432,
+            365,
+            620,
+            386
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "gross",
+          "raw": "Rs. 95,000",
+          "bbox": [
+            433,
+            451,
+            578,
+            475
+          ],
+          "conf": 0.95,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "deductions",
+          "raw": "Rs. 37,000",
+          "bbox": [
+            433,
+            536,
+            578,
+            560
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        },
+        {
+          "key": "net_pay",
+          "raw": "Rs. 85,000",
+          "bbox": [
+            432,
+            625,
+            579,
+            648
+          ],
+          "conf": 0.96,
+          "matched_by": "fuzzy"
+        }
+      ],
+      "prev": "ab7413d05caaf63aadb5bd8172dc83f27a0019b2267662c1aa8d326e43c1768c",
+      "hash": "2e82568338a9b7226f388a5c5fa9acf0288f5ad3b63d108ef16487ae30193ec4"
+    },
+    {
+      "ts": "2026-11-05T05:44:25+0000",
+      "event": "finding",
+      "run": "20261105T054413-dcf1ee",
+      "fid": "V-001",
+      "kind": "visual",
+      "severity": "high",
+      "confidence": 0.98,
+      "status": "potential_manipulation",
+      "title": "Possible alteration of 'Date of Birth' in id_card",
+      "method": "peer-relative ELA/noise/background/stroke analysis",
+      "refs": [
+        {
+          "doc_id": "id_card",
+          "field": "dob",
+          "value": "14/03/1990",
+          "bbox": [
+            434,
+            285,
+            590,
+            308
+          ]
+        }
+      ],
+      "source_sha256": {
+        "id_card": "c47d6e90089bbd980f1da359e2d94fcad602e96f19be86a52a5624711e7862d2"
+      },
+      "evidence_crop": "evidence/V-001.png",
+      "evidence_sha256": "d307b03e0de872b820f24ed36cae233b648758bbd43055871ee0ad0d909a2424",
+      "produced_by": {
+        "id_card": {
+          "ingest": "6a37d44ae9d25c78c84a0a668c424bbbc5bc00f89b733141587b141fcb457bb5",
+          "ocr": "5c1314dc1134713fa6ab68c2fe7ce511953cf515a3decc7a46d712c72fd99edd",
+          "extract": "f487fc230fd1b4ab8f0a2f66a9545572aea4c9432a6628cb55aedcf998d5569b",
+          "fields_final": "ab7413d05caaf63aadb5bd8172dc83f27a0019b2267662c1aa8d326e43c1768c"
+        }
+      },
+      "prev": "2e82568338a9b7226f388a5c5fa9acf0288f5ad3b63d108ef16487ae30193ec4",
+      "hash": "d7f0112720efe00e6ee0955e9b1aebf82705e56d4f7d51527382b69665c89561"
+    },
+    {
+      "ts": "2026-11-05T05:44:25+0000",
+      "event": "finding",
+      "run": "20261105T054413-dcf1ee",
+      "fid": "V-002",
+      "kind": "visual",
+      "severity": "high",
+      "confidence": 0.98,
+      "status": "potential_manipulation",
+      "title": "Possible alteration of 'Net Pay' in salary_slip",
+      "method": "peer-relative ELA/noise/background/stroke analysis",
+      "refs": [
+        {
+          "doc_id": "salary_slip",
+          "field": "net_pay",
+          "value": "Rs. 85,000",
+          "bbox": [
+            432,
+            625,
+            579,
+            648
+          ]
+        }
+      ],
+      "source_sha256": {
+        "salary_slip": "7ef5677dede75362fe9af6a8bad261d6728c7f0e56a747f112a404d3cece87a1"
+      },
+      "evidence_crop": "evidence/V-002.png",
+      "evidence_sha256": "da34a8e7c46385de0b4310a2ecb7186c0b1415adce1a914c58fbee2281cfc5d9",
+      "produced_by": {
+        "salary_slip": {
+          "ingest": "f6af07232952758dfbeeeffc18be954964d079b2a09730259fcfa37027c9fd28",
+          "ocr": "fd7903f42bbc49a0f77978fc3d5ee8c6ac1a855e6b84a7184008db11b5536140",
+          "extract": "55257176a7935c7efd2be90dfec8ee559e3dcccf997c26e8cb5b33bc76b6dc87",
+          "fields_final": "2e82568338a9b7226f388a5c5fa9acf0288f5ad3b63d108ef16487ae30193ec4"
+        }
+      },
+      "prev": "d7f0112720efe00e6ee0955e9b1aebf82705e56d4f7d51527382b69665c89561",
+      "hash": "98cf3d5380bb0a424b0a8f836d25f7cc7cc5fcbf7c1a140a168e26baba7eaa0b"
+    },
+    {
+      "ts": "2026-11-05T05:44:25+0000",
+      "event": "finding",
+      "run": "20261105T054413-dcf1ee",
+      "fid": "C-001",
+      "kind": "intra",
+      "severity": "high",
+      "confidence": 0.98,
+      "status": "inconsistency",
+      "title": "Salary slip arithmetic does not balance in salary_slip",
+      "method": "arithmetic check",
+      "refs": [
+        {
+          "doc_id": "salary_slip",
+          "field": "gross",
+          "value": "Rs. 95,000",
+          "bbox": [
+            433,
+            451,
+            578,
+            475
+          ]
+        },
+        {
+          "doc_id": "salary_slip",
+          "field": "deductions",
+          "value": "Rs. 37,000",
+          "bbox": [
+            433,
+            536,
+            578,
+            560
+          ]
+        },
+        {
+          "doc_id": "salary_slip",
+          "field": "net_pay",
+          "value": "Rs. 85,000",
+          "bbox": [
+            432,
+            625,
+            579,
+            648
+          ]
+        }
+      ],
+      "source_sha256": {
+        "salary_slip": "7ef5677dede75362fe9af6a8bad261d6728c7f0e56a747f112a404d3cece87a1"
+      },
+      "evidence_crop": "evidence/C-001.png",
+      "evidence_sha256": "02000f39defcb21be20ca38affcabdef8d5cb8c4faeffd0b8945dde125faa4c7",
+      "produced_by": {
+        "salary_slip": {
+          "ingest": "f6af07232952758dfbeeeffc18be954964d079b2a09730259fcfa37027c9fd28",
+          "ocr": "fd7903f42bbc49a0f77978fc3d5ee8c6ac1a855e6b84a7184008db11b5536140",
+          "extract": "55257176a7935c7efd2be90dfec8ee559e3dcccf997c26e8cb5b33bc76b6dc87",
+          "fields_final": "2e82568338a9b7226f388a5c5fa9acf0288f5ad3b63d108ef16487ae30193ec4"
+        }
+      },
+      "prev": "98cf3d5380bb0a424b0a8f836d25f7cc7cc5fcbf7c1a140a168e26baba7eaa0b",
+      "hash": "3857f1e7a4646cf5a63ee48123f8a24064e4e8da91e368d3dfe33eb038aad203"
+    },
+    {
+      "ts": "2026-11-05T05:44:25+0000",
+      "event": "finding",
+      "run": "20261105T054413-dcf1ee",
+      "fid": "X-001",
+      "kind": "cross",
+      "severity": "medium",
+      "confidence": 0.8,
+      "status": "inconsistency",
+      "title": "Applicant name in bank_statement disagrees with 3 other document(s)",
+      "method": "cross-document name comparison",
+      "refs": [
+        {
+          "doc_id": "bank_statement",
+          "field": "name",
+          "value": "Rohan Mehra",
+          "bbox": [
+            433,
+            195,
+            613,
+            216
+          ]
+        },
+        {
+          "doc_id": "application_form",
+          "field": "name",
+          "value": "Rohan Mehta",
+          "bbox": [
+            433,
+            195,
+            612,
+            216
+          ]
+        },
+        {
+          "doc_id": "id_card",
+          "field": "name",
+          "value": "Rohan Mehta",
+          "bbox": [
+            433,
+            195,
+            612,
+            216
+          ]
+        },
+        {
+          "doc_id": "salary_slip",
+          "field": "name",
+          "value": "Rohan Mehta",
+          "bbox": [
+            433,
+            195,
+            612,
+            216
+          ]
+        }
+      ],
+      "source_sha256": {
+        "application_form": "b65f9da544765c44dc9e452ee5f7bda31330c41f41c3541042faebeca3df5108",
+        "bank_statement": "4805d814c8f5b1227d892269d353734ec1e40126da239b4932963af886ece4ec",
+        "id_card": "c47d6e90089bbd980f1da359e2d94fcad602e96f19be86a52a5624711e7862d2",
+        "salary_slip": "7ef5677dede75362fe9af6a8bad261d6728c7f0e56a747f112a404d3cece87a1"
+      },
+      "evidence_crop": "evidence/X-001.png",
+      "evidence_sha256": "9d92a072b5ddc905b90972e1c96e83f2f07277921b92ac82e5fb496c21f78409",
+      "produced_by": {
+        "application_form": {
+          "ingest": "9bcbc19fa1b257b7fd2e733e81881f968697a70e3d0ce9f8cef192d1158fe894",
+          "ocr": "71b41420f1364666b956eaed7efe8ef254504cf5115297791664963f48c76bfa",
+          "extract": "4bda3b8ac56041edf10d9a4da0505d5426c0cfcaa941e94c414d68080c5e8865",
+          "fields_final": "7be676ea0d6cc9df4374ac22270bf6c1eed374f339f9a06aa066c1aac84242e6"
+        },
+        "bank_statement": {
+          "ingest": "adf366e151877705a93388dc164fa69b7ee6bab9950a1f8d53349bffe48bff08",
+          "ocr": "f07ff62f296a588bca7c03cfe51bb8313b716d38c727f1beecfa0054e4d09026",
+          "extract": "4e59b42a5125421eab1226a210a93a0f64c6f45d6709f724212988cc56643d27",
+          "fields_final": "261ee5faa03c93221b63dda8871b91923c9f049575bb2b30487b1f317843cba8"
+        },
+        "id_card": {
+          "ingest": "6a37d44ae9d25c78c84a0a668c424bbbc5bc00f89b733141587b141fcb457bb5",
+          "ocr": "5c1314dc1134713fa6ab68c2fe7ce511953cf515a3decc7a46d712c72fd99edd",
+          "extract": "f487fc230fd1b4ab8f0a2f66a9545572aea4c9432a6628cb55aedcf998d5569b",
+          "fields_final": "ab7413d05caaf63aadb5bd8172dc83f27a0019b2267662c1aa8d326e43c1768c"
+        },
+        "salary_slip": {
+          "ingest": "f6af07232952758dfbeeeffc18be954964d079b2a09730259fcfa37027c9fd28",
+          "ocr": "fd7903f42bbc49a0f77978fc3d5ee8c6ac1a855e6b84a7184008db11b5536140",
+          "extract": "55257176a7935c7efd2be90dfec8ee559e3dcccf997c26e8cb5b33bc76b6dc87",
+          "fields_final": "2e82568338a9b7226f388a5c5fa9acf0288f5ad3b63d108ef16487ae30193ec4"
+        }
+      },
+      "prev": "3857f1e7a4646cf5a63ee48123f8a24064e4e8da91e368d3dfe33eb038aad203",
+      "hash": "2ae38d6b310773bf9d214d1894477f2c4328280f0dbcae626ae05c3402f85dc8"
+    },
+    {
+      "ts": "2026-11-05T05:44:25+0000",
+      "event": "finding",
+      "run": "20261105T054413-dcf1ee",
+      "fid": "X-002",
+      "kind": "cross",
+      "severity": "high",
+      "confidence": 0.95,
+      "status": "inconsistency",
+      "title": "Date of birth mismatch: application_form vs id_card",
+      "method": "cross-document dob comparison",
+      "refs": [
+        {
+          "doc_id": "id_card",
+          "field": "dob",
+          "value": "14/03/1990",
+          "bbox": [
+            434,
+            285,
+            590,
+            308
+          ]
+        },
+        {
+          "doc_id": "application_form",
+          "field": "dob",
+          "value": "14/03/1994",
+          "bbox": [
+            433,
+            281,
+            590,
+            304
+          ]
+        }
+      ],
+      "source_sha256": {
+        "application_form": "b65f9da544765c44dc9e452ee5f7bda31330c41f41c3541042faebeca3df5108",
+        "id_card": "c47d6e90089bbd980f1da359e2d94fcad602e96f19be86a52a5624711e7862d2"
+      },
+      "evidence_crop": "evidence/X-002.png",
+      "evidence_sha256": "070ecb1d8e2af4e074969d4dcaf726c36048e5651d6fac64fb839df6fb8fcf8e",
+      "produced_by": {
+        "application_form": {
+          "ingest": "9bcbc19fa1b257b7fd2e733e81881f968697a70e3d0ce9f8cef192d1158fe894",
+          "ocr": "71b41420f1364666b956eaed7efe8ef254504cf5115297791664963f48c76bfa",
+          "extract": "4bda3b8ac56041edf10d9a4da0505d5426c0cfcaa941e94c414d68080c5e8865",
+          "fields_final": "7be676ea0d6cc9df4374ac22270bf6c1eed374f339f9a06aa066c1aac84242e6"
+        },
+        "id_card": {
+          "ingest": "6a37d44ae9d25c78c84a0a668c424bbbc5bc00f89b733141587b141fcb457bb5",
+          "ocr": "5c1314dc1134713fa6ab68c2fe7ce511953cf515a3decc7a46d712c72fd99edd",
+          "extract": "f487fc230fd1b4ab8f0a2f66a9545572aea4c9432a6628cb55aedcf998d5569b",
+          "fields_final": "ab7413d05caaf63aadb5bd8172dc83f27a0019b2267662c1aa8d326e43c1768c"
+        }
+      },
+      "prev": "2ae38d6b310773bf9d214d1894477f2c4328280f0dbcae626ae05c3402f85dc8",
+      "hash": "9763e666e0b36acd5b050e73e209c8f401c3ff627baaa558dabdf37d19203ad6"
+    },
+    {
+      "ts": "2026-11-05T05:44:25+0000",
+      "event": "finding",
+      "run": "20261105T054413-dcf1ee",
+      "fid": "X-003",
+      "kind": "cross",
+      "severity": "high",
+      "confidence": 0.9,
+      "status": "inconsistency",
+      "title": "ID number mismatch: application_form vs id_card",
+      "method": "cross-document id_number comparison",
+      "refs": [
+        {
+          "doc_id": "id_card",
+          "field": "id_number",
+          "value": "ABCDE1284F",
+          "bbox": [
+            430,
+            366,
+            613,
+            386
+          ]
+        },
+        {
+          "doc_id": "application_form",
+          "field": "id_number",
+          "value": "ABCDE1234F",
+          "bbox": [
+            430,
+            366,
+            613,
+            386
+          ]
+        }
+      ],
+      "source_sha256": {
+        "application_form": "b65f9da544765c44dc9e452ee5f7bda31330c41f41c3541042faebeca3df5108",
+        "id_card": "c47d6e90089bbd980f1da359e2d94fcad602e96f19be86a52a5624711e7862d2"
+      },
+      "evidence_crop": "evidence/X-003.png",
+      "evidence_sha256": "57c23da774144a3988924d9e0810d0ccb89a7d251496636fb1cc87d144245fd8",
+      "produced_by": {
+        "application_form": {
+          "ingest": "9bcbc19fa1b257b7fd2e733e81881f968697a70e3d0ce9f8cef192d1158fe894",
+          "ocr": "71b41420f1364666b956eaed7efe8ef254504cf5115297791664963f48c76bfa",
+          "extract": "4bda3b8ac56041edf10d9a4da0505d5426c0cfcaa941e94c414d68080c5e8865",
+          "fields_final": "7be676ea0d6cc9df4374ac22270bf6c1eed374f339f9a06aa066c1aac84242e6"
+        },
+        "id_card": {
+          "ingest": "6a37d44ae9d25c78c84a0a668c424bbbc5bc00f89b733141587b141fcb457bb5",
+          "ocr": "5c1314dc1134713fa6ab68c2fe7ce511953cf515a3decc7a46d712c72fd99edd",
+          "extract": "f487fc230fd1b4ab8f0a2f66a9545572aea4c9432a6628cb55aedcf998d5569b",
+          "fields_final": "ab7413d05caaf63aadb5bd8172dc83f27a0019b2267662c1aa8d326e43c1768c"
+        }
+      },
+      "prev": "9763e666e0b36acd5b050e73e209c8f401c3ff627baaa558dabdf37d19203ad6",
+      "hash": "6304abea299fd5c7af49b7bda8d0c6ee3cc7a56939742538dc2c25487019a456"
+    },
+    {
+      "ts": "2026-11-05T05:44:25+0000",
+      "event": "finding",
+      "run": "20261105T054413-dcf1ee",
+      "fid": "X-004",
+      "kind": "cross",
+      "severity": "high",
+      "confidence": 0.95,
+      "status": "inconsistency",
+      "title": "Salary slip net pay does not match bank payroll credit",
+      "method": "income reconciliation",
+      "refs": [
+        {
+          "doc_id": "salary_slip",
+          "field": "net_pay",
+          "value": "Rs. 85,000",
+          "bbox": [
+            432,
+            625,
+            579,
+            648
+          ]
+        },
+        {
+          "doc_id": "bank_statement",
+          "field": "salary_credit",
+          "value": "Rs. 58,000",
+          "bbox": [
+            433,
+            536,
+            578,
+            560
+          ]
+        }
+      ],
+      "source_sha256": {
+        "bank_statement": "4805d814c8f5b1227d892269d353734ec1e40126da239b4932963af886ece4ec",
+        "salary_slip": "7ef5677dede75362fe9af6a8bad261d6728c7f0e56a747f112a404d3cece87a1"
+      },
+      "evidence_crop": "evidence/X-004.png",
+      "evidence_sha256": "032c480500872b0e0f6bf3dff288560aad97f6308918715c6afb23138bda861b",
+      "produced_by": {
+        "bank_statement": {
+          "ingest": "adf366e151877705a93388dc164fa69b7ee6bab9950a1f8d53349bffe48bff08",
+          "ocr": "f07ff62f296a588bca7c03cfe51bb8313b716d38c727f1beecfa0054e4d09026",
+          "extract": "4e59b42a5125421eab1226a210a93a0f64c6f45d6709f724212988cc56643d27",
+          "fields_final": "261ee5faa03c93221b63dda8871b91923c9f049575bb2b30487b1f317843cba8"
+        },
+        "salary_slip": {
+          "ingest": "f6af07232952758dfbeeeffc18be954964d079b2a09730259fcfa37027c9fd28",
+          "ocr": "fd7903f42bbc49a0f77978fc3d5ee8c6ac1a855e6b84a7184008db11b5536140",
+          "extract": "55257176a7935c7efd2be90dfec8ee559e3dcccf997c26e8cb5b33bc76b6dc87",
+          "fields_final": "2e82568338a9b7226f388a5c5fa9acf0288f5ad3b63d108ef16487ae30193ec4"
+        }
+      },
+      "prev": "6304abea299fd5c7af49b7bda8d0c6ee3cc7a56939742538dc2c25487019a456",
+      "hash": "0de964a8d8dd274f1156319001cb9484d1f470afdf33d98bf31907ef4f508bcc"
+    },
+    {
+      "ts": "2026-11-05T05:44:25+0000",
+      "event": "finding",
+      "run": "20261105T054413-dcf1ee",
+      "fid": "X-005",
+      "kind": "cross",
+      "severity": "medium",
+      "confidence": 0.7,
+      "status": "inconsistency",
+      "title": "Declared income exceeds income shown in bank_statement",
+      "method": "income reconciliation",
+      "refs": [
+        {
+          "doc_id": "application_form",
+          "field": "declared_income",
+          "value": "85,000",
+          "bbox": [
+            484,
+            621,
+            578,
+            645
+          ]
+        },
+        {
+          "doc_id": "bank_statement",
+          "field": "salary_credit",
+          "value": "Rs. 58,000",
+          "bbox": [
+            433,
+            536,
+            578,
+            560
+          ]
+        }
+      ],
+      "source_sha256": {
+        "application_form": "b65f9da544765c44dc9e452ee5f7bda31330c41f41c3541042faebeca3df5108",
+        "bank_statement": "4805d814c8f5b1227d892269d353734ec1e40126da239b4932963af886ece4ec"
+      },
+      "evidence_crop": "evidence/X-005.png",
+      "evidence_sha256": "8c2842099909394c864ff07811a635ce05c6d71c6707f31d45ede9651b78df24",
+      "produced_by": {
+        "application_form": {
+          "ingest": "9bcbc19fa1b257b7fd2e733e81881f968697a70e3d0ce9f8cef192d1158fe894",
+          "ocr": "71b41420f1364666b956eaed7efe8ef254504cf5115297791664963f48c76bfa",
+          "extract": "4bda3b8ac56041edf10d9a4da0505d5426c0cfcaa941e94c414d68080c5e8865",
+          "fields_final": "7be676ea0d6cc9df4374ac22270bf6c1eed374f339f9a06aa066c1aac84242e6"
+        },
+        "bank_statement": {
+          "ingest": "adf366e151877705a93388dc164fa69b7ee6bab9950a1f8d53349bffe48bff08",
+          "ocr": "f07ff62f296a588bca7c03cfe51bb8313b716d38c727f1beecfa0054e4d09026",
+          "extract": "4e59b42a5125421eab1226a210a93a0f64c6f45d6709f724212988cc56643d27",
+          "fields_final": "261ee5faa03c93221b63dda8871b91923c9f049575bb2b30487b1f317843cba8"
+        }
+      },
+      "prev": "0de964a8d8dd274f1156319001cb9484d1f470afdf33d98bf31907ef4f508bcc",
+      "hash": "9633261ab6d8ec1aa2ff7ff1cacace03d59ede71064b977043db6fc2b7ebadc9"
+    },
+    {
+      "ts": "2026-11-05T05:44:25+0000",
+      "event": "finding",
+      "run": "20261105T054413-dcf1ee",
+      "fid": "R-001",
+      "kind": "cross",
+      "severity": "medium",
+      "confidence": 0.6,
+      "status": "observed",
+      "title": "bank_statement shares no identifier with the other documents",
+      "method": "document linkage",
+      "refs": [
+        {
+          "doc_id": "bank_statement",
+          "field": null,
+          "value": null,
+          "bbox": null
+        }
+      ],
+      "source_sha256": {
+        "bank_statement": "4805d814c8f5b1227d892269d353734ec1e40126da239b4932963af886ece4ec"
+      },
+      "evidence_crop": null,
+      "evidence_sha256": null,
+      "produced_by": {
+        "bank_statement": {
+          "ingest": "adf366e151877705a93388dc164fa69b7ee6bab9950a1f8d53349bffe48bff08",
+          "ocr": "f07ff62f296a588bca7c03cfe51bb8313b716d38c727f1beecfa0054e4d09026",
+          "extract": "4e59b42a5125421eab1226a210a93a0f64c6f45d6709f724212988cc56643d27",
+          "fields_final": "261ee5faa03c93221b63dda8871b91923c9f049575bb2b30487b1f317843cba8"
+        }
+      },
+      "prev": "9633261ab6d8ec1aa2ff7ff1cacace03d59ede71064b977043db6fc2b7ebadc9",
+      "hash": "88513d085e65ae072ba05c4df234500cd0f9099d022469a17953f073cf7fb982"
+    },
+    {
+      "ts": "2026-11-05T05:44:26+0000",
+      "event": "dossier",
+      "run": "20261105T054413-dcf1ee",
+      "case_id": "case_tampered",
+      "n_findings": 9,
+      "summary_source": "template",
+      "prev": "88513d085e65ae072ba05c4df234500cd0f9099d022469a17953f073cf7fb982",
+      "hash": "432981265a7f117da7838bb584450f6145101acadbd46769a19b3e2f8951bc51"
+    }
+  ]
+}

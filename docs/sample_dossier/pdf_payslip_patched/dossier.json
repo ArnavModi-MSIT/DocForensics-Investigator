@@ -1,0 +1,1292 @@
+{
+  "case_id": "pdf_payslip_patched",
+  "audit_digest": "7d7f101cb6e38fb4c56de983e31b278c8bc3c12bd6792c05c54beceb9169093f",
+  "summary": "Case pdf_payslip_patched: 1 documents analysed; 2 finding(s) about the documents (1 high, 1 medium, 0 low) and 1 coverage note(s). Most significant: C-001 Salary slip arithmetic does not balance in salary_slip; V-001 Possible replacement patch over 'INR 98,700' in salary_slip. Visual findings are indicators of possible alteration, not proof; confirm against originals. Pixel-level visual forensics ran on 0 of 1 recognised page(s); PDF structure checks (fonts, overlays, hidden text, file history) ran on 1 generated PDF page(s), where pixel analysis does not apply.",
+  "summary_source": "template",
+  "documents": [
+    {
+      "doc_id": "salary_slip",
+      "source": {
+        "file": "salary_slip.pdf",
+        "file_type": "PDF",
+        "file_bytes": 6203,
+        "page": 1,
+        "pages_in_file": 1,
+        "page_px": [
+          1653,
+          2339
+        ]
+      },
+      "processing_status": "recognised as salary slip; text read exactly from the PDF text layer; 8 field(s); PDF structure checks ran; pixel analysis not applicable",
+      "type": "salary_slip",
+      "type_conf": 0.77,
+      "sha256": "9cc419b78b95fdacea72ad0da3c3783d950b5bd8083db20459bb57b9814d248e",
+      "size": [
+        1653,
+        2339
+      ],
+      "decision": "accepted as salary_slip",
+      "structure": {
+        "layout": {
+          "label": "sparse form (few labelled fields)",
+          "evidence": [
+            "0 labelled field(s)",
+            "0 label-free field(s)",
+            "5 heading(s)"
+          ],
+          "hierarchy": {
+            "sections": 5,
+            "headed_sections": 5,
+            "fields": 7,
+            "tables": 0,
+            "table_rows": 0,
+            "table_cells": 0
+          }
+        },
+        "sections": [
+          {
+            "sid": "S1",
+            "title": "NORTHWIND DEMO LABS",
+            "kind": "title",
+            "bbox": [
+              119.4,
+              92.5,
+              605.5,
+              202.2
+            ],
+            "n_lines": 2,
+            "fields": [],
+            "tables": [],
+            "has_heading": true
+          },
+          {
+            "sid": "S2",
+            "title": "EMPLOYEE NAME EMPLOYEE ID",
+            "kind": "personal_details",
+            "bbox": [
+              150.0,
+              427.3,
+              1046.1,
+              501.8
+            ],
+            "n_lines": 2,
+            "fields": [
+              "name",
+              "employee_id"
+            ],
+            "tables": [],
+            "has_heading": true
+          },
+          {
+            "sid": "S3",
+            "title": "PAYROLL PERIOD PAYMENT DATE",
+            "kind": "other",
+            "bbox": [
+              150.0,
+              593.9,
+              1067.7,
+              668.5
+            ],
+            "n_lines": 2,
+            "fields": [
+              "pay_month",
+              "pay_date"
+            ],
+            "tables": [],
+            "has_heading": true
+          },
+          {
+            "sid": "S4",
+            "title": "EARNINGS INR DEDUCTIONS INR",
+            "kind": "earnings_deductions",
+            "bbox": [
+              161.1,
+              813.4,
+              1482.8,
+              1074.0
+            ],
+            "n_lines": 4,
+            "fields": [],
+            "tables": [],
+            "has_heading": true
+          },
+          {
+            "sid": "S5",
+            "title": "GROSS PAY TOTAL DEDUCTIONS",
+            "kind": "deductions",
+            "bbox": [
+              180.6,
+              1205.0,
+              1215.6,
+              1476.8
+            ],
+            "n_lines": 4,
+            "fields": [
+              "gross",
+              "deductions",
+              "net_pay"
+            ],
+            "tables": [],
+            "has_heading": true
+          }
+        ],
+        "tables": []
+      },
+      "visual_ext": {
+        "typography": null,
+        "grid": null,
+        "photo": null,
+        "signature": "no signature label",
+        "regions": [
+          {
+            "kind": "patch",
+            "bbox": [
+              908.3,
+              1411.1,
+              1386.1,
+              1497.2
+            ],
+            "found": true
+          }
+        ]
+      },
+      "best_guess": "salary_slip",
+      "category_page": {
+        "top": [
+          {
+            "key": "salary_slip",
+            "name": "Salary slip",
+            "confidence": 0.442,
+            "cosine": 0.629
+          },
+          {
+            "key": "bank_statement",
+            "name": "Bank statement",
+            "confidence": 0.168,
+            "cosine": 0.6
+          },
+          {
+            "key": "employment_letter",
+            "name": "Employment confirmation",
+            "confidence": 0.147,
+            "cosine": 0.596
+          }
+        ],
+        "label": "Salary slip",
+        "confidence": 0.442,
+        "key": "salary_slip",
+        "margin": 0.029
+      },
+      "category_file": {
+        "top": [
+          {
+            "key": "salary_slip",
+            "name": "Salary slip",
+            "confidence": 0.442,
+            "cosine": 0.629
+          },
+          {
+            "key": "bank_statement",
+            "name": "Bank statement",
+            "confidence": 0.168,
+            "cosine": 0.6
+          },
+          {
+            "key": "employment_letter",
+            "name": "Employment confirmation",
+            "confidence": 0.147,
+            "cosine": 0.596
+          }
+        ],
+        "label": "Salary slip",
+        "confidence": 0.442,
+        "key": "salary_slip",
+        "margin": 0.029,
+        "pages_agree": [
+          1,
+          1
+        ]
+      },
+      "skew_deg": 0.0,
+      "born_digital": true,
+      "forensics": "pixel-level checks not applicable (born-digital PDF page); PDF structure checks run instead",
+      "fields": [
+        {
+          "key": "name",
+          "label": "EMPLOYEE NAME",
+          "raw": "Asha Verma",
+          "value": "Asha Verma",
+          "confidence": 1.0,
+          "bbox": [
+            150.0,
+            470.1,
+            302.8,
+            508.3
+          ],
+          "matched_by": "stacked",
+          "label_score": 100.0
+        },
+        {
+          "key": "employee_id",
+          "label": "EMPLOYEE ID",
+          "raw": "NW-3141",
+          "value": "NW-3141",
+          "confidence": 1.0,
+          "bbox": [
+            905.6,
+            470.1,
+            1022.9,
+            508.3
+          ],
+          "matched_by": "stacked",
+          "label_score": 100.0
+        },
+        {
+          "key": "pay_month",
+          "label": "PAYROLL PERIOD",
+          "raw": "October 2026",
+          "value": "October 2026",
+          "confidence": 1.0,
+          "bbox": [
+            150.0,
+            636.8,
+            318.3,
+            675.0
+          ],
+          "matched_by": "stacked",
+          "label_score": 100.0
+        },
+        {
+          "key": "pay_date",
+          "label": "PAYMENT DATE",
+          "raw": "30 Oct 2026",
+          "value": "2026-10-30",
+          "confidence": 1.0,
+          "bbox": [
+            905.6,
+            636.8,
+            1056.9,
+            675.0
+          ],
+          "matched_by": "stacked",
+          "label_score": 100.0
+        },
+        {
+          "key": "gross",
+          "label": "GROSS PAY",
+          "raw": "INR 97,000",
+          "value": 97000.0,
+          "confidence": 1.0,
+          "bbox": [
+            180.6,
+            1247.9,
+            321.1,
+            1286.1
+          ],
+          "matched_by": "stacked",
+          "label_score": 100.0
+        },
+        {
+          "key": "deductions",
+          "label": "TOTAL DEDUCTIONS",
+          "raw": "INR 7,300",
+          "value": 7300.0,
+          "confidence": 1.0,
+          "bbox": [
+            736.1,
+            1247.9,
+            861.2,
+            1286.1
+          ],
+          "matched_by": "stacked",
+          "label_score": 100.0
+        },
+        {
+          "key": "net_pay",
+          "label": "NET PAY / TAKE-HOME",
+          "raw": "INR 98,700",
+          "value": 98700.0,
+          "confidence": 1.0,
+          "bbox": [
+            955.6,
+            1431.8,
+            1215.6,
+            1486.0
+          ],
+          "matched_by": "stacked",
+          "label_score": 97.3
+        },
+        {
+          "key": "employer",
+          "label": "issuer (page header)",
+          "raw": "NORTHWIND DEMO LABS",
+          "value": "NORTHWIND DEMO LABS",
+          "confidence": 1.0,
+          "bbox": [
+            119.4,
+            83.4,
+            605.5,
+            136.9
+          ],
+          "matched_by": "header",
+          "label_score": 0.6
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "fid": "V-001",
+      "kind": "visual",
+      "title": "Possible replacement patch over 'INR 98,700' in salary_slip",
+      "severity": "medium",
+      "confidence": 0.73,
+      "status": "potential_manipulation",
+      "explanation": "The PDF draws a bordered rectangle (fill #f5f2e8, border #d4cfbf) on top of the panel behind 'INR 98,700'; the panel is #e0edf2, so the rectangle stands out in colour as well as by its border. The figure on it is set in Courier, a different font family from the 7 other amounts on the page (helvetica). A bordered patch with different lettering is a common way to cover a printed number and write another one. This is an observation about how the file was built: it does not show that the value was changed, by whom or why, and a design element can look similar. Compare with the issuer's original.",
+      "refs": [
+        {
+          "doc_id": "salary_slip",
+          "field": "net_pay",
+          "value": "INR 98,700",
+          "bbox": [
+            908.3,
+            1411.1,
+            1386.1,
+            1497.2
+          ],
+          "exact": true
+        }
+      ],
+      "metrics": {
+        "font": "Courier",
+        "page_font": "helvetica",
+        "amounts_compared": 8,
+        "panel_contrast": 0.14,
+        "pdf_rect_pt": [
+          327.0,
+          508.0,
+          499.0,
+          539.0
+        ],
+        "corroborated_by": [
+          "C-001"
+        ]
+      },
+      "method": "PDF structure: drawing order and fonts",
+      "confidence_level": "medium",
+      "group": "visual"
+    },
+    {
+      "fid": "C-001",
+      "kind": "intra",
+      "title": "Salary slip arithmetic does not balance in salary_slip",
+      "severity": "high",
+      "confidence": 0.98,
+      "status": "inconsistency",
+      "explanation": "Gross 97,000 - deductions 7,300 = 89,700, but Net Pay shows 98,700 (difference +9,000). Corroborated by visual evidence (V-001) on the same field.",
+      "refs": [
+        {
+          "doc_id": "salary_slip",
+          "field": "gross",
+          "value": "INR 97,000",
+          "bbox": [
+            180.6,
+            1247.9,
+            321.1,
+            1286.1
+          ]
+        },
+        {
+          "doc_id": "salary_slip",
+          "field": "deductions",
+          "value": "INR 7,300",
+          "bbox": [
+            736.1,
+            1247.9,
+            861.2,
+            1286.1
+          ]
+        },
+        {
+          "doc_id": "salary_slip",
+          "field": "net_pay",
+          "value": "INR 98,700",
+          "bbox": [
+            955.6,
+            1431.8,
+            1215.6,
+            1486.0
+          ]
+        }
+      ],
+      "metrics": {
+        "corroborated_by": [
+          "V-001"
+        ]
+      },
+      "method": "arithmetic check",
+      "confidence_level": "high",
+      "group": "inconsistencies"
+    },
+    {
+      "fid": "N-001",
+      "kind": "missing",
+      "title": "Pixel-level forensics not applicable to 1 born-digital PDF page(s)",
+      "severity": "low",
+      "confidence": 0.9,
+      "status": "observed",
+      "explanation": "These pages are generated PDFs (text layer, no scanned image), so compression/grain/ink analysis does not apply. Their exact text was read from the PDF (no OCR), and PDF structure checks were run instead: font consistency of amounts, bordered patches and covered or hidden text, and file history. Content checks (arithmetic, formats, cross-document) were run as for any page. A clean result is not proof of authenticity: a document can be forged before it is turned into a PDF. Pages: salary_slip",
+      "refs": [
+        {
+          "doc_id": "salary_slip",
+          "field": null,
+          "value": null,
+          "bbox": null
+        }
+      ],
+      "metrics": {},
+      "method": "input type detection",
+      "confidence_level": "high",
+      "group": "notes"
+    }
+  ],
+  "confidence_scale": "Confidence levels: high (0.80 and above), medium (0.60 to 0.79), low (below 0.60). The number is the system's own estimate of how reliable the specific check is on this evidence (for example an exact arithmetic mismatch scores high, a weak pixel signal scores low). It is not a probability that a document is forged, and it does not say which of two conflicting documents is correct.",
+  "contextual": {
+    "missing": [],
+    "duplicated": [],
+    "misplaced": []
+  },
+  "visual_groups": [
+    {
+      "key": "regions",
+      "title": "Suspicious regions and potential alterations",
+      "findings": [
+        "V-001"
+      ],
+      "checked": []
+    },
+    {
+      "key": "font_structure",
+      "title": "Font, alignment and structural inconsistencies",
+      "findings": [],
+      "checked": [
+        "salary_slip: PDF structure checks (8 amounts compared (page font helvetica))"
+      ]
+    },
+    {
+      "key": "image",
+      "title": "Image manipulation observations",
+      "findings": [],
+      "checked": [
+        "salary_slip: not applicable (generated PDF, no scan or photo)"
+      ]
+    },
+    {
+      "key": "signature",
+      "title": "Signature-related observations",
+      "findings": [],
+      "checked": [
+        "salary_slip: no signature label"
+      ]
+    }
+  ],
+  "anomalies": [
+    {
+      "fid": "C-001",
+      "title": "Salary slip arithmetic does not balance in salary_slip",
+      "severity": "high",
+      "status": "inconsistency",
+      "confidence": "high (0.98)",
+      "documents": [
+        "salary_slip"
+      ]
+    },
+    {
+      "fid": "V-001",
+      "title": "Possible replacement patch over 'INR 98,700' in salary_slip",
+      "severity": "medium",
+      "status": "potential_manipulation",
+      "confidence": "medium (0.73)",
+      "documents": [
+        "salary_slip"
+      ]
+    }
+  ],
+  "standards": {
+    "note": "This system draws on the frameworks below as reference points. It does not claim compliance or certification with any of them; each row says what we do and what we do not do.",
+    "rows": [
+      {
+        "framework": "ISO/IEC 27037 (identification, collection, acquisition and preservation of digital evidence)",
+        "what_we_do": "Each source file is hashed (SHA-256) at ingest; originals are never modified (analysis uses derived copies, recorded in the log); every step is written to a hash-chained audit log with archived run history.",
+        "what_we_do_not": "No acquisition or custody control before upload: the system only sees the copy it is given. No write protection or collection records for the original device or system."
+      },
+      {
+        "framework": "ISO/IEC 27041 (suitability and adequacy of investigative methods)",
+        "what_we_do": "Methods are documented (ARCHITECTURE.md), tested on a synthetic benchmark and an organiser test pack with an answer key, and limitations are stated openly (skilled forgeries, tuning on synthetic data).",
+        "what_we_do_not": "No formal validation study, no measured error rates on real documents, no independent testing."
+      },
+      {
+        "framework": "ISO/IEC 27042 (analysis and interpretation of digital evidence)",
+        "what_we_do": "Findings separate a data inconsistency, a potential alteration and an observation; each has a confidence level, possible explanations and a suggested check; nothing is called fraud; the pipeline is deterministic and repeatable.",
+        "what_we_do_not": "Confidence levels are the system's own estimates, not calibrated probabilities; no formal competence or review process around the analyst."
+      },
+      {
+        "framework": "NIST SP 800-86 (forensic techniques in incident response)",
+        "what_we_do": "The pipeline follows its collection, examination, analysis and reporting phases: ingest and hashing; reading, extraction, structure and forensic checks; contextual and cross-document analysis; the dossier.",
+        "what_we_do_not": "It is written for incident response on live systems; volatile data, network and system sources are out of scope here."
+      },
+      {
+        "framework": "OWASP Machine Learning Security Top 10",
+        "what_we_do": "No training is done and no model is hosted, so model theft, poisoning, inversion and membership inference do not apply. Supply chain: the downloaded embedding model is checked against recorded SHA-256 values and the result is logged. Output integrity: hash-chained audit and review logs. The optional Claude summary is off by default.",
+        "what_we_do_not": "Input manipulation (documents crafted to mislead OCR or classification) is only partly mitigated (veto rule, minimum expected fields) and not tested adversarially. Recorded model hashes were taken from our own first download, not from a publisher signature. RapidOCR models are bundled in their package and not separately pinned. When the optional summary is on, finding text (document values) is sent to an external API."
+      }
+    ]
+  },
+  "processing": [
+    "1 page(s) from 1 file(s); 1 recognised as a supported type, 0 not recognised.",
+    "Text: 1 page(s) read exactly from the PDF text layer, 0 page(s) read by OCR.",
+    "8 field(s) extracted, 0 table(s) found.",
+    "Visual forensics: pixel-level checks on 0 page(s), PDF structure checks on 1 generated PDF page(s).",
+    "Cross-document: 5 field(s) compared across documents (0 agree, 0 differ, 5 in one document only, 0 could not be compared); 0 document pair(s) linked by shared identifiers.",
+    "3 finding(s) in total."
+  ],
+  "verification": [
+    {
+      "area": "1 generated PDF page(s): pixel analysis does not apply",
+      "detail": "Only file-structure checks were possible. A document altered before it was turned into a PDF, or issued with wrong values, passes them. Compare with the issuer's own copy."
+    },
+    {
+      "area": "Fields present in only one document",
+      "detail": "Name, Employer, Employee ID, Monthly gross income, Pay month. They could not be cross-checked; confirm them against an independent source."
+    },
+    {
+      "area": "Issuer verification",
+      "detail": "No document was checked against the issuing organisation or a registry. Confirm identity, employment and account details with the issuers."
+    },
+    {
+      "area": "Original documents",
+      "detail": "Findings come from the submitted copies only. Compare every flagged value and region with the originals before any decision."
+    }
+  ],
+  "correlation": {
+    "matrix": [
+      {
+        "field": "Name",
+        "key": "name",
+        "verdict": "single",
+        "entries": [
+          {
+            "doc_id": "salary_slip",
+            "raw": "Asha Verma",
+            "bbox": [
+              150.0,
+              470.1,
+              302.8,
+              508.3
+            ],
+            "field": "name"
+          }
+        ]
+      },
+      {
+        "field": "Employer",
+        "key": "employer",
+        "verdict": "single",
+        "entries": [
+          {
+            "doc_id": "salary_slip",
+            "raw": "NORTHWIND DEMO LABS",
+            "bbox": [
+              119.4,
+              83.4,
+              605.5,
+              136.9
+            ],
+            "field": "employer"
+          }
+        ]
+      },
+      {
+        "field": "Employee ID",
+        "key": "employee_id",
+        "verdict": "single",
+        "entries": [
+          {
+            "doc_id": "salary_slip",
+            "raw": "NW-3141",
+            "bbox": [
+              905.6,
+              470.1,
+              1022.9,
+              508.3
+            ],
+            "field": "employee_id"
+          }
+        ]
+      },
+      {
+        "field": "Monthly gross income",
+        "key": "amount",
+        "verdict": "single",
+        "entries": [
+          {
+            "doc_id": "salary_slip",
+            "raw": "INR 97,000",
+            "bbox": [
+              180.6,
+              1247.9,
+              321.1,
+              1286.1
+            ],
+            "field": "gross"
+          }
+        ]
+      },
+      {
+        "field": "Pay month",
+        "key": "pay_month",
+        "verdict": "single",
+        "entries": [
+          {
+            "doc_id": "salary_slip",
+            "raw": "October 2026",
+            "bbox": [
+              150.0,
+              636.8,
+              318.3,
+              675.0
+            ],
+            "field": "pay_month"
+          }
+        ]
+      }
+    ],
+    "links": [],
+    "unlinked": [],
+    "case_codes": {},
+    "documents": [
+      "salary_slip"
+    ]
+  },
+  "evidence": {
+    "V-001": {
+      "label": "Potential alteration: an indicator that something may have been changed, not proof",
+      "why": "The way this PDF was built (fonts, drawing order, hidden layers, file history) differs from an untouched generated document.",
+      "check": "Request the native or re-issued file from the issuer, inspect the region at full size and compare the two.",
+      "explanations": [
+        "A legitimate correction re-issued by the issuer",
+        "A design element (badge, highlight) that looks like a patch",
+        "A value overwritten after the document was generated"
+      ],
+      "crop": "evidence/V-001.png",
+      "regions": 1
+    },
+    "C-001": {
+      "label": "Confirmed data conflict: two values in the submitted documents contradict each other (this says nothing about intent)",
+      "why": "Figures printed on the same page do not add up, so at least one of them is wrong or was changed after the document was produced.",
+      "check": "Ask the issuer for the original or a recalculation and compare the figures with the payroll record.",
+      "explanations": [
+        "A typing or calculation error when the document was produced",
+        "One figure edited after the document was produced",
+        "A different version of the statement mixed with this one"
+      ],
+      "crop": "evidence/C-001.png",
+      "regions": 3
+    },
+    "N-001": {
+      "label": "Observation: a note, coverage gap or weak signal, not an accusation",
+      "why": "A check could not be completed or a value could not be read, so the absence of findings here is not evidence that the page is genuine.",
+      "check": "Review the field or page manually, or resubmit a clearer capture.",
+      "explanations": [
+        "Poor capture, faint print or an unusual layout",
+        "The information is genuinely absent from the document"
+      ],
+      "crop": null,
+      "regions": 0
+    }
+  },
+  "audit": {
+    "run_id": "20261105T054345-643d05",
+    "chain_ok": true,
+    "events": 17,
+    "digest": "7d7f101cb6e38fb4c56de983e31b278c8bc3c12bd6792c05c54beceb9169093f",
+    "earlier_runs": [],
+    "review_log": "review_log.jsonl (reviewer decisions, hash-chained, anchored to this digest)"
+  },
+  "capabilities": [
+    {
+      "capability": "Ingestion: images, PDFs and ZIP bundles (one zip = one case); multi-document cases",
+      "status": "Implemented"
+    },
+    {
+      "capability": "Page normalisation: deskew (tilt up to +/-8 deg) and lighting flattening for phone photos",
+      "status": "Implemented; perspective correction planned"
+    },
+    {
+      "capability": "OCR + field extraction with field-level confidence and bounding boxes",
+      "status": "Implemented (Tesseract + optional RapidOCR; printed text, label:value layouts)"
+    },
+    {
+      "capability": "Semantic label matching (embeddings) for field labels outside the dictionary",
+      "status": "Implemented (needs embedding model; falls back to fuzzy dictionary)"
+    },
+    {
+      "capability": "Document classification: embeddings + keywords, unsupported-class veto, structural gate (>=3 expected fields)",
+      "status": "Implemented (keyword + structure fallback when no model)"
+    },
+    {
+      "capability": "Visual forensics: ELA, grain/noise, paper tone, ink darkness (peer-relative, lighting-corrected)",
+      "status": "Implemented"
+    },
+    {
+      "capability": "Contextual checks: arithmetic, formats, date logic, completeness",
+      "status": "Implemented"
+    },
+    {
+      "capability": "Cross-document entity matching (odd-one-out) and income reconciliation",
+      "status": "Implemented"
+    },
+    {
+      "capability": "Section detection; transaction and earnings/deductions tables with running-balance, page-continuity, total and component-sum checks",
+      "status": "Implemented (bank-statement and salary-slip layouts)"
+    },
+    {
+      "capability": "Evidence mapping (annotated regions), audit trail, reviewer UI, PDF/JSON dossier",
+      "status": "Implemented"
+    },
+    {
+      "capability": "Handwriting recognition",
+      "status": "Unsupported"
+    },
+    {
+      "capability": "Typography / spacing / alignment checks, JPEG block-grid consistency (inserted or replaced content), photo-region check on ID cards, signature detection with placement and background checks",
+      "status": "Implemented (heuristic; see limitations)"
+    },
+    {
+      "capability": "Born-digital PDFs: exact text layer (no OCR), font consistency of amounts, bordered patches over values, covered or hidden text, file history (revisions, dates, producer)",
+      "status": "Implemented (observations about file structure, not proof)"
+    },
+    {
+      "capability": "Duplicated (copy-move) image regions on scans and photos; image metadata (editing software, modification after capture); scanned-PDF file history",
+      "status": "Implemented (observations; copies recompressed below about JPEG quality 92 after pasting can be missed)"
+    },
+    {
+      "capability": "Signature authenticity, photo identity matching",
+      "status": "Planned"
+    },
+    {
+      "capability": "Layout-aware ML models (LayoutLM etc.), tables in other layouts, multilingual OCR",
+      "status": "Planned"
+    }
+  ],
+  "audit_trail": [
+    {
+      "ts": "2026-11-05T05:43:45+0000",
+      "event": "case_start",
+      "run": "20261105T054345-643d05",
+      "case_id": "pdf_payslip_patched",
+      "n_inputs": 1,
+      "run_id": "20261105T054345-643d05",
+      "earlier_runs": 0,
+      "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "fce3320f90df51f6e23b2fa1177bafa7f719cabd556876b3c9170f28a467f0c1"
+    },
+    {
+      "ts": "2026-11-05T05:43:47+0000",
+      "event": "embedding_model",
+      "run": "20261105T054345-643d05",
+      "backend": "fastembed:BAAI/bge-small-en-v1.5",
+      "active": true,
+      "integrity": "verified",
+      "integrity_detail": "5 files match the recorded SHA-256 values (revision aa8f8b060edb)",
+      "model_files": {
+        "model_optimized.onnx": "51f1bd0addd6e859e42c2c8021a5e5461385bb676a649f4b269aa445449f2431",
+        "tokenizer.json": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+        "config.json": "13582bcf2effc85b7bf3d3f5532e686bc1c9ce86bb009d10f0ec33cbe92299dd",
+        "special_tokens_map.json": "5d5b662e421ea9fac075174bb0688ee0d9431699900b90662acd44b2a350503a",
+        "tokenizer_config.json": "0b29c7bfc889e53b36d9dd3e686dd4300f6525110eaa98c76a5dafceb2029f53"
+      },
+      "prev": "fce3320f90df51f6e23b2fa1177bafa7f719cabd556876b3c9170f28a467f0c1",
+      "hash": "ce838c9c45bb4f1405d9f942326b334d44e6c571a6b36c8848e26c4bef4d4e4c"
+    },
+    {
+      "ts": "2026-11-05T05:43:48+0000",
+      "event": "ingest",
+      "run": "20261105T054345-643d05",
+      "doc_id": "salary_slip",
+      "source": "salary_slip.pdf",
+      "sha256": "9cc419b78b95fdacea72ad0da3c3783d950b5bd8083db20459bb57b9814d248e",
+      "size": [
+        1653,
+        2339
+      ],
+      "prev": "ce838c9c45bb4f1405d9f942326b334d44e6c571a6b36c8848e26c4bef4d4e4c",
+      "hash": "dc9952f66c731fc2dcd5ba2db0d1132dce486ba71b8147000ac3477c8d3b7562"
+    },
+    {
+      "ts": "2026-11-05T05:43:48+0000",
+      "event": "ocr",
+      "run": "20261105T054345-643d05",
+      "doc_id": "salary_slip",
+      "engine": "pdf-text-layer",
+      "n_words": 54,
+      "mean_conf": 1.0,
+      "candidates": {
+        "pdf-text-layer": [
+          54,
+          1.0
+        ]
+      },
+      "prev": "dc9952f66c731fc2dcd5ba2db0d1132dce486ba71b8147000ac3477c8d3b7562",
+      "hash": "3e3773035c28e158d7141b188dd8b4e6c0c29a91d89fa2113ee12a1eaaf327c5"
+    },
+    {
+      "ts": "2026-11-05T05:43:48+0000",
+      "event": "stacked_fields",
+      "run": "20261105T054345-643d05",
+      "doc_id": "salary_slip",
+      "added": [
+        [
+          "name",
+          "EMPLOYEE NAME"
+        ],
+        [
+          "employee_id",
+          "EMPLOYEE ID"
+        ],
+        [
+          "pay_month",
+          "PAYROLL PERIOD"
+        ],
+        [
+          "pay_date",
+          "PAYMENT DATE"
+        ],
+        [
+          "gross",
+          "GROSS PAY"
+        ],
+        [
+          "deductions",
+          "TOTAL DEDUCTIONS"
+        ],
+        [
+          "net_pay",
+          "NET PAY / TAKE-HOME"
+        ]
+      ],
+      "prev": "3e3773035c28e158d7141b188dd8b4e6c0c29a91d89fa2113ee12a1eaaf327c5",
+      "hash": "b59b82638e2e854903b1c831239756d0546d061020b88e5e686e328edb2ca32d"
+    },
+    {
+      "ts": "2026-11-05T05:43:48+0000",
+      "event": "extract",
+      "run": "20261105T054345-643d05",
+      "doc_id": "salary_slip",
+      "fields": [
+        "name",
+        "employee_id",
+        "pay_month",
+        "pay_date",
+        "gross",
+        "deductions",
+        "net_pay"
+      ],
+      "prev": "b59b82638e2e854903b1c831239756d0546d061020b88e5e686e328edb2ca32d",
+      "hash": "9c8c0bd40f5a2a66013556f904600265c620af659fc9104204a527837566060d"
+    },
+    {
+      "ts": "2026-11-05T05:43:49+0000",
+      "event": "classify",
+      "run": "20261105T054345-643d05",
+      "doc_id": "salary_slip",
+      "doc_type": "salary_slip",
+      "best_guess": "salary_slip",
+      "keyword": {
+        "application_form": 0.0,
+        "id_card": 0.0,
+        "salary_slip": 0.67,
+        "bank_statement": 0.2,
+        "employment_letter": 0.38
+      },
+      "expected_fields_found": {
+        "application_form": 2,
+        "id_card": 1,
+        "salary_slip": 7,
+        "bank_statement": 1,
+        "employment_letter": 3
+      },
+      "semantic": {
+        "application_form": 0.574,
+        "id_card": 0.555,
+        "salary_slip": 0.629,
+        "bank_statement": 0.6,
+        "employment_letter": 0.596,
+        "other:research_paper": 0.469,
+        "other:resume": 0.52,
+        "other:invoice": 0.551,
+        "other:article_letter": 0.404,
+        "other:financial_report": 0.524,
+        "other:business_report": 0.478,
+        "other:contract": 0.543,
+        "other:tax_form": 0.547,
+        "other:utility_bill": 0.476,
+        "other:certificate": 0.527,
+        "other:medical_report": 0.401,
+        "other:presentation_brochure": 0.386
+      },
+      "decision": "accepted as salary_slip",
+      "prev": "9c8c0bd40f5a2a66013556f904600265c620af659fc9104204a527837566060d",
+      "hash": "b419662138774d8932f0e05c233b6006f5f003b27b9ff2b71d51153ff7b1ff81"
+    },
+    {
+      "ts": "2026-11-05T05:43:49+0000",
+      "event": "categorise",
+      "run": "20261105T054345-643d05",
+      "file": "salary_slip.pdf",
+      "label": "Salary slip",
+      "confidence": 0.442,
+      "pages_agree": [
+        1,
+        1
+      ],
+      "top": [
+        [
+          "Salary slip",
+          0.442
+        ],
+        [
+          "Bank statement",
+          0.168
+        ],
+        [
+          "Employment confirmation",
+          0.147
+        ]
+      ],
+      "prev": "b419662138774d8932f0e05c233b6006f5f003b27b9ff2b71d51153ff7b1ff81",
+      "hash": "17a7bc10b3a7bfc240b5d02bb8a8dd87d59c06dc93c338a4498c504a6d18489a"
+    },
+    {
+      "ts": "2026-11-05T05:43:49+0000",
+      "event": "structure",
+      "run": "20261105T054345-643d05",
+      "doc_id": "salary_slip",
+      "sections": [
+        [
+          "NORTHWIND DEMO LABS",
+          "title"
+        ],
+        [
+          "EMPLOYEE NAME EMPLOYEE ID",
+          "personal_details"
+        ],
+        [
+          "PAYROLL PERIOD PAYMENT DATE",
+          "other"
+        ],
+        [
+          "EARNINGS INR DEDUCTIONS INR",
+          "earnings_deductions"
+        ],
+        [
+          "GROSS PAY TOTAL DEDUCTIONS",
+          "deductions"
+        ]
+      ],
+      "tables": [],
+      "prev": "17a7bc10b3a7bfc240b5d02bb8a8dd87d59c06dc93c338a4498c504a6d18489a",
+      "hash": "01c69e60db3343fb50c6db138d06f19fb9e1c222103ba6d300b0c3f29af5a81e"
+    },
+    {
+      "ts": "2026-11-05T05:43:49+0000",
+      "event": "forensics_skipped",
+      "run": "20261105T054345-643d05",
+      "doc_id": "salary_slip",
+      "reason": "born-digital PDF page (no scan/capture); PDF structure checks run instead",
+      "prev": "01c69e60db3343fb50c6db138d06f19fb9e1c222103ba6d300b0c3f29af5a81e",
+      "hash": "7d4448537c344f7e181cf539f03c364996981be18664ea736a14c4977809458b"
+    },
+    {
+      "ts": "2026-11-05T05:43:49+0000",
+      "event": "pdf_forensics",
+      "run": "20261105T054345-643d05",
+      "doc_id": "salary_slip",
+      "checks": {
+        "amount_fonts": "8 amounts compared (page font helvetica)",
+        "patches": 1,
+        "covered_text": 0,
+        "hidden_text": 0
+      },
+      "flagged": [
+        "V-001"
+      ],
+      "prev": "7d4448537c344f7e181cf539f03c364996981be18664ea736a14c4977809458b",
+      "hash": "1f79828856260b23827e0d7253fcf9b14097f85c70f1b30568c33e2881123379"
+    },
+    {
+      "ts": "2026-11-05T05:43:49+0000",
+      "event": "issuer_as_employer",
+      "run": "20261105T054345-643d05",
+      "doc_id": "salary_slip",
+      "employer": "NORTHWIND DEMO LABS",
+      "prev": "1f79828856260b23827e0d7253fcf9b14097f85c70f1b30568c33e2881123379",
+      "hash": "e4fd74836dff2416c7bf935a58bb9f1bbe109096f590f01b85a0c9689bdc3684"
+    },
+    {
+      "ts": "2026-11-05T05:43:49+0000",
+      "event": "fields_final",
+      "run": "20261105T054345-643d05",
+      "doc_id": "salary_slip",
+      "doc_type": "salary_slip",
+      "source_sha256": "9cc419b78b95fdacea72ad0da3c3783d950b5bd8083db20459bb57b9814d248e",
+      "fields": [
+        {
+          "key": "name",
+          "raw": "Asha Verma",
+          "bbox": [
+            150.0,
+            470.1,
+            302.8,
+            508.3
+          ],
+          "conf": 1.0,
+          "matched_by": "stacked"
+        },
+        {
+          "key": "employee_id",
+          "raw": "NW-3141",
+          "bbox": [
+            905.6,
+            470.1,
+            1022.9,
+            508.3
+          ],
+          "conf": 1.0,
+          "matched_by": "stacked"
+        },
+        {
+          "key": "pay_month",
+          "raw": "October 2026",
+          "bbox": [
+            150.0,
+            636.8,
+            318.3,
+            675.0
+          ],
+          "conf": 1.0,
+          "matched_by": "stacked"
+        },
+        {
+          "key": "pay_date",
+          "raw": "30 Oct 2026",
+          "bbox": [
+            905.6,
+            636.8,
+            1056.9,
+            675.0
+          ],
+          "conf": 1.0,
+          "matched_by": "stacked"
+        },
+        {
+          "key": "gross",
+          "raw": "INR 97,000",
+          "bbox": [
+            180.6,
+            1247.9,
+            321.1,
+            1286.1
+          ],
+          "conf": 1.0,
+          "matched_by": "stacked"
+        },
+        {
+          "key": "deductions",
+          "raw": "INR 7,300",
+          "bbox": [
+            736.1,
+            1247.9,
+            861.2,
+            1286.1
+          ],
+          "conf": 1.0,
+          "matched_by": "stacked"
+        },
+        {
+          "key": "net_pay",
+          "raw": "INR 98,700",
+          "bbox": [
+            955.6,
+            1431.8,
+            1215.6,
+            1486.0
+          ],
+          "conf": 1.0,
+          "matched_by": "stacked"
+        },
+        {
+          "key": "employer",
+          "raw": "NORTHWIND DEMO LABS",
+          "bbox": [
+            119.4,
+            83.4,
+            605.5,
+            136.9
+          ],
+          "conf": 1.0,
+          "matched_by": "header"
+        }
+      ],
+      "prev": "e4fd74836dff2416c7bf935a58bb9f1bbe109096f590f01b85a0c9689bdc3684",
+      "hash": "be3dbae2734794af4dbd1d17a7911678e870b3320bf8bd59a0099dad83a3d06e"
+    },
+    {
+      "ts": "2026-11-05T05:43:49+0000",
+      "event": "finding",
+      "run": "20261105T054345-643d05",
+      "fid": "V-001",
+      "kind": "visual",
+      "severity": "medium",
+      "confidence": 0.73,
+      "status": "potential_manipulation",
+      "title": "Possible replacement patch over 'INR 98,700' in salary_slip",
+      "method": "PDF structure: drawing order and fonts",
+      "refs": [
+        {
+          "doc_id": "salary_slip",
+          "field": "net_pay",
+          "value": "INR 98,700",
+          "bbox": [
+            908.3,
+            1411.1,
+            1386.1,
+            1497.2
+          ]
+        }
+      ],
+      "source_sha256": {
+        "salary_slip": "9cc419b78b95fdacea72ad0da3c3783d950b5bd8083db20459bb57b9814d248e"
+      },
+      "evidence_crop": "evidence/V-001.png",
+      "evidence_sha256": "1f807a5cb97d8953dd962aae91e0256f8812e4621e025e8c11f133e7d7e11915",
+      "produced_by": {
+        "salary_slip": {
+          "ingest": "dc9952f66c731fc2dcd5ba2db0d1132dce486ba71b8147000ac3477c8d3b7562",
+          "ocr": "3e3773035c28e158d7141b188dd8b4e6c0c29a91d89fa2113ee12a1eaaf327c5",
+          "extract": "9c8c0bd40f5a2a66013556f904600265c620af659fc9104204a527837566060d",
+          "fields_final": "be3dbae2734794af4dbd1d17a7911678e870b3320bf8bd59a0099dad83a3d06e"
+        }
+      },
+      "prev": "be3dbae2734794af4dbd1d17a7911678e870b3320bf8bd59a0099dad83a3d06e",
+      "hash": "17d52ab3701e83a03a5f360eb4459ac4523b1d43728939acbe9dbacbdc8feb61"
+    },
+    {
+      "ts": "2026-11-05T05:43:49+0000",
+      "event": "finding",
+      "run": "20261105T054345-643d05",
+      "fid": "C-001",
+      "kind": "intra",
+      "severity": "high",
+      "confidence": 0.98,
+      "status": "inconsistency",
+      "title": "Salary slip arithmetic does not balance in salary_slip",
+      "method": "arithmetic check",
+      "refs": [
+        {
+          "doc_id": "salary_slip",
+          "field": "gross",
+          "value": "INR 97,000",
+          "bbox": [
+            180.6,
+            1247.9,
+            321.1,
+            1286.1
+          ]
+        },
+        {
+          "doc_id": "salary_slip",
+          "field": "deductions",
+          "value": "INR 7,300",
+          "bbox": [
+            736.1,
+            1247.9,
+            861.2,
+            1286.1
+          ]
+        },
+        {
+          "doc_id": "salary_slip",
+          "field": "net_pay",
+          "value": "INR 98,700",
+          "bbox": [
+            955.6,
+            1431.8,
+            1215.6,
+            1486.0
+          ]
+        }
+      ],
+      "source_sha256": {
+        "salary_slip": "9cc419b78b95fdacea72ad0da3c3783d950b5bd8083db20459bb57b9814d248e"
+      },
+      "evidence_crop": "evidence/C-001.png",
+      "evidence_sha256": "16b918fd7aa09ba1aa02220f71bc179de7ca85b343a85e5212dde3f6df899e15",
+      "produced_by": {
+        "salary_slip": {
+          "ingest": "dc9952f66c731fc2dcd5ba2db0d1132dce486ba71b8147000ac3477c8d3b7562",
+          "ocr": "3e3773035c28e158d7141b188dd8b4e6c0c29a91d89fa2113ee12a1eaaf327c5",
+          "extract": "9c8c0bd40f5a2a66013556f904600265c620af659fc9104204a527837566060d",
+          "fields_final": "be3dbae2734794af4dbd1d17a7911678e870b3320bf8bd59a0099dad83a3d06e"
+        }
+      },
+      "prev": "17d52ab3701e83a03a5f360eb4459ac4523b1d43728939acbe9dbacbdc8feb61",
+      "hash": "2eff173cf4a6aa5cc29b415a8adc89479f3b5e76aaef98acc0e0b940ba98945a"
+    },
+    {
+      "ts": "2026-11-05T05:43:49+0000",
+      "event": "finding",
+      "run": "20261105T054345-643d05",
+      "fid": "N-001",
+      "kind": "missing",
+      "severity": "low",
+      "confidence": 0.9,
+      "status": "observed",
+      "title": "Pixel-level forensics not applicable to 1 born-digital PDF page(s)",
+      "method": "input type detection",
+      "refs": [
+        {
+          "doc_id": "salary_slip",
+          "field": null,
+          "value": null,
+          "bbox": null
+        }
+      ],
+      "source_sha256": {
+        "salary_slip": "9cc419b78b95fdacea72ad0da3c3783d950b5bd8083db20459bb57b9814d248e"
+      },
+      "evidence_crop": null,
+      "evidence_sha256": null,
+      "produced_by": {
+        "salary_slip": {
+          "ingest": "dc9952f66c731fc2dcd5ba2db0d1132dce486ba71b8147000ac3477c8d3b7562",
+          "ocr": "3e3773035c28e158d7141b188dd8b4e6c0c29a91d89fa2113ee12a1eaaf327c5",
+          "extract": "9c8c0bd40f5a2a66013556f904600265c620af659fc9104204a527837566060d",
+          "fields_final": "be3dbae2734794af4dbd1d17a7911678e870b3320bf8bd59a0099dad83a3d06e"
+        }
+      },
+      "prev": "2eff173cf4a6aa5cc29b415a8adc89479f3b5e76aaef98acc0e0b940ba98945a",
+      "hash": "c42ad6112a77ab531baed52f51bed209cc196ecdc0ec3a12f18f9ea49de4c7c3"
+    },
+    {
+      "ts": "2026-11-05T05:43:50+0000",
+      "event": "dossier",
+      "run": "20261105T054345-643d05",
+      "case_id": "pdf_payslip_patched",
+      "n_findings": 3,
+      "summary_source": "template",
+      "prev": "c42ad6112a77ab531baed52f51bed209cc196ecdc0ec3a12f18f9ea49de4c7c3",
+      "hash": "7d7f101cb6e38fb4c56de983e31b278c8bc3c12bd6792c05c54beceb9169093f"
+    }
+  ]
+}
