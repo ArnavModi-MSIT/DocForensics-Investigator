@@ -4,7 +4,7 @@ DataOps Innovation Hackathon 2026 (Problem Statement 2). It goes beyond OCR: it 
 are, extracts fields, tests them for signs of tampering, checks documents against themselves and against each other,
 and produces an evidence-mapped investigation dossier (PDF + JSON) with a full audit trail.
 
-[![tests](https://github.com/ArnavModi-MSIT/DataOps-Innovation/actions/workflows/ci.yml/badge.svg)](https://github.com/ArnavModi-MSIT/DataOps-Innovation/actions/workflows/ci.yml)
+[![tests](https://github.com/ArnavModi-MSIT/DocForensics-Investigator/actions/workflows/ci.yml/badge.svg)](https://github.com/ArnavModi-MSIT/DocForensics-Investigator/actions/workflows/ci.yml)
 
 > Visual findings are **indicators** of possible alteration, not proof of fraud. All bundled sample data is fictional.
 
