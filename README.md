@@ -103,12 +103,14 @@ Optional: `pip install -r requirements-optional.txt` adds a local second OCR eng
 
 Synthetic benchmark, self-generated: evidence that the pipeline works, not real-world accuracy. Clean pages produced no false alarms and classification was correct on every case.
 
-| Capture quality | Naive forgery (pasted value, different ink/tone) | Skilled forgery (font, ink, tone matched; numbers consistent) |
-|---|---|---|
-| Digital render | 5/5 per case | **0/8** |
-| Mild scan | 5/5 per case | **0/8** |
-| Hard scan (tilt, blur, JPEG 60) | 10/10 | **0/8** |
-| Rough phone photo (5 deg tilt, JPEG 45) | 10/10 | **0/8** |
+| Capture quality | Naive forgery detected (pasted value, different ink or tone) |
+|---|---|
+| Digital render | 5/5 per case |
+| Mild scan | 5/5 per case |
+| Hard scan (tilt, blur, JPEG 60) | 10/10 |
+| Rough phone photo (5 deg tilt, JPEG 45) | 10/10 |
+
+**Not detected:** skilled forgeries, where font, ink and tone are matched and every number stays consistent (0 of 8 per capture quality in this benchmark). Nothing in the files contradicts such an edit, so no check here can flag it; it needs issuer verification (see Known limitations).
 
 Field extraction is about 95-100%; remaining errors are OCR slips on IDs. A second pack generated separately with another AI tool (not supplied by the organisers): 108/108 source fields located, 5/5 planted findings found with evidence boxes (IoU 0.99-1.00), 0 substantive findings on the two clean controls. That pack drove fixes, so it is now a regression check, not a held-out test. Thresholds were tuned on synthetic data; expect lower numbers on real documents.
 

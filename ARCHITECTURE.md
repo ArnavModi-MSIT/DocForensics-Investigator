@@ -275,14 +275,16 @@ expose these fields, the page classification reason, deskew angle and whether fo
 `synth/generate.py` builds fictional document sets (4 pages per case) in several capture conditions (digital, mild scan, hard scan, rough phone photo with 5 deg tilt and JPEG 45) with injected tampering. `tests/eval_synth.py`
 scores classification, field extraction, issue recall and false positives per condition. Latest results (real embedding model active):
 
-| Capture | Clean: false positives | Naive forgery found | Skilled forgery found | Classification | Field extraction |
-|---|---|---|---|---|---|
-| Digital | 0 | 5/5 | 0/8 | 4/4 per case | ~96-100% |
-| Mild scan | 0 | 5/5 | 0/8 | 4/4 | ~98-100% |
-| Hard scan (2 unseen people) | 0 | 10/10 | 0/8 | 4/4 | 100% |
-| Rough phone photo (2 unseen people) | 0 | 10/10 | 0/8 | 4/4 | ~94-98% |
+| Capture | Clean: false positives | Naive forgery found | Classification | Field extraction |
+|---|---|---|---|---|
+| Digital | 0 | 5/5 | 4/4 per case | ~96-100% |
+| Mild scan | 0 | 5/5 | 4/4 | ~98-100% |
+| Hard scan (2 unseen people) | 0 | 10/10 | 4/4 | 100% |
+| Rough phone photo (2 unseen people) | 0 | 10/10 | 4/4 | ~94-98% |
 
-- "Naive" = pasted value with a different font, paper tone and ink. "Skilled" = same font, ink and tone matched, all numbers consistent across documents, so only pixel traces could reveal it.
+**Not detected:** skilled forgeries (0 of 8 per capture quality in this benchmark). Nothing in the files contradicts such an edit, so no check here can flag it; it needs issuer verification.
+
+- "Naive" = pasted value with a different font, paper tone and ink. "Skilled" = same font, ink and tone matched, all numbers consistent across documents.
 - **Caveats:** the benchmark is self-generated, small (about 24 cases), the forensic thresholds were derived from the same family of data, and the naive forgery deliberately changes ink darkness, which is the cue the detector learned. Treat the results as evidence that the pipeline works end to end, **not as real-world accuracy**.
 - **Real-document checks** (not a benchmark and not in the repo): bank statement, Aadhaar card, sales report, resume, research paper behave as described above. We do not yet have real salary slips, application forms, PAN cards or any real tampered documents.
 - A dedicated test (`tests/test_id_cards.py`) builds fictional Aadhaar-style cards (valid and corrupted number) and checks classification, extraction, masking and the checksum finding.
