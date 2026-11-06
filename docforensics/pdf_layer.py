@@ -122,15 +122,52 @@ def read_meta(path):
         meta.update(producer=m.get("producer") or None, creator=m.get("creator") or None, created=m.get("creationDate") or None,
                     modified=m.get("modDate") or None, encrypted=bool(pdf.is_encrypted), pages=len(pdf))
         meta["title"] = m.get("title") or None
+        meta["xmp"] = parse_xmp(pdf.get_xml_metadata())
     except Exception:
         pass
     try:
         with open(path, "rb") as fh:
             data = fh.read(60 << 20)
         meta["revisions"] = max(1, len(re.findall(rb"%%EOF", data)))
+        meta["signed"] = b"/ByteRange" in data                          # a digital signature is present (signing legitimately adds a revision)
     except Exception:
         pass
     return meta
+
+
+def parse_xmp(xml):
+    """The few XMP properties that duplicate the Info dictionary: creator tool, producer, create / modify dates (None when absent)."""
+    out = {}
+    if not xml:
+        return out
+    for key, tags in (("creator", ("xmp:CreatorTool",)), ("producer", ("pdf:Producer",)), ("created", ("xmp:CreateDate",)), ("modified", ("xmp:ModifyDate",))):
+        for t in tags:
+            m = re.search(rf"<{t}>([^<]+)</{t}>", xml) or re.search(rf'{t}="([^"]+)"', xml)
+            if m:
+                out[key] = m.group(1).strip()
+                break
+    return out
+
+
+def to_utc(s):
+    """A PDF Info date ('D:20261103085713+05\'30\'') or an XMP / ISO date -> (naive UTC datetime, had_timezone) or (None, False)."""
+    from datetime import datetime, timedelta, timezone
+    s = (s or "").strip()
+    m = re.match(r"D:(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?\s*(?:([+-])(\d{2})'?(\d{2})?'?|Z)?", s)
+    try:
+        if m:
+            parts = [int(g) if g else d for g, d in zip(m.groups()[:6], (0, 1, 1, 0, 0, 0))]
+            dt = datetime(*parts)
+            if m.group(7):
+                off = timedelta(hours=int(m.group(8)), minutes=int(m.group(9) or 0))
+                return (dt - off if m.group(7) == "+" else dt + off), True
+            return dt, s.endswith("Z")
+        dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+        if dt.tzinfo:
+            return dt.astimezone(timezone.utc).replace(tzinfo=None), True
+        return dt, False
+    except ValueError:
+        return None, False
 
 
 def parse_pdf_date(s):

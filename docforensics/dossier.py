@@ -17,7 +17,7 @@ CAPABILITIES = [
     ("Evidence mapping (annotated regions), audit trail, reviewer UI, PDF/JSON dossier", "Implemented"),
     ("Handwriting recognition", "Unsupported"),
     ("Typography / spacing / alignment checks, JPEG block-grid consistency (inserted or replaced content), photo-region check on ID cards, signature detection with placement and background checks", "Implemented (heuristic; see limitations)"),
-    ("Born-digital PDFs: exact text layer (no OCR), font consistency of amounts, bordered patches over values, covered or hidden text, file history (revisions, dates, producer)", "Implemented (observations about file structure, not proof)"),
+    ("Born-digital PDFs: exact text layer (no OCR), font consistency of amounts, bordered patches over values, covered or hidden text, file history (revisions, dates, producer, Info vs XMP records, font subset tags)", "Implemented (observations about file structure, not proof)"),
     ("Duplicated (copy-move) image regions on scans and photos; image metadata (editing software, modification after capture); scanned-PDF file history", "Implemented (observations; copies recompressed below about JPEG quality 92 after pasting can be missed)"),
     ("Signature authenticity, photo identity matching", "Planned"),
     ("Layout-aware ML models (LayoutLM etc.), tables in other layouts, multilingual OCR", "Planned"),

@@ -14,20 +14,72 @@ For reviewers: **[ARCHITECTURE.md](ARCHITECTURE.md)** explains how stages 1-4 wo
 `Submission -> Page normalisation -> OCR -> Field extraction -> Classification -> Visual forensics -> Contextual checks -> Cross-document correlation -> Evidence mapping -> Dossier`
 
 ```mermaid
-flowchart LR
-  A[Submit: images, PDF, ZIP] --> B[Ingest: SHA-256, deskew,<br/>PDF text layer]
-  B --> C[Read: OCR or exact text,<br/>fields, classification]
-  C --> D[Structure: sections, tables]
-  D --> E[Visual forensics:<br/>pixel and PDF-structure checks]
-  D --> F[Contextual checks:<br/>arithmetic, formats, dates]
-  F --> G[Cross-document correlation:<br/>comparators, linkage, reconciliation]
-  E --> H[Findings with evidence,<br/>status and confidence]
-  G --> H
-  H --> I[Dossier PDF and JSON<br/>sections 7.1 to 7.6]
-  B -.-> L[(Hash-chained audit log<br/>and review log)]
-  C -.-> L
-  H -.-> L
+flowchart TB
+  IN["Submission: images, PDFs, ZIP bundles<br/>(authorised documents only)"]
+  subgraph PROC["Document processing"]
+    ING["Ingest: SHA-256, page IDs, deskew,<br/>born-digital detection"]
+    TXT["PDF text layer: exact text,<br/>fonts, draw order"]
+    OCR["OCR: Tesseract word boxes,<br/>optional RapidOCR second engine"]
+    EXT["Field extraction: label dictionary,<br/>stacked grids, ID patterns, confidence"]
+    CLS["Classification: keywords + structure<br/>+ bge-small embeddings"]
+    STR["Structure: sections, tables,<br/>layout label"]
+  end
+  subgraph CV["Computer vision and file forensics"]
+    PIX["Scans and photos: ELA, noise, tone,<br/>ink, typography, block grid"]
+    CLO["Copy-move regions,<br/>image metadata"]
+    PDF["Generated PDFs: font outliers, patches,<br/>hidden text, file history"]
+  end
+  subgraph CTX["Contextual analysis"]
+    INT["Within a document: arithmetic, formats,<br/>checksums, dates, running balances"]
+    CROSS["Across documents: entity matching,<br/>income reconciliation, linkage map"]
+  end
+  subgraph EVM["Evidence management"]
+    FND["Findings: status, confidence,<br/>document, field, box"]
+    EVD["Evidence crops and annotated pages"]
+    DOS["Dossier PDF and JSON,<br/>sections 7.1 to 7.6"]
+    LOG[("Hash-chained audit log,<br/>review log, case history")]
+  end
+  UI["Review interface (Streamlit) and CLI"]
+  LLM["Optional LLM summary, off by default;<br/>explains findings, never creates them"]
+  IN --> ING
+  ING --> TXT
+  ING --> OCR
+  TXT --> EXT
+  OCR --> EXT
+  EXT --> CLS --> STR
+  STR --> PIX
+  STR --> CLO
+  STR --> PDF
+  STR --> INT
+  INT --> CROSS
+  PIX --> FND
+  CLO --> FND
+  PDF --> FND
+  INT --> FND
+  CROSS --> FND
+  FND --> EVD --> DOS
+  FND --> UI
+  DOS --> UI
+  FND -.-> LLM -.-> DOS
+  ING -.-> LOG
+  EXT -.-> LOG
+  FND -.-> LOG
+  UI -.-> LOG
 ```
+
+**Models and technologies, and what each one does**
+
+| Technology | Role | Limits |
+|---|---|---|
+| Tesseract (and optional local RapidOCR) | Printed-text OCR with word boxes and confidences | No handwriting; English text only; OCR output is never treated as verified |
+| PyMuPDF | Exact text, fonts and drawing order of generated PDFs; page rendering | Structure checks apply to generated PDFs only |
+| bge-small-en-v1.5 (ONNX, via fastembed; local, checked against recorded SHA-256 values) | Document-type classification and label matching | Five document types; no training on user data |
+| OpenCV / NumPy | Deskew, ELA, noise, tone, copy-move and layout measurements | Heuristic; weak on skilled or AI-generated edits |
+| Rule engine (`correlate.py`, `structure.py`) | Arithmetic, format, date, cross-document and reconciliation checks | Conservative rules tuned on synthetic data |
+| Optional LLM (off by default) | Writes the investigator summary from existing findings | Needs an API key; never adds findings, values or evidence |
+
+There is no trained anomaly-detection model: the system has no labelled real-world forgeries to train one on, so findings come from explicit checks that can each be explained and traced to a place in a document. The sample dossiers are produced by this pipeline (rules plus the local embedding model), with the LLM summary switched off.
+
 
 | Stage | Module | How |
 |---|---|---|
@@ -39,7 +91,8 @@ flowchart LR
 | PDF text layer | `pdf_layer.py` | Generated (born-digital) PDFs are read from their own text layer: exact text, no OCR misreads, per-span font/size/draw order, drawn rectangles, file metadata. Word boxes are scaled to OCR-like height so every downstream threshold behaves the same on scans and PDFs; reported boxes are restored to the PDF's own geometry. `DOCFOR_PDF_TEXT=off` forces OCR |
 | Image checks | `forensics_clone.py` | Duplicated regions (copy-move) on scans and photos: DCT block matching at any shift, then a comparison of the NOISE of the two areas (a copy carries its noise, repeated text does not); EXIF / PNG metadata naming an editor or showing modification after capture. Born-digital pages are skipped for the clone check |
 | Visual forensics | `forensics.py` | Per-field ELA, grain noise, paper tone, ink darkness, compared with fields of similar text size on the **same page** (leave-one-out robust z-score), after flattening page lighting. Skipped for born-digital PDFs and when too few comparable fields exist - and the dossier says so |
-| PDF structure forensics | `pdf_forensics.py` | For generated PDFs (pixel analysis does not apply): amount set in a different font family, bordered patch of a different colour over a value, text hidden under a later-drawn rectangle, invisible text, file history (revisions, dates, producer). Observations about file structure, never proof |
+| PDF structure forensics | `pdf_forensics.py` | For generated PDFs (pixel analysis does not apply): amount set in a different font family, bordered patch of a different colour over a value, text hidden under a later-drawn rectangle, invisible text, file history (revisions unless signed, dates, producer, Info vs XMP records that disagree, missing creation date, one typeface under several subset tags). Observations about file structure, never proof |
+| Statement amount patterns | `structure.py` | Low-severity observations on transaction amounts: a high share of exact multiples of 1,000, three or more amounts in the 5% just under a common limit, one amount repeated under different descriptions. Thresholds are stated in the code; never evidence on its own |
 | Contextual checks | `correlate.py` | Payslip arithmetic, ID formats, Aadhaar checksum, date logic, completeness |
 | Structure | `structure.py` | Sections (headings) and tables (bank transactions, earnings/deductions) with running-balance, carried-balance, total-row and component-sum checks; overlay image + UI tab |
 | Categories | `embed_classifier.py` | Every page gets a semantic category with a confidence score (16 classes incl. corporate financial report, resume, contract, invoice ...); files of unsupported types are described instead of just called "unknown" |
@@ -139,6 +192,8 @@ Everything here is fictional; no real document or personal data is committed.
 
 `python synth/make_demo.py` rebuilds these folders. Run the CLI on one (`python -m docforensics.pipeline demo_data/case_tampered --out output/case_tampered`) or upload the files in the UI.
 
+The sample dossiers are generated by the pipeline itself (rules plus the local embedding model); the optional LLM summary was not used.
+
 **Sample investigation dossier:** `docs/sample_dossier/case_tampered/dossier.pdf` (plus `dossier.json`, the hash-chained `audit.jsonl` and the `evidence/` crops) `docs/sample_dossier/pdf_payslip_patched/` and `docs/sample_dossier/pdf_slips_and_bank/`. Verify an audit log with `python -m docforensics.audit verify docs/sample_dossier/case_tampered/audit.jsonl`.
 
 ## Known limitations
@@ -148,15 +203,40 @@ Everything here is fictional; no real document or personal data is committed.
 - Handwriting, tables in other layouts (invoices, schedules, merged cells), Hindi and vertical text (e.g. issue dates on an Aadhaar card edge) are not read.
 - OCR errors can create false content mismatches (similarity is reported so reviewers can judge).
 - Only five document types are supported (application form, ID card, salary slip, bank statement, employment letter); layouts outside label:value, multi-column and the ID patterns need new rules.
+- No trained anomaly-detection model is used: judgements come from explicit, explainable checks plus embedding-based classification and label matching. This keeps every finding traceable, but it cannot learn forgery styles that the checks do not describe.
 - Thresholds were tuned on synthetic data; validate on real documents before any production use.
 
 ### Potential false positives
 - A different trade name and legal name for the same employer, or a changed address after a house move, can show as a cross-document mismatch; the finding states the two values so a reviewer can judge.
 - OCR slips on low-quality scans can create content mismatches (the similarity between the two readings is reported); born-digital PDFs use the exact text layer, so this does not apply to them.
+- Round amounts, amounts just under a limit and repeated amounts are normal for rent, instalments and own-account transfers; they are reported only as low-severity prompts to read the descriptions.
 - A statement or payslip re-exported by the issuer's own software can show a later modification date, a second revision or an editor name in the file history; these are reported as observations, not as alteration.
 - Pasted-region detection can fire on genuinely repeated graphics such as logos or stamps (reported at low severity unless an extracted field sits inside the region).
 - A document that shares no identifier with the others is reported as unlinked, which can also happen for a legitimate supporting document.
 - Findings are reviewer prompts, not verdicts; confidence levels are not calibrated probabilities.
+
+## Related work and positioning
+
+DocForensics is deliberately rule-based and evidence-first. This section places it against published work; nothing listed here as "future work" is implemented.
+
+| Approach (reference) | What it does | How this project relates |
+|---|---|---|
+| Field-localised ID-document forgery detection (FLiD, arXiv 2605.09089) | Finds face and text fields, then classifies each field with a small trained network | Same idea of judging fields separately (findings are field-level with evidence crops), but without a trained detector or a labelled dataset |
+| Hybrid CNN-transformer localisation for ID documents (EdgeDoc, arXiv 2508.16284) | Learns anomaly maps; its authors note poor generalisation across layouts and scarce training data because documents are personal | Supports the choice not to depend on a trained model that would need real documents |
+| PDF structure forensics (published signals from a PDF-integrity service: revision count, Info vs XMP mismatch, missing metadata, font-subset tags) | Reads file structure for signs of re-saving or assembly | Borrowed as observations in `pdf_forensics.py`, with the legitimate causes (signing, merging) stated in each finding |
+| Forensic-accounting amount tests (round numbers, just-below-threshold values, duplicates; Benford's law) | Statistical screening of ledgers | Round, near-limit and repeated amounts are implemented as low-severity prompts. Benford's law is not used: it needs far more values than one statement holds |
+| Double-JPEG / compression-grid analysis for scanned documents | Finds regions that were compressed differently | Not implemented. Weak on re-scanned or resized images; listed as future work |
+| Provenance-first document intelligence (Civic Table, a historical-records platform; AGPL-3.0, uses cloud OCR and an LLM API) | Extracts entities from degraded records, hashes each source file with SHA-256 and keeps provenance on every item and marks unverified data until an analyst reviews it | Similar principle: nothing is treated as established until a human decides. Here every finding carries its method, boxes and confidence, and reviewer decisions are recorded by a person in a separate hash-chained log (`review.py`), never inferred. Its OCR and LLM calls are cloud services; this project runs offline. Ideas only, no code taken |
+| Question-led investigation (DFIQ, an open catalogue of investigative questions, Apache-2.0) | Organises an investigation as questions and the approaches that answer them | A reference for the idea only; this project does not implement or claim alignment with DFIQ. The dossier sections (arithmetic, cross-document, visual, history) correspond informally to questions such as "do the figures add up?" or "do two documents about the same person agree?" |
+| PDF structure explorer and scanner (Pdfalyzer, GPL-3.0; draws the object tree of a PDF, scans bytes with YARA rules written for malicious PDFs, shows fonts and character maps, and can score how well a text layer matches OCR of the page image) | Helps an analyst inspect how a PDF is built, mainly for malware and structure questions | A different aim: it explains the file, it does not judge the values in it. Its idea of comparing the text layer with what OCR reads from the rendered page is not implemented here and is listed as future work. Ideas only; no code is taken because of its licence |
+| PDF forensic workbench (PDFRecon, MIT, Windows desktop and command-line tool: Acrobat TouchUp markers, extracted earlier revisions with text and visual diff, XMP history and identifier checks, JPEG and ELA views, case files, hashed exports, signed reports, chain-of-custody log) | Scans PDFs for 40+ indicators of editing, with an examiner's interface | The most complete PDF-only tool found. Shared ideas: earlier revisions are recovered and compared with the final text, exports are hashed, and the examiner's log is tamper-evident. Differences: it works on PDF files only, whereas this project also reads scans and photos, extracts and links values across documents, and checks arithmetic and consistency; its output is a list of indicators, not located, field-level findings with a stated confidence |
+| Local-first PDF auditor (questio, MIT, command line: producer and editor strings, revision markers, font subset tags, content-stream "handwriting" fingerprints learned from known-genuine files) | Scores a PDF's structure and metadata; fingerprints let it compare a document with a known issuer | Closest in spirit to the PDF-structure checks here, and the same no-upload principle. Differences: its font check treats any second subset tag in the file as evidence of another editing session, but each typeface in a clean file gets its own tag, so this project compares tags per typeface. It reads structure only; this project also reads values, so a changed figure can be checked against the rest of the document and other documents. Issuer fingerprints need genuine reference files, which this project does not assume |
+| Document forgery toolkit (DocAuth, MIT, Streamlit app: ORB + RANSAC copy-move, ELA, edge and wavelet views, OCR, and a Siamese-network signature verifier) | Separate tabs for signature matching, copy-move and image analysis, with a single Authentic / Suspicious / Forged score per tool | Copy-move is the overlap: ORB matches any repeated feature, and printed characters repeat constantly, so a document needs a further test. Here a duplicated region must also share its noise pattern (a real copy brings the noise along, repeated letters do not), and born-digital pages are not examined. Signature authenticity (a trained verifier needing reference signatures) is listed as planned, not implemented. The project publishes no accuracy figures of its own |
+| Multi-generator deepfake document detection and tamper localisation (a research prototype, MIT; trained on AI-inpainted forgery benchmarks) | A trained network that scores a document and localises edited pixels, with a few receipt-total checks beside it | Its authors report, on their own splits, pixel F1 of about 0.32 and image ROC-AUC of 0.38, and pixel F1 of 0.04 and 0.0001 when trained on one generator and tested on another. Their conclusion is that the model learns generator-specific cues. This project does not rely on image statistics alone: arithmetic, cross-document and field-consistency checks do not depend on how an edit was made. Their receipt check has three rules (subtotal + tax = total, non-positive total, too few amounts); this project checks payslips, statements, IDs and cross-document links as well. Ideas only; the benchmark data is non-commercial and is not used here |
+| Single-verdict image checker (Document_Forgery_Detection, an open web app; its code is a hand-tuned OpenCV pipeline of ELA, edge, noise, file-header string, face and layout checks combined with fixed weights into "likely genuine / inconclusive / likely fake") | Scores a whole image and returns one verdict with heatmaps | Same building blocks for scans (ELA, duplicated blocks, header strings). Differences: no single verdict here, only located findings with boxes, a stated method and confidence, and titles that never assert fraud; it adds the PDF text layer and structure, cross-document and arithmetic checks, which that code does not have. Its published accuracy figures are not comparable to the benchmarks here |
+| Learned localisers and multimodal-LLM explainers | Pixel-level localisation, generated explanations | Out of scope: they need large model downloads or an external model, which this project avoids |
+
+Learned detectors reported in the literature are trained and tested on specific datasets; this project does not claim comparable accuracy on real documents.
 
 ## Standards and reference frameworks (reference points, not a compliance claim)
 We draw on ISO/IEC 27037, 27041, 27042, NIST SP 800-86 and the OWASP Machine Learning Security Top 10 where they apply. **We do not claim compliance or certification with any of them.** The same table is Appendix B of every dossier.

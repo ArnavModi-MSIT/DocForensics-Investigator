@@ -750,6 +750,59 @@ def table_findings(docs):
                                        method="table page-continuity check"))
             last = next((r for r in reversed(rows) if r["balance"] is not None and r["role"] != "closing"), None)
             prev_last = (d.doc_id, last["balance"]) if last else None
+    out += amount_pattern_findings(by_file, nid)
+    return out
+
+
+
+# ----------------------------------------------------------------------------------------------- amount patterns (forensic accounting)
+ROUND_MIN_N, ROUND_SHARE, ROUND_STEP = 12, 0.6, 1000          # needs enough rows; 60 % of amounts exact multiples of 1,000
+THRESHOLDS = (50_000, 200_000, 1_000_000)                      # values often cited for PAN / cash limits / reporting; the tool does not know which applies
+NEAR_BAND, NEAR_MIN = 0.05, 3                                  # amounts in the 5 % just below a threshold; at least 3 of them
+REPEAT_MIN, REPEAT_FLOOR, REPEAT_DESC = 4, 5_000, 3            # one amount used on 4+ rows, 3+ different descriptions, each at least 5,000
+
+
+def amount_pattern_findings(by_file, nid):
+    """Low-severity OBSERVATIONS about how the amounts of a statement are distributed (round-number share, amounts just under common limits,
+    one amount repeated under different descriptions). Invented figures tend to look rounder and more repetitive than real ones, but real
+    accounts (rent, EMIs, salary, UPI payments) also produce these patterns, so none of this is evidence on its own. Benford's law is not used: it
+    needs hundreds of values, and a single statement page has too few for it to say anything."""
+    out = []
+    for path, ds in by_file.items():
+        rows = [(d, t, r) for d in ds for t in d.tables if t["kind"] == "transactions" for r in t["rows"] if r["role"] == "txn"]
+        amts = [(d, t, r, r["debit"] or r["credit"]) for d, t, r in rows if (r["debit"] or r["credit"])]
+        if not amts:
+            continue
+        name = os.path.basename(path)
+        rnd = [x for x in amts if abs(x[3]) >= ROUND_STEP and abs(x[3]) % ROUND_STEP < 0.005]
+        if len(amts) >= ROUND_MIN_N and len(rnd) / len(amts) >= ROUND_SHARE:
+            out.append(Finding(nid(), "intra", f"Most transaction amounts are round numbers ({name})", "low", 0.35, "observed",
+                               f"{len(rnd)} of {len(amts)} transaction amounts are exact multiples of {ROUND_STEP:,}. Everyday spending rarely looks like this, while "
+                               "typed-in figures often do. Rent, loan instalments and transfers between own accounts are round too, so treat this as a prompt to look at the "
+                               "descriptions, not as a result.",
+                               [_tref(d, f"{t['tid']} row {r['n']}", v, r["bbox"]) for d, t, r, v in rnd[:4]],
+                               metrics={"round": len(rnd), "amounts": len(amts), "step": ROUND_STEP}, method="transaction amount patterns"))
+        for th in THRESHOLDS:
+            near = [x for x in amts if th * (1 - NEAR_BAND) <= x[3] < th]
+            if len(near) >= NEAR_MIN:
+                out.append(Finding(nid(), "intra", f"{len(near)} transaction amounts sit just below {th:,} ({name})", "low", 0.35, "observed",
+                                   f"{len(near)} amounts lie in the 5% just under {th:,} (" + ", ".join(f"{x[3]:,.2f}" for x in near[:4]) + "). Amounts kept below a limit are a "
+                                   "recognised pattern in financial-crime reviews; they are also what ordinary payments of that size look like. The tool does not know which limit "
+                                   "applies to this account. Review the dates and counterparties.",
+                                   [_tref(d, f"{t['tid']} row {r['n']}", v, r["bbox"]) for d, t, r, v in near[:4]],
+                                   metrics={"threshold": th, "count": len(near)}, method="transaction amount patterns"))
+        by_amt = {}
+        for d, t, r, v in amts:
+            if abs(v) >= REPEAT_FLOOR:
+                by_amt.setdefault((round(v, 2), "d" if r["debit"] else "c"), []).append((d, t, r, v))
+        for (v, side), xs in sorted(by_amt.items()):
+            descs = {re.sub(r"[^a-z]", "", x[2]["desc"].lower())[:14] for x in xs}
+            if len(xs) >= REPEAT_MIN and len(descs) >= REPEAT_DESC:
+                out.append(Finding(nid(), "intra", f"The same amount {v:,.2f} appears on {len(xs)} rows under different descriptions ({name})", "low", 0.35, "observed",
+                                   f"{len(xs)} {'withdrawals' if side == 'd' else 'deposits'} of exactly {v:,.2f} carry {len(descs)} different descriptions. Repeated identical "
+                                   "amounts are common for fixed charges and instalments; across unrelated counterparties they are worth a look.",
+                                   [_tref(d, f"{t['tid']} row {r['n']}", x, r["bbox"]) for d, t, r, x in xs[:4]],
+                                   metrics={"amount": v, "rows": len(xs), "descriptions": len(descs)}, method="transaction amount patterns"))
     return out
 
 

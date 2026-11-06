@@ -29,6 +29,8 @@ summarised in section 7, but this document focuses on stages 1 to 4.
 
 ## 2. High-level architecture
 
+The current end-to-end data-flow diagram (document processing, computer vision, contextual analysis, evidence management, models and their roles) is in the README under "Pipeline". The diagram below shows the first stages in detail.
+
 ```
                     +-----------------------------+
  files/zip  ------> | 1. ingest.py                |  expand zip safely, render PDF pages, hash source,
@@ -303,7 +305,7 @@ scores classification, field extraction, issue recall and false positives per co
 | 1 | Test real salary slip, application form, PAN card | Real layouts broke earlier versions twice; biggest unknown |
 | 2 | Re-read typed fields (IDs, dates, amounts) with character-restricted upscaled OCR | Removes most OCR-slip false alarms |
 | 3 | ~~Transaction-table extraction and running-balance check for statements~~ (done 2 Nov); next: tables without a repeated header across pages, invoice/loan-schedule tables | Strengthens stage 4 and gives generated PDFs a real content check |
-| 4 | PDF structure and metadata checks (producer, edit dates, font changes, incremental updates) | Gives born-digital documents a forensic signal |
+| 4 | PDF structure and metadata checks (producer, edit dates, font changes, incremental updates, Info vs XMP disagreement, font subset tags) | Gives born-digital documents a forensic signal |
 | 5 | JPEG-ghost (compression-history) check | May expose pasted values in files with preserved compression history; useless after re-capture |
 | 6 | Handwriting via a local handwriting model (no API/LLM dependency - decided 2 Nov 2026) | Closes the main gap against the stated requirement |
 | 7 | Perspective correction, Hindi OCR, vertical text | Real-world capture robustness |
@@ -403,3 +405,15 @@ Three fictional PDFs (a bank statement and two payslips, one with its net pay ch
 - **Corroboration:** a visual finding that sits on a value that also breaks an exact check gains confidence once (+0.10), then only +0.02 per further finding.
 - **Dossier front page:** counts findings about the documents separately from coverage notes.
 Tests: `tests/test_layout_variants.py`. Known gap: a statement that prints no debit column leaves withdrawals unreadable, so only the rows with a printed credit are checked (reported as a coverage note).
+
+
+## 15. Enhancements from the literature scan (5 Nov 2026)
+
+A scan of recent papers and open tools (field-level ID forgery detectors, PDF structure forensics, forensic-accounting tests) produced two additions that fit the no-model, evidence-first design:
+
+- **File-level PDF signals** (`pdf_forensics.analyze_pdf_file`): later revisions are noted as routine when the file carries a digital signature (`/ByteRange`) and as "no signature to explain it" otherwise; Info and XMP records that disagree on producer, creator tool or dates (a gap that looks like a time-zone offset is ignored when one side has no zone); a producer without a creation date; one typeface embedded under several subset tags. All are low severity, `observed`, confidence at most 0.55, and each states its harmless causes (signing, merging, re-export).
+- **Amount patterns** (`structure.amount_pattern_findings`): share of exact multiples of 1,000 (needs 12+ amounts and 60%), 3+ amounts in the 5% below 50,000 / 200,000 / 1,000,000, one amount of at least 5,000 repeated on 4+ rows under 3+ descriptions. Low severity, confidence 0.35. Benford's law was considered and left out because a single statement has too few values.
+
+Not done: double-JPEG grid analysis for scans (weak on re-scanned images) and learned localisers (need large model downloads and labelled data). Tests: `tests/test_pdf_structure_signals.py`, `tests/test_amount_patterns.py`.
+
+Two further repositories were read for ideas only and nothing was taken from them: a provenance-first platform for historical records (AGPL-3.0, cloud OCR and an LLM API) and the DFIQ catalogue of investigative questions (Apache-2.0). Both reinforce principles the design already follows: findings are descriptive, a human records every conclusion in a separate hash-chained log, and each finding names the check that produced it. A possible later step is to print the plain-language question each finding group answers in the dossier; it is not implemented.

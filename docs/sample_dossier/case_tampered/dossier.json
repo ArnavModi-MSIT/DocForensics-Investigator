@@ -1,6 +1,6 @@
 {
   "case_id": "case_tampered",
-  "audit_digest": "c928f5a6b2053ff47c7f9936fa8f82b4a3b1c952544d648b6368a943a844a102",
+  "audit_digest": "6ab225d07b016bda25445a437966cda7157730c65bbf71de5b8ba05d1952bb1b",
   "summary": "Case case_tampered: 4 documents analysed; 9 finding(s) about the documents (6 high, 3 medium, 0 low). Most significant: C-001 Salary slip arithmetic does not balance in salary_slip; X-002 Date of birth mismatch: application_form vs id_card; X-004 Salary slip net pay does not match bank payroll credit; V-001 Possible alteration of 'Date of Birth' in id_card. Visual findings are indicators of possible alteration, not proof; confirm against originals. Pixel-level visual forensics ran on 4 of 4 recognised page(s).",
   "summary_source": "template",
   "documents": [
@@ -1881,10 +1881,10 @@
     }
   },
   "audit": {
-    "run_id": "20261105T071202-fdf147",
+    "run_id": "20261105T170234-e8603f",
     "chain_ok": true,
     "events": 56,
-    "digest": "c928f5a6b2053ff47c7f9936fa8f82b4a3b1c952544d648b6368a943a844a102",
+    "digest": "6ab225d07b016bda25445a437966cda7157730c65bbf71de5b8ba05d1952bb1b",
     "earlier_runs": [],
     "review_log": "review_log.jsonl (reviewer decisions, hash-chained, anchored to this digest)"
   },
@@ -1938,7 +1938,7 @@
       "status": "Implemented (heuristic; see limitations)"
     },
     {
-      "capability": "Born-digital PDFs: exact text layer (no OCR), font consistency of amounts, bordered patches over values, covered or hidden text, file history (revisions, dates, producer)",
+      "capability": "Born-digital PDFs: exact text layer (no OCR), font consistency of amounts, bordered patches over values, covered or hidden text, file history (revisions, dates, producer, Info vs XMP records, font subset tags)",
       "status": "Implemented (observations about file structure, not proof)"
     },
     {
@@ -1956,20 +1956,20 @@
   ],
   "audit_trail": [
     {
-      "ts": "2026-11-05T07:12:02+0000",
+      "ts": "2026-11-05T17:02:34+0000",
       "event": "case_start",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "case_id": "case_tampered",
       "n_inputs": 4,
-      "run_id": "20261105T071202-fdf147",
+      "run_id": "20261105T170234-e8603f",
       "earlier_runs": 0,
       "prev": "0000000000000000000000000000000000000000000000000000000000000000",
-      "hash": "2a27af80540e630ee63d09d59ea700d63e317e7d38507859226a045e43c70978"
+      "hash": "0c7a60e36da27be700ffbab1926a222466490349f33c960c33c867c8e23d9cae"
     },
     {
-      "ts": "2026-11-05T07:12:03+0000",
+      "ts": "2026-11-05T17:02:36+0000",
       "event": "embedding_model",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "backend": "fastembed:BAAI/bge-small-en-v1.5",
       "active": true,
       "integrity": "verified",
@@ -1981,24 +1981,24 @@
         "special_tokens_map.json": "5d5b662e421ea9fac075174bb0688ee0d9431699900b90662acd44b2a350503a",
         "tokenizer_config.json": "0b29c7bfc889e53b36d9dd3e686dd4300f6525110eaa98c76a5dafceb2029f53"
       },
-      "prev": "2a27af80540e630ee63d09d59ea700d63e317e7d38507859226a045e43c70978",
-      "hash": "d577cb96c3caf3a13b68f8cea9463874e4ff2046ee877d830289efa3b75c51c5"
+      "prev": "0c7a60e36da27be700ffbab1926a222466490349f33c960c33c867c8e23d9cae",
+      "hash": "9a70faa44b671672389a0957ba51e13ca0c5e3335a510b5808caa3fed67725ec"
     },
     {
-      "ts": "2026-11-05T07:12:03+0000",
+      "ts": "2026-11-05T17:02:36+0000",
       "event": "deskew",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "application_form",
       "estimated_angle": -0.0,
       "gain": 1.0,
       "applied": false,
-      "prev": "d577cb96c3caf3a13b68f8cea9463874e4ff2046ee877d830289efa3b75c51c5",
-      "hash": "8c6527898e6af521e3eb9aec7cc5347fbcb26532d12e9fb4de26f9820651b140"
+      "prev": "9a70faa44b671672389a0957ba51e13ca0c5e3335a510b5808caa3fed67725ec",
+      "hash": "f442763d5c3dcf015cc7ba089045f120d4bc93cd3b760d7fbb2bd5d458380f6f"
     },
     {
-      "ts": "2026-11-05T07:12:03+0000",
+      "ts": "2026-11-05T17:02:36+0000",
       "event": "ingest",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "application_form",
       "source": "application_form.jpg",
       "sha256": "b65f9da544765c44dc9e452ee5f7bda31330c41f41c3541042faebeca3df5108",
@@ -2006,24 +2006,24 @@
         1000,
         1300
       ],
-      "prev": "8c6527898e6af521e3eb9aec7cc5347fbcb26532d12e9fb4de26f9820651b140",
-      "hash": "ecf4313c2bfe7af3eef7208690497b92ea600cd4ab7290c5bbe4ecec3c852986"
+      "prev": "f442763d5c3dcf015cc7ba089045f120d4bc93cd3b760d7fbb2bd5d458380f6f",
+      "hash": "49a5fd34df74e849d78e67b87d1fa3f560730c3362a4759232357350082126c2"
     },
     {
-      "ts": "2026-11-05T07:12:03+0000",
+      "ts": "2026-11-05T17:02:37+0000",
       "event": "deskew",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "bank_statement",
       "estimated_angle": -0.0,
       "gain": 1.0,
       "applied": false,
-      "prev": "ecf4313c2bfe7af3eef7208690497b92ea600cd4ab7290c5bbe4ecec3c852986",
-      "hash": "cc2d81a061e54a92d809661216e52ff0e790d2d6d5fd4e4cbb2e21a301cd64d0"
+      "prev": "49a5fd34df74e849d78e67b87d1fa3f560730c3362a4759232357350082126c2",
+      "hash": "3549d9e0383052d523321f064963d459ced8d1056a3ae8445a9104c20dbadab7"
     },
     {
-      "ts": "2026-11-05T07:12:03+0000",
+      "ts": "2026-11-05T17:02:37+0000",
       "event": "ingest",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "bank_statement",
       "source": "bank_statement.jpg",
       "sha256": "4805d814c8f5b1227d892269d353734ec1e40126da239b4932963af886ece4ec",
@@ -2031,24 +2031,24 @@
         1000,
         1300
       ],
-      "prev": "cc2d81a061e54a92d809661216e52ff0e790d2d6d5fd4e4cbb2e21a301cd64d0",
-      "hash": "21370fd01831d5d0954e8468b91e935bd6b7c662a4411bfa954cac19bd4c759a"
+      "prev": "3549d9e0383052d523321f064963d459ced8d1056a3ae8445a9104c20dbadab7",
+      "hash": "2b6c17c9bfde388952aa2c3dc2b35dc00b4ffbc0ab8cfd7ea34927cc77589c87"
     },
     {
-      "ts": "2026-11-05T07:12:03+0000",
+      "ts": "2026-11-05T17:02:37+0000",
       "event": "deskew",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "id_card",
       "estimated_angle": -0.0,
       "gain": 1.0,
       "applied": false,
-      "prev": "21370fd01831d5d0954e8468b91e935bd6b7c662a4411bfa954cac19bd4c759a",
-      "hash": "bbed4491c7b8f37861bc6d32bbc4dc31af4483ffd41feec64e8dfa516c647985"
+      "prev": "2b6c17c9bfde388952aa2c3dc2b35dc00b4ffbc0ab8cfd7ea34927cc77589c87",
+      "hash": "3250f08d6ee642ee0ba905f69d9b552227f3c1a5bc14b28de0b8f5e11abbbf27"
     },
     {
-      "ts": "2026-11-05T07:12:03+0000",
+      "ts": "2026-11-05T17:02:38+0000",
       "event": "ingest",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "id_card",
       "source": "id_card.jpg",
       "sha256": "c47d6e90089bbd980f1da359e2d94fcad602e96f19be86a52a5624711e7862d2",
@@ -2056,24 +2056,24 @@
         1000,
         1300
       ],
-      "prev": "bbed4491c7b8f37861bc6d32bbc4dc31af4483ffd41feec64e8dfa516c647985",
-      "hash": "40bc4d3383b7e08e4ebb49ca09d7eb3942ea91185c3dff3f1152c443105cb771"
+      "prev": "3250f08d6ee642ee0ba905f69d9b552227f3c1a5bc14b28de0b8f5e11abbbf27",
+      "hash": "cb37b1c44511f217544f6955ce5dba2be2908831c121c51e6c01e8fc8258caf0"
     },
     {
-      "ts": "2026-11-05T07:12:04+0000",
+      "ts": "2026-11-05T17:02:38+0000",
       "event": "deskew",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "salary_slip",
       "estimated_angle": -0.0,
       "gain": 1.0,
       "applied": false,
-      "prev": "40bc4d3383b7e08e4ebb49ca09d7eb3942ea91185c3dff3f1152c443105cb771",
-      "hash": "bdcf6891efd2582b023f42c00bb19d7142f99294df3472cd5d9884537d7d2e15"
+      "prev": "cb37b1c44511f217544f6955ce5dba2be2908831c121c51e6c01e8fc8258caf0",
+      "hash": "a3b6a2454b594f4f331c80fbc916f7d06c93f6eaf45f186d7dd0aa3b7816c1e3"
     },
     {
-      "ts": "2026-11-05T07:12:04+0000",
+      "ts": "2026-11-05T17:02:38+0000",
       "event": "ingest",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "salary_slip",
       "source": "salary_slip.jpg",
       "sha256": "7ef5677dede75362fe9af6a8bad261d6728c7f0e56a747f112a404d3cece87a1",
@@ -2081,13 +2081,13 @@
         1000,
         1300
       ],
-      "prev": "bdcf6891efd2582b023f42c00bb19d7142f99294df3472cd5d9884537d7d2e15",
-      "hash": "262550c01efb815a8a821975c4866ac96b7d89f73373d700857e9c4229cfe0e8"
+      "prev": "a3b6a2454b594f4f331c80fbc916f7d06c93f6eaf45f186d7dd0aa3b7816c1e3",
+      "hash": "439205874c2f016cba93170b911fd292330edeaff7e54736bbece96983268e05"
     },
     {
-      "ts": "2026-11-05T07:12:05+0000",
+      "ts": "2026-11-05T17:02:40+0000",
       "event": "ocr",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "application_form",
       "engine": "tesseract",
       "n_words": 40,
@@ -2098,13 +2098,13 @@
           29.46
         ]
       },
-      "prev": "262550c01efb815a8a821975c4866ac96b7d89f73373d700857e9c4229cfe0e8",
-      "hash": "8bafc6bd8ffb9d84583753a46f5e31aad9ba11cfd9c0dd602fdf5f74f0f0ec58"
+      "prev": "439205874c2f016cba93170b911fd292330edeaff7e54736bbece96983268e05",
+      "hash": "87a89fe7e1147c6725591ff4f0c9427059ce0acb3a50f362214c5cc158b26c08"
     },
     {
-      "ts": "2026-11-05T07:12:05+0000",
+      "ts": "2026-11-05T17:02:40+0000",
       "event": "extract",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "application_form",
       "fields": [
         "name",
@@ -2114,13 +2114,13 @@
         "employer",
         "declared_income"
       ],
-      "prev": "8bafc6bd8ffb9d84583753a46f5e31aad9ba11cfd9c0dd602fdf5f74f0f0ec58",
-      "hash": "0089a0554e65cae19db4d5e058b05ca9288a36c772266f513214bc7836dc81a4"
+      "prev": "87a89fe7e1147c6725591ff4f0c9427059ce0acb3a50f362214c5cc158b26c08",
+      "hash": "48f9ac2b786cc4b2cd5876818673c4000c7e9d7bac30d50c392044ac65884fc7"
     },
     {
-      "ts": "2026-11-05T07:12:05+0000",
+      "ts": "2026-11-05T17:02:42+0000",
       "event": "classify",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "application_form",
       "doc_type": "application_form",
       "best_guess": "application_form",
@@ -2158,13 +2158,13 @@
         "other:presentation_brochure": 0.417
       },
       "decision": "accepted as application_form",
-      "prev": "0089a0554e65cae19db4d5e058b05ca9288a36c772266f513214bc7836dc81a4",
-      "hash": "0d485cf18d2213691524f55248a81cca86770746f96ae1b8b5299954272d7dab"
+      "prev": "48f9ac2b786cc4b2cd5876818673c4000c7e9d7bac30d50c392044ac65884fc7",
+      "hash": "fdec5dc76826319c1fd18101989f169bb538cff4f531b6d70e8effcd1e0fd25f"
     },
     {
-      "ts": "2026-11-05T07:12:07+0000",
+      "ts": "2026-11-05T17:02:43+0000",
       "event": "ocr",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "bank_statement",
       "engine": "tesseract",
       "n_words": 36,
@@ -2175,13 +2175,13 @@
           28.56
         ]
       },
-      "prev": "0d485cf18d2213691524f55248a81cca86770746f96ae1b8b5299954272d7dab",
-      "hash": "dfd9d40159b1c6ab961f4d6a1a7e6c044fb488cf1c0a195c2689a2252d744046"
+      "prev": "fdec5dc76826319c1fd18101989f169bb538cff4f531b6d70e8effcd1e0fd25f",
+      "hash": "d72b9d044f1c5589b1aa440feae902eebefda4d1cb345ba46e2d18cc8975718e"
     },
     {
-      "ts": "2026-11-05T07:12:07+0000",
+      "ts": "2026-11-05T17:02:43+0000",
       "event": "extract",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "bank_statement",
       "fields": [
         "name",
@@ -2191,13 +2191,13 @@
         "salary_credit",
         "closing_balance"
       ],
-      "prev": "dfd9d40159b1c6ab961f4d6a1a7e6c044fb488cf1c0a195c2689a2252d744046",
-      "hash": "655fe1586a51f43c48f395778981ae9257883f168c11467c2a65cbf7106127c7"
+      "prev": "d72b9d044f1c5589b1aa440feae902eebefda4d1cb345ba46e2d18cc8975718e",
+      "hash": "b6c801d5b551aaa452e9dec502da2a669e82c855e3acd664c3d8f82ac432fd4c"
     },
     {
-      "ts": "2026-11-05T07:12:07+0000",
+      "ts": "2026-11-05T17:02:43+0000",
       "event": "classify",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "bank_statement",
       "doc_type": "bank_statement",
       "best_guess": "bank_statement",
@@ -2235,13 +2235,13 @@
         "other:presentation_brochure": 0.398
       },
       "decision": "accepted as bank_statement",
-      "prev": "655fe1586a51f43c48f395778981ae9257883f168c11467c2a65cbf7106127c7",
-      "hash": "c355b4ce7a411129e539478ba1b128137b0415468a87de90b297f94784ad4cb0"
+      "prev": "b6c801d5b551aaa452e9dec502da2a669e82c855e3acd664c3d8f82ac432fd4c",
+      "hash": "20ce04be85b3ce40c21aa7806c8943f899a53df4cc9a31751e93ed7e3d181ef2"
     },
     {
-      "ts": "2026-11-05T07:12:07+0000",
+      "ts": "2026-11-05T17:02:45+0000",
       "event": "ocr",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "id_card",
       "engine": "tesseract",
       "n_words": 33,
@@ -2252,13 +2252,13 @@
           24.69
         ]
       },
-      "prev": "c355b4ce7a411129e539478ba1b128137b0415468a87de90b297f94784ad4cb0",
-      "hash": "ba8dd8c4c15219b6b9f83540ad0d444a2560d2470ca6092dca63ae89624e6d02"
+      "prev": "20ce04be85b3ce40c21aa7806c8943f899a53df4cc9a31751e93ed7e3d181ef2",
+      "hash": "4336d839a75f0b13077ee5b5958307f5340af3cc4b43fcb9de59e1c83ecd8f46"
     },
     {
-      "ts": "2026-11-05T07:12:07+0000",
+      "ts": "2026-11-05T17:02:45+0000",
       "event": "extract",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "id_card",
       "fields": [
         "name",
@@ -2267,13 +2267,13 @@
         "address",
         "issue_date"
       ],
-      "prev": "ba8dd8c4c15219b6b9f83540ad0d444a2560d2470ca6092dca63ae89624e6d02",
-      "hash": "18b4ac62a556132c9aa92083b8ba9b42b17f784192bfb74c99b5c769111aba04"
+      "prev": "4336d839a75f0b13077ee5b5958307f5340af3cc4b43fcb9de59e1c83ecd8f46",
+      "hash": "5fd1ff8128ef07af30fa3cef411ea29bc6323836cc25b06014d334dc384d2a11"
     },
     {
-      "ts": "2026-11-05T07:12:07+0000",
+      "ts": "2026-11-05T17:02:45+0000",
       "event": "classify",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "id_card",
       "doc_type": "id_card",
       "best_guess": "id_card",
@@ -2311,13 +2311,13 @@
         "other:presentation_brochure": 0.384
       },
       "decision": "accepted as id_card",
-      "prev": "18b4ac62a556132c9aa92083b8ba9b42b17f784192bfb74c99b5c769111aba04",
-      "hash": "2eb5fef28cb51c4fcc5b720b5686f23ca0236bdda8ece406db7852756a6794f4"
+      "prev": "5fd1ff8128ef07af30fa3cef411ea29bc6323836cc25b06014d334dc384d2a11",
+      "hash": "4811a5b16f79e56bbae2ebe23ab46afad83b25015965306e11318bcbbe525d39"
     },
     {
-      "ts": "2026-11-05T07:12:08+0000",
+      "ts": "2026-11-05T17:02:46+0000",
       "event": "ocr",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "salary_slip",
       "engine": "tesseract",
       "n_words": 36,
@@ -2328,13 +2328,13 @@
           27.66
         ]
       },
-      "prev": "2eb5fef28cb51c4fcc5b720b5686f23ca0236bdda8ece406db7852756a6794f4",
-      "hash": "39100ad5cf42fb6d368cac2d7a0eedcea0d8646161d601a8eb7f8481c5f2ad58"
+      "prev": "4811a5b16f79e56bbae2ebe23ab46afad83b25015965306e11318bcbbe525d39",
+      "hash": "05d70e5430dbd52d3d69b01b93a18b7b0668ab1595a88cf2f569aa4ccd31ab7b"
     },
     {
-      "ts": "2026-11-05T07:12:08+0000",
+      "ts": "2026-11-05T17:02:46+0000",
       "event": "extract",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "salary_slip",
       "fields": [
         "name",
@@ -2344,13 +2344,13 @@
         "deductions",
         "net_pay"
       ],
-      "prev": "39100ad5cf42fb6d368cac2d7a0eedcea0d8646161d601a8eb7f8481c5f2ad58",
-      "hash": "22f9349a7af4fa0d2558132724e5899dc09aeaaac0d92de4d50c71bd13918b10"
+      "prev": "05d70e5430dbd52d3d69b01b93a18b7b0668ab1595a88cf2f569aa4ccd31ab7b",
+      "hash": "d84adc0d770de0802a2a5c2f2d0ece4982b9ae85833817d179cd46b0b3bad452"
     },
     {
-      "ts": "2026-11-05T07:12:08+0000",
+      "ts": "2026-11-05T17:02:46+0000",
       "event": "classify",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "salary_slip",
       "doc_type": "salary_slip",
       "best_guess": "salary_slip",
@@ -2388,13 +2388,13 @@
         "other:presentation_brochure": 0.427
       },
       "decision": "accepted as salary_slip",
-      "prev": "22f9349a7af4fa0d2558132724e5899dc09aeaaac0d92de4d50c71bd13918b10",
-      "hash": "b7c0cf62aa2b82a9b9a57289bd65cb09ad6bc1431ed263bbffaf70475634ae4e"
+      "prev": "d84adc0d770de0802a2a5c2f2d0ece4982b9ae85833817d179cd46b0b3bad452",
+      "hash": "ddfedd589c3846b5bd95577a232512d2a1b8e1efd1d1198cd74edd38d53cdc8a"
     },
     {
-      "ts": "2026-11-05T07:12:08+0000",
+      "ts": "2026-11-05T17:02:46+0000",
       "event": "categorise",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "file": "application_form.jpg",
       "label": "Application form",
       "confidence": 0.887,
@@ -2416,13 +2416,13 @@
           0.021
         ]
       ],
-      "prev": "b7c0cf62aa2b82a9b9a57289bd65cb09ad6bc1431ed263bbffaf70475634ae4e",
-      "hash": "585bd2aa92a7cea9348aab5709bd69e2012c176f44ca6f2fb2d2a4d8eb202e8f"
+      "prev": "ddfedd589c3846b5bd95577a232512d2a1b8e1efd1d1198cd74edd38d53cdc8a",
+      "hash": "a4aa8308fc86b60a23c534182e3d364146c6bff581edd05fe7daddc9aba9a255"
     },
     {
-      "ts": "2026-11-05T07:12:08+0000",
+      "ts": "2026-11-05T17:02:46+0000",
       "event": "categorise",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "file": "bank_statement.jpg",
       "label": "Bank statement",
       "confidence": 0.955,
@@ -2444,13 +2444,13 @@
           0.012
         ]
       ],
-      "prev": "585bd2aa92a7cea9348aab5709bd69e2012c176f44ca6f2fb2d2a4d8eb202e8f",
-      "hash": "b6b19c501e7378e791a4c54126017d6174f1be689fd3cf6c39d5ae27dea4a5ce"
+      "prev": "a4aa8308fc86b60a23c534182e3d364146c6bff581edd05fe7daddc9aba9a255",
+      "hash": "8e87152a0510561acbd46277ea2673d384d8bea206e36541ba97d66d7cda7870"
     },
     {
-      "ts": "2026-11-05T07:12:08+0000",
+      "ts": "2026-11-05T17:02:46+0000",
       "event": "categorise",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "file": "id_card.jpg",
       "label": "ID card",
       "confidence": 0.973,
@@ -2472,13 +2472,13 @@
           0.005
         ]
       ],
-      "prev": "b6b19c501e7378e791a4c54126017d6174f1be689fd3cf6c39d5ae27dea4a5ce",
-      "hash": "f59107c8b4a079c06fbc057b0ed221486c7659e1bd2d0e583221596e20e85ced"
+      "prev": "8e87152a0510561acbd46277ea2673d384d8bea206e36541ba97d66d7cda7870",
+      "hash": "cc488b962dcbd83f0c288f7b34f3f3d1455858bf5760fe9f32b401c4957dca51"
     },
     {
-      "ts": "2026-11-05T07:12:08+0000",
+      "ts": "2026-11-05T17:02:46+0000",
       "event": "categorise",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "file": "salary_slip.jpg",
       "label": "Salary slip",
       "confidence": 0.891,
@@ -2500,13 +2500,13 @@
           0.016
         ]
       ],
-      "prev": "f59107c8b4a079c06fbc057b0ed221486c7659e1bd2d0e583221596e20e85ced",
-      "hash": "c5b21f6b21c0c8c4d3464539a9ac593197b8a89d9c8d62a3ae4b49effca1f4cc"
+      "prev": "cc488b962dcbd83f0c288f7b34f3f3d1455858bf5760fe9f32b401c4957dca51",
+      "hash": "d0dc41eced26bd07df875d9f5fcbff687c80e00a9267aed6ed723c7a2854d9d9"
     },
     {
-      "ts": "2026-11-05T07:12:08+0000",
+      "ts": "2026-11-05T17:02:46+0000",
       "event": "structure",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "application_form",
       "sections": [
         [
@@ -2515,13 +2515,13 @@
         ]
       ],
       "tables": [],
-      "prev": "c5b21f6b21c0c8c4d3464539a9ac593197b8a89d9c8d62a3ae4b49effca1f4cc",
-      "hash": "344869dd831b2c26abf375fce3ecc9576bddaf1610790f707525fb7d4779445f"
+      "prev": "d0dc41eced26bd07df875d9f5fcbff687c80e00a9267aed6ed723c7a2854d9d9",
+      "hash": "b38f56594ac583a2cca740e5c1b53b2012801171777ec7500f5a011ff6bfe33f"
     },
     {
-      "ts": "2026-11-05T07:12:08+0000",
+      "ts": "2026-11-05T17:02:46+0000",
       "event": "structure",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "bank_statement",
       "sections": [
         [
@@ -2530,13 +2530,13 @@
         ]
       ],
       "tables": [],
-      "prev": "344869dd831b2c26abf375fce3ecc9576bddaf1610790f707525fb7d4779445f",
-      "hash": "3f0a20924e78ed01fb9d893aa16518478f4629c4767115283df3fa441b578f9d"
+      "prev": "b38f56594ac583a2cca740e5c1b53b2012801171777ec7500f5a011ff6bfe33f",
+      "hash": "359c0b11500182cf44b6ed640b7dc24383055f96baa12a2929f1be92e99ae0f7"
     },
     {
-      "ts": "2026-11-05T07:12:08+0000",
+      "ts": "2026-11-05T17:02:46+0000",
       "event": "structure",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "id_card",
       "sections": [
         [
@@ -2545,13 +2545,13 @@
         ]
       ],
       "tables": [],
-      "prev": "3f0a20924e78ed01fb9d893aa16518478f4629c4767115283df3fa441b578f9d",
-      "hash": "13378dca122c384cceaf72f8bb8991ce97d97c74796a79a14f46e3763f1b13d9"
+      "prev": "359c0b11500182cf44b6ed640b7dc24383055f96baa12a2929f1be92e99ae0f7",
+      "hash": "09b395fbf388d15381a8363d354ec7ffcea57677de7e8a1f42cfa605048b7b9c"
     },
     {
-      "ts": "2026-11-05T07:12:08+0000",
+      "ts": "2026-11-05T17:02:46+0000",
       "event": "structure",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "salary_slip",
       "sections": [
         [
@@ -2560,149 +2560,149 @@
         ]
       ],
       "tables": [],
-      "prev": "13378dca122c384cceaf72f8bb8991ce97d97c74796a79a14f46e3763f1b13d9",
-      "hash": "3c4149526a5f8d47a475468d1d99fddc7340a6ffa846edde533ea5e1ec0eff72"
+      "prev": "09b395fbf388d15381a8363d354ec7ffcea57677de7e8a1f42cfa605048b7b9c",
+      "hash": "350926a60aa47113cadd90fd7689c7934e82c770a4c1b7cffc5210667cce6054"
     },
     {
-      "ts": "2026-11-05T07:12:09+0000",
+      "ts": "2026-11-05T17:02:46+0000",
       "event": "forensics",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "application_form",
       "fields_tested": 6,
       "flagged": [],
-      "prev": "3c4149526a5f8d47a475468d1d99fddc7340a6ffa846edde533ea5e1ec0eff72",
-      "hash": "1cd4ce2d45d8ddd1fa446b8d1e3192b3caedf856aa456ac8be6ff303a53ed8c3"
+      "prev": "350926a60aa47113cadd90fd7689c7934e82c770a4c1b7cffc5210667cce6054",
+      "hash": "b0f0e43c7f1beb584f78dcece976ddd45e48eb6315b5941b7dd713c028e41cd6"
     },
     {
-      "ts": "2026-11-05T07:12:09+0000",
+      "ts": "2026-11-05T17:02:46+0000",
       "event": "forensics",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "bank_statement",
       "fields_tested": 6,
       "flagged": [],
-      "prev": "1cd4ce2d45d8ddd1fa446b8d1e3192b3caedf856aa456ac8be6ff303a53ed8c3",
-      "hash": "fa2f96a0f66545cdd60a138b347a8848473aeca0a1ef1c5817ea26d302cd9fc1"
+      "prev": "b0f0e43c7f1beb584f78dcece976ddd45e48eb6315b5941b7dd713c028e41cd6",
+      "hash": "6e15620186259bd7e5c59e1043fe091e524ded13215f52d12755311426907ebf"
     },
     {
-      "ts": "2026-11-05T07:12:09+0000",
+      "ts": "2026-11-05T17:02:47+0000",
       "event": "forensics",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "id_card",
       "fields_tested": 5,
       "flagged": [
         "dob"
       ],
-      "prev": "fa2f96a0f66545cdd60a138b347a8848473aeca0a1ef1c5817ea26d302cd9fc1",
-      "hash": "c2d667924a9f17f295028d08b75005b16071a8f5a3a832cd0b713fb5b01d7969"
+      "prev": "6e15620186259bd7e5c59e1043fe091e524ded13215f52d12755311426907ebf",
+      "hash": "b7819613d7d4abbe3728c8066dc2ee492db96f562b8f1def0a68899050ad736d"
     },
     {
-      "ts": "2026-11-05T07:12:10+0000",
+      "ts": "2026-11-05T17:02:47+0000",
       "event": "forensics",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "salary_slip",
       "fields_tested": 6,
       "flagged": [
         "net_pay"
       ],
-      "prev": "c2d667924a9f17f295028d08b75005b16071a8f5a3a832cd0b713fb5b01d7969",
-      "hash": "482907d217b1e5adb391ef28b1a311c5418f4d1f8e143e7cbb7763ec47192f50"
+      "prev": "b7819613d7d4abbe3728c8066dc2ee492db96f562b8f1def0a68899050ad736d",
+      "hash": "a4e6ef8d0ca7ce59fa020d9c52129bf8794041e716bc1a9b4cfceb011c5375de"
     },
     {
-      "ts": "2026-11-05T07:12:10+0000",
+      "ts": "2026-11-05T17:02:47+0000",
       "event": "typography",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "application_form",
       "fields": 5,
       "flagged": [],
-      "prev": "482907d217b1e5adb391ef28b1a311c5418f4d1f8e143e7cbb7763ec47192f50",
-      "hash": "92c4b252f5e0873a1109fb3a1bfeafc72e41b3edd9f5161f331d4b3aa37c4719"
+      "prev": "a4e6ef8d0ca7ce59fa020d9c52129bf8794041e716bc1a9b4cfceb011c5375de",
+      "hash": "fe89a085bd777053e8bc684063a82e3bbb3ba8e48fc370bd3fa4d0e424ba8f1c"
     },
     {
-      "ts": "2026-11-05T07:12:10+0000",
+      "ts": "2026-11-05T17:02:47+0000",
       "event": "visual_ext",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "application_form",
       "typography": "run on 5 fields",
       "grid": "run on 266 tiles; dominant grid 100%",
       "photo": "not an ID card",
       "signature": "no signature label on the page",
       "flagged": [],
-      "prev": "92c4b252f5e0873a1109fb3a1bfeafc72e41b3edd9f5161f331d4b3aa37c4719",
-      "hash": "0dfede21d33bc60ece9c84febd48941acf20b0611568a0dba3290931fb043b92"
+      "prev": "fe89a085bd777053e8bc684063a82e3bbb3ba8e48fc370bd3fa4d0e424ba8f1c",
+      "hash": "fa843731fb6f3a09891a5d9d239b9fe4157537e6bee6f4bb713426bae573d22c"
     },
     {
-      "ts": "2026-11-05T07:12:11+0000",
+      "ts": "2026-11-05T17:02:48+0000",
       "event": "typography",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "bank_statement",
       "fields": 6,
       "flagged": [],
-      "prev": "0dfede21d33bc60ece9c84febd48941acf20b0611568a0dba3290931fb043b92",
-      "hash": "d4e6f00357e87ccb338b8a16f93486c6aa1b2be6c5c68fc5d7fe3801c5ea46bf"
+      "prev": "fa843731fb6f3a09891a5d9d239b9fe4157537e6bee6f4bb713426bae573d22c",
+      "hash": "1e6b709f0a975e3c77edeb4728edb24514178eb4c214878925458c764cbc3c1e"
     },
     {
-      "ts": "2026-11-05T07:12:11+0000",
+      "ts": "2026-11-05T17:02:48+0000",
       "event": "visual_ext",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "bank_statement",
       "typography": "run on 6 fields",
       "grid": "run on 258 tiles; dominant grid 100%",
       "photo": "not an ID card",
       "signature": "no signature label on the page",
       "flagged": [],
-      "prev": "d4e6f00357e87ccb338b8a16f93486c6aa1b2be6c5c68fc5d7fe3801c5ea46bf",
-      "hash": "cac9da1bdb361866df1763c801a59488e0a715064c1067a4e47eac669b1e6f8c"
+      "prev": "1e6b709f0a975e3c77edeb4728edb24514178eb4c214878925458c764cbc3c1e",
+      "hash": "58c9ddd40b1b3c0c94c06a788b0da16ab6538fa2f92849acad555eecd60c461e"
     },
     {
-      "ts": "2026-11-05T07:12:11+0000",
+      "ts": "2026-11-05T17:02:49+0000",
       "event": "typography",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "id_card",
       "fields": 5,
       "flagged": [],
-      "prev": "cac9da1bdb361866df1763c801a59488e0a715064c1067a4e47eac669b1e6f8c",
-      "hash": "7468d5578932b48add6815538a2ccd4234443f55b4ff5bf7309757f7f62c9263"
+      "prev": "58c9ddd40b1b3c0c94c06a788b0da16ab6538fa2f92849acad555eecd60c461e",
+      "hash": "6ed3841035a5761b2c0d8ee972e8775ae867015df6e195536f5b802a617152eb"
     },
     {
-      "ts": "2026-11-05T07:12:12+0000",
+      "ts": "2026-11-05T17:02:49+0000",
       "event": "visual_ext",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "id_card",
       "typography": "run on 5 fields",
       "grid": "run on 298 tiles; dominant grid 100%",
       "photo": "no photo-shaped continuous-tone region located (busy background, no photo, or photo too small)",
       "signature": "no signature label on the page",
       "flagged": [],
-      "prev": "7468d5578932b48add6815538a2ccd4234443f55b4ff5bf7309757f7f62c9263",
-      "hash": "967b808fc41218ae7147825e7446ff7a9886c2c9f7cf2156f8cc6e823ea24d40"
+      "prev": "6ed3841035a5761b2c0d8ee972e8775ae867015df6e195536f5b802a617152eb",
+      "hash": "ba9e2ea45fb40bed7c8d37b8ce10892dd6000a85d87afbcb2b994aa225c25ae5"
     },
     {
-      "ts": "2026-11-05T07:12:12+0000",
+      "ts": "2026-11-05T17:02:50+0000",
       "event": "typography",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "salary_slip",
       "fields": 6,
       "flagged": [],
-      "prev": "967b808fc41218ae7147825e7446ff7a9886c2c9f7cf2156f8cc6e823ea24d40",
-      "hash": "cb25cdd7b57c95925b70cceed66cb598a784a5e66e516a8e7b64f80baf1db5b5"
+      "prev": "ba9e2ea45fb40bed7c8d37b8ce10892dd6000a85d87afbcb2b994aa225c25ae5",
+      "hash": "83375ff4a171fc976867a4d80a64b69f3fbf9b96a66e4f13103bb4924e9940b2"
     },
     {
-      "ts": "2026-11-05T07:12:12+0000",
+      "ts": "2026-11-05T17:02:50+0000",
       "event": "visual_ext",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "salary_slip",
       "typography": "run on 6 fields",
       "grid": "run on 300 tiles; dominant grid 100%",
       "photo": "not an ID card",
       "signature": "no signature label on the page",
       "flagged": [],
-      "prev": "cb25cdd7b57c95925b70cceed66cb598a784a5e66e516a8e7b64f80baf1db5b5",
-      "hash": "c7385e46a5094818d492a5a11c0755ff7fcac8c5052aea36ee95defb417e0a13"
+      "prev": "83375ff4a171fc976867a4d80a64b69f3fbf9b96a66e4f13103bb4924e9940b2",
+      "hash": "78a3848e26e7932d72e419871eae03f6d8be6a457ed2143c69003991992b4dca"
     },
     {
-      "ts": "2026-11-05T07:12:13+0000",
+      "ts": "2026-11-05T17:02:50+0000",
       "event": "fields_final",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "application_form",
       "doc_type": "application_form",
       "source_sha256": "b65f9da544765c44dc9e452ee5f7bda31330c41f41c3541042faebeca3df5108",
@@ -2780,13 +2780,13 @@
           "matched_by": "fuzzy"
         }
       ],
-      "prev": "c7385e46a5094818d492a5a11c0755ff7fcac8c5052aea36ee95defb417e0a13",
-      "hash": "0e33fb32012f9f28973b89c0a54585d9141b5f1c333dab3e88fdd5d21b7efc8b"
+      "prev": "78a3848e26e7932d72e419871eae03f6d8be6a457ed2143c69003991992b4dca",
+      "hash": "684cbc6abab33b6bc5d2a1f9dae4ad232014e0c6bfb754b020785d5787d869e4"
     },
     {
-      "ts": "2026-11-05T07:12:13+0000",
+      "ts": "2026-11-05T17:02:50+0000",
       "event": "fields_final",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "bank_statement",
       "doc_type": "bank_statement",
       "source_sha256": "4805d814c8f5b1227d892269d353734ec1e40126da239b4932963af886ece4ec",
@@ -2864,13 +2864,13 @@
           "matched_by": "fuzzy"
         }
       ],
-      "prev": "0e33fb32012f9f28973b89c0a54585d9141b5f1c333dab3e88fdd5d21b7efc8b",
-      "hash": "8231c8d43e4080412cc825e311d3ccc5ac56e7c457b310c5a4712a56580517f0"
+      "prev": "684cbc6abab33b6bc5d2a1f9dae4ad232014e0c6bfb754b020785d5787d869e4",
+      "hash": "de8a4b2ef2af91d3c5da961e2e5649b66d2d957e8f5e60270e31bed53c20bf0d"
     },
     {
-      "ts": "2026-11-05T07:12:13+0000",
+      "ts": "2026-11-05T17:02:50+0000",
       "event": "fields_final",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "id_card",
       "doc_type": "id_card",
       "source_sha256": "c47d6e90089bbd980f1da359e2d94fcad602e96f19be86a52a5624711e7862d2",
@@ -2936,13 +2936,13 @@
           "matched_by": "fuzzy"
         }
       ],
-      "prev": "8231c8d43e4080412cc825e311d3ccc5ac56e7c457b310c5a4712a56580517f0",
-      "hash": "28f426f99c3bddb2537346df89ca0c8d4984f4d5c549baf61b9b75765bc74601"
+      "prev": "de8a4b2ef2af91d3c5da961e2e5649b66d2d957e8f5e60270e31bed53c20bf0d",
+      "hash": "9c5b734ef9b7546a3e42234a24bc7e09e9fdaab8ac0ea5d63e283e0c590a10ff"
     },
     {
-      "ts": "2026-11-05T07:12:13+0000",
+      "ts": "2026-11-05T17:02:50+0000",
       "event": "fields_final",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "doc_id": "salary_slip",
       "doc_type": "salary_slip",
       "source_sha256": "7ef5677dede75362fe9af6a8bad261d6728c7f0e56a747f112a404d3cece87a1",
@@ -3020,13 +3020,13 @@
           "matched_by": "fuzzy"
         }
       ],
-      "prev": "28f426f99c3bddb2537346df89ca0c8d4984f4d5c549baf61b9b75765bc74601",
-      "hash": "0990d06d10e849985546d74d563af82462527419620abccccd6f9e4542649ad4"
+      "prev": "9c5b734ef9b7546a3e42234a24bc7e09e9fdaab8ac0ea5d63e283e0c590a10ff",
+      "hash": "406d8cb01c73ddb619a8709da9fa03d217b12409bf7e7b27cc47df095c595d83"
     },
     {
-      "ts": "2026-11-05T07:12:13+0000",
+      "ts": "2026-11-05T17:02:51+0000",
       "event": "finding",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "fid": "V-001",
       "kind": "visual",
       "severity": "high",
@@ -3054,19 +3054,19 @@
       "evidence_sha256": "d307b03e0de872b820f24ed36cae233b648758bbd43055871ee0ad0d909a2424",
       "produced_by": {
         "id_card": {
-          "ingest": "40bc4d3383b7e08e4ebb49ca09d7eb3942ea91185c3dff3f1152c443105cb771",
-          "ocr": "ba8dd8c4c15219b6b9f83540ad0d444a2560d2470ca6092dca63ae89624e6d02",
-          "extract": "18b4ac62a556132c9aa92083b8ba9b42b17f784192bfb74c99b5c769111aba04",
-          "fields_final": "28f426f99c3bddb2537346df89ca0c8d4984f4d5c549baf61b9b75765bc74601"
+          "ingest": "cb37b1c44511f217544f6955ce5dba2be2908831c121c51e6c01e8fc8258caf0",
+          "ocr": "4336d839a75f0b13077ee5b5958307f5340af3cc4b43fcb9de59e1c83ecd8f46",
+          "extract": "5fd1ff8128ef07af30fa3cef411ea29bc6323836cc25b06014d334dc384d2a11",
+          "fields_final": "9c5b734ef9b7546a3e42234a24bc7e09e9fdaab8ac0ea5d63e283e0c590a10ff"
         }
       },
-      "prev": "0990d06d10e849985546d74d563af82462527419620abccccd6f9e4542649ad4",
-      "hash": "811ab7e95312801e6010929386cd55f1e491991821ce16c7e2d37b0b7a588b50"
+      "prev": "406d8cb01c73ddb619a8709da9fa03d217b12409bf7e7b27cc47df095c595d83",
+      "hash": "354a5d8d629d6b210472e262c1fe95aa047ef4652aa2be72231f08eb804307da"
     },
     {
-      "ts": "2026-11-05T07:12:13+0000",
+      "ts": "2026-11-05T17:02:51+0000",
       "event": "finding",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "fid": "V-002",
       "kind": "visual",
       "severity": "high",
@@ -3094,19 +3094,19 @@
       "evidence_sha256": "da34a8e7c46385de0b4310a2ecb7186c0b1415adce1a914c58fbee2281cfc5d9",
       "produced_by": {
         "salary_slip": {
-          "ingest": "262550c01efb815a8a821975c4866ac96b7d89f73373d700857e9c4229cfe0e8",
-          "ocr": "39100ad5cf42fb6d368cac2d7a0eedcea0d8646161d601a8eb7f8481c5f2ad58",
-          "extract": "22f9349a7af4fa0d2558132724e5899dc09aeaaac0d92de4d50c71bd13918b10",
-          "fields_final": "0990d06d10e849985546d74d563af82462527419620abccccd6f9e4542649ad4"
+          "ingest": "439205874c2f016cba93170b911fd292330edeaff7e54736bbece96983268e05",
+          "ocr": "05d70e5430dbd52d3d69b01b93a18b7b0668ab1595a88cf2f569aa4ccd31ab7b",
+          "extract": "d84adc0d770de0802a2a5c2f2d0ece4982b9ae85833817d179cd46b0b3bad452",
+          "fields_final": "406d8cb01c73ddb619a8709da9fa03d217b12409bf7e7b27cc47df095c595d83"
         }
       },
-      "prev": "811ab7e95312801e6010929386cd55f1e491991821ce16c7e2d37b0b7a588b50",
-      "hash": "80cfa7309b4f9647efe3adb4399ee8e823133926806b21d5106eba0887cdf6ee"
+      "prev": "354a5d8d629d6b210472e262c1fe95aa047ef4652aa2be72231f08eb804307da",
+      "hash": "0cdf210f3677cff801e74b42fdae78fcc077d351bc1ce56ecd3089cf98c0737d"
     },
     {
-      "ts": "2026-11-05T07:12:13+0000",
+      "ts": "2026-11-05T17:02:51+0000",
       "event": "finding",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "fid": "C-001",
       "kind": "intra",
       "severity": "high",
@@ -3156,19 +3156,19 @@
       "evidence_sha256": "02000f39defcb21be20ca38affcabdef8d5cb8c4faeffd0b8945dde125faa4c7",
       "produced_by": {
         "salary_slip": {
-          "ingest": "262550c01efb815a8a821975c4866ac96b7d89f73373d700857e9c4229cfe0e8",
-          "ocr": "39100ad5cf42fb6d368cac2d7a0eedcea0d8646161d601a8eb7f8481c5f2ad58",
-          "extract": "22f9349a7af4fa0d2558132724e5899dc09aeaaac0d92de4d50c71bd13918b10",
-          "fields_final": "0990d06d10e849985546d74d563af82462527419620abccccd6f9e4542649ad4"
+          "ingest": "439205874c2f016cba93170b911fd292330edeaff7e54736bbece96983268e05",
+          "ocr": "05d70e5430dbd52d3d69b01b93a18b7b0668ab1595a88cf2f569aa4ccd31ab7b",
+          "extract": "d84adc0d770de0802a2a5c2f2d0ece4982b9ae85833817d179cd46b0b3bad452",
+          "fields_final": "406d8cb01c73ddb619a8709da9fa03d217b12409bf7e7b27cc47df095c595d83"
         }
       },
-      "prev": "80cfa7309b4f9647efe3adb4399ee8e823133926806b21d5106eba0887cdf6ee",
-      "hash": "5bb40262e807fdd66231c25674e75a6dc474706b1424a2d417120d46e54f0a8e"
+      "prev": "0cdf210f3677cff801e74b42fdae78fcc077d351bc1ce56ecd3089cf98c0737d",
+      "hash": "1216fcae070e06bd5f1dd0d317ebdf29a10242ff5065af73319cbfee0c21ec74"
     },
     {
-      "ts": "2026-11-05T07:12:13+0000",
+      "ts": "2026-11-05T17:02:51+0000",
       "event": "finding",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "fid": "X-001",
       "kind": "cross",
       "severity": "medium",
@@ -3232,37 +3232,37 @@
       "evidence_sha256": "9d92a072b5ddc905b90972e1c96e83f2f07277921b92ac82e5fb496c21f78409",
       "produced_by": {
         "application_form": {
-          "ingest": "ecf4313c2bfe7af3eef7208690497b92ea600cd4ab7290c5bbe4ecec3c852986",
-          "ocr": "8bafc6bd8ffb9d84583753a46f5e31aad9ba11cfd9c0dd602fdf5f74f0f0ec58",
-          "extract": "0089a0554e65cae19db4d5e058b05ca9288a36c772266f513214bc7836dc81a4",
-          "fields_final": "0e33fb32012f9f28973b89c0a54585d9141b5f1c333dab3e88fdd5d21b7efc8b"
+          "ingest": "49a5fd34df74e849d78e67b87d1fa3f560730c3362a4759232357350082126c2",
+          "ocr": "87a89fe7e1147c6725591ff4f0c9427059ce0acb3a50f362214c5cc158b26c08",
+          "extract": "48f9ac2b786cc4b2cd5876818673c4000c7e9d7bac30d50c392044ac65884fc7",
+          "fields_final": "684cbc6abab33b6bc5d2a1f9dae4ad232014e0c6bfb754b020785d5787d869e4"
         },
         "bank_statement": {
-          "ingest": "21370fd01831d5d0954e8468b91e935bd6b7c662a4411bfa954cac19bd4c759a",
-          "ocr": "dfd9d40159b1c6ab961f4d6a1a7e6c044fb488cf1c0a195c2689a2252d744046",
-          "extract": "655fe1586a51f43c48f395778981ae9257883f168c11467c2a65cbf7106127c7",
-          "fields_final": "8231c8d43e4080412cc825e311d3ccc5ac56e7c457b310c5a4712a56580517f0"
+          "ingest": "2b6c17c9bfde388952aa2c3dc2b35dc00b4ffbc0ab8cfd7ea34927cc77589c87",
+          "ocr": "d72b9d044f1c5589b1aa440feae902eebefda4d1cb345ba46e2d18cc8975718e",
+          "extract": "b6c801d5b551aaa452e9dec502da2a669e82c855e3acd664c3d8f82ac432fd4c",
+          "fields_final": "de8a4b2ef2af91d3c5da961e2e5649b66d2d957e8f5e60270e31bed53c20bf0d"
         },
         "id_card": {
-          "ingest": "40bc4d3383b7e08e4ebb49ca09d7eb3942ea91185c3dff3f1152c443105cb771",
-          "ocr": "ba8dd8c4c15219b6b9f83540ad0d444a2560d2470ca6092dca63ae89624e6d02",
-          "extract": "18b4ac62a556132c9aa92083b8ba9b42b17f784192bfb74c99b5c769111aba04",
-          "fields_final": "28f426f99c3bddb2537346df89ca0c8d4984f4d5c549baf61b9b75765bc74601"
+          "ingest": "cb37b1c44511f217544f6955ce5dba2be2908831c121c51e6c01e8fc8258caf0",
+          "ocr": "4336d839a75f0b13077ee5b5958307f5340af3cc4b43fcb9de59e1c83ecd8f46",
+          "extract": "5fd1ff8128ef07af30fa3cef411ea29bc6323836cc25b06014d334dc384d2a11",
+          "fields_final": "9c5b734ef9b7546a3e42234a24bc7e09e9fdaab8ac0ea5d63e283e0c590a10ff"
         },
         "salary_slip": {
-          "ingest": "262550c01efb815a8a821975c4866ac96b7d89f73373d700857e9c4229cfe0e8",
-          "ocr": "39100ad5cf42fb6d368cac2d7a0eedcea0d8646161d601a8eb7f8481c5f2ad58",
-          "extract": "22f9349a7af4fa0d2558132724e5899dc09aeaaac0d92de4d50c71bd13918b10",
-          "fields_final": "0990d06d10e849985546d74d563af82462527419620abccccd6f9e4542649ad4"
+          "ingest": "439205874c2f016cba93170b911fd292330edeaff7e54736bbece96983268e05",
+          "ocr": "05d70e5430dbd52d3d69b01b93a18b7b0668ab1595a88cf2f569aa4ccd31ab7b",
+          "extract": "d84adc0d770de0802a2a5c2f2d0ece4982b9ae85833817d179cd46b0b3bad452",
+          "fields_final": "406d8cb01c73ddb619a8709da9fa03d217b12409bf7e7b27cc47df095c595d83"
         }
       },
-      "prev": "5bb40262e807fdd66231c25674e75a6dc474706b1424a2d417120d46e54f0a8e",
-      "hash": "d08a6cdc79a0d6bff3e486899a00247d4035d9d9e75c2d5f14b81d865c2b236c"
+      "prev": "1216fcae070e06bd5f1dd0d317ebdf29a10242ff5065af73319cbfee0c21ec74",
+      "hash": "3076301f4fbd1d7933cbbe4602c71ad3f3d3497072045a01f8400f9be3551a1e"
     },
     {
-      "ts": "2026-11-05T07:12:13+0000",
+      "ts": "2026-11-05T17:02:51+0000",
       "event": "finding",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "fid": "X-002",
       "kind": "cross",
       "severity": "high",
@@ -3302,25 +3302,25 @@
       "evidence_sha256": "070ecb1d8e2af4e074969d4dcaf726c36048e5651d6fac64fb839df6fb8fcf8e",
       "produced_by": {
         "application_form": {
-          "ingest": "ecf4313c2bfe7af3eef7208690497b92ea600cd4ab7290c5bbe4ecec3c852986",
-          "ocr": "8bafc6bd8ffb9d84583753a46f5e31aad9ba11cfd9c0dd602fdf5f74f0f0ec58",
-          "extract": "0089a0554e65cae19db4d5e058b05ca9288a36c772266f513214bc7836dc81a4",
-          "fields_final": "0e33fb32012f9f28973b89c0a54585d9141b5f1c333dab3e88fdd5d21b7efc8b"
+          "ingest": "49a5fd34df74e849d78e67b87d1fa3f560730c3362a4759232357350082126c2",
+          "ocr": "87a89fe7e1147c6725591ff4f0c9427059ce0acb3a50f362214c5cc158b26c08",
+          "extract": "48f9ac2b786cc4b2cd5876818673c4000c7e9d7bac30d50c392044ac65884fc7",
+          "fields_final": "684cbc6abab33b6bc5d2a1f9dae4ad232014e0c6bfb754b020785d5787d869e4"
         },
         "id_card": {
-          "ingest": "40bc4d3383b7e08e4ebb49ca09d7eb3942ea91185c3dff3f1152c443105cb771",
-          "ocr": "ba8dd8c4c15219b6b9f83540ad0d444a2560d2470ca6092dca63ae89624e6d02",
-          "extract": "18b4ac62a556132c9aa92083b8ba9b42b17f784192bfb74c99b5c769111aba04",
-          "fields_final": "28f426f99c3bddb2537346df89ca0c8d4984f4d5c549baf61b9b75765bc74601"
+          "ingest": "cb37b1c44511f217544f6955ce5dba2be2908831c121c51e6c01e8fc8258caf0",
+          "ocr": "4336d839a75f0b13077ee5b5958307f5340af3cc4b43fcb9de59e1c83ecd8f46",
+          "extract": "5fd1ff8128ef07af30fa3cef411ea29bc6323836cc25b06014d334dc384d2a11",
+          "fields_final": "9c5b734ef9b7546a3e42234a24bc7e09e9fdaab8ac0ea5d63e283e0c590a10ff"
         }
       },
-      "prev": "d08a6cdc79a0d6bff3e486899a00247d4035d9d9e75c2d5f14b81d865c2b236c",
-      "hash": "9ca00e23d19d69b1f03cfe86a517c91a12e2254b69fd98147e3f9cc990443f27"
+      "prev": "3076301f4fbd1d7933cbbe4602c71ad3f3d3497072045a01f8400f9be3551a1e",
+      "hash": "de94bd67a5d7e423fac310e6deac4f8cf07c89d607f6c175f53c3ef9c19d0495"
     },
     {
-      "ts": "2026-11-05T07:12:13+0000",
+      "ts": "2026-11-05T17:02:51+0000",
       "event": "finding",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "fid": "X-003",
       "kind": "cross",
       "severity": "high",
@@ -3360,25 +3360,25 @@
       "evidence_sha256": "57c23da774144a3988924d9e0810d0ccb89a7d251496636fb1cc87d144245fd8",
       "produced_by": {
         "application_form": {
-          "ingest": "ecf4313c2bfe7af3eef7208690497b92ea600cd4ab7290c5bbe4ecec3c852986",
-          "ocr": "8bafc6bd8ffb9d84583753a46f5e31aad9ba11cfd9c0dd602fdf5f74f0f0ec58",
-          "extract": "0089a0554e65cae19db4d5e058b05ca9288a36c772266f513214bc7836dc81a4",
-          "fields_final": "0e33fb32012f9f28973b89c0a54585d9141b5f1c333dab3e88fdd5d21b7efc8b"
+          "ingest": "49a5fd34df74e849d78e67b87d1fa3f560730c3362a4759232357350082126c2",
+          "ocr": "87a89fe7e1147c6725591ff4f0c9427059ce0acb3a50f362214c5cc158b26c08",
+          "extract": "48f9ac2b786cc4b2cd5876818673c4000c7e9d7bac30d50c392044ac65884fc7",
+          "fields_final": "684cbc6abab33b6bc5d2a1f9dae4ad232014e0c6bfb754b020785d5787d869e4"
         },
         "id_card": {
-          "ingest": "40bc4d3383b7e08e4ebb49ca09d7eb3942ea91185c3dff3f1152c443105cb771",
-          "ocr": "ba8dd8c4c15219b6b9f83540ad0d444a2560d2470ca6092dca63ae89624e6d02",
-          "extract": "18b4ac62a556132c9aa92083b8ba9b42b17f784192bfb74c99b5c769111aba04",
-          "fields_final": "28f426f99c3bddb2537346df89ca0c8d4984f4d5c549baf61b9b75765bc74601"
+          "ingest": "cb37b1c44511f217544f6955ce5dba2be2908831c121c51e6c01e8fc8258caf0",
+          "ocr": "4336d839a75f0b13077ee5b5958307f5340af3cc4b43fcb9de59e1c83ecd8f46",
+          "extract": "5fd1ff8128ef07af30fa3cef411ea29bc6323836cc25b06014d334dc384d2a11",
+          "fields_final": "9c5b734ef9b7546a3e42234a24bc7e09e9fdaab8ac0ea5d63e283e0c590a10ff"
         }
       },
-      "prev": "9ca00e23d19d69b1f03cfe86a517c91a12e2254b69fd98147e3f9cc990443f27",
-      "hash": "e11fba59f956ee506a2d99a38bb4ebeee34556c54411592a597166913e5d165f"
+      "prev": "de94bd67a5d7e423fac310e6deac4f8cf07c89d607f6c175f53c3ef9c19d0495",
+      "hash": "7b444de29e004fb88f8b78f07c0a913824307fa485b3d35bf7cd505e874a720b"
     },
     {
-      "ts": "2026-11-05T07:12:13+0000",
+      "ts": "2026-11-05T17:02:51+0000",
       "event": "finding",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "fid": "X-004",
       "kind": "cross",
       "severity": "high",
@@ -3418,25 +3418,25 @@
       "evidence_sha256": "032c480500872b0e0f6bf3dff288560aad97f6308918715c6afb23138bda861b",
       "produced_by": {
         "bank_statement": {
-          "ingest": "21370fd01831d5d0954e8468b91e935bd6b7c662a4411bfa954cac19bd4c759a",
-          "ocr": "dfd9d40159b1c6ab961f4d6a1a7e6c044fb488cf1c0a195c2689a2252d744046",
-          "extract": "655fe1586a51f43c48f395778981ae9257883f168c11467c2a65cbf7106127c7",
-          "fields_final": "8231c8d43e4080412cc825e311d3ccc5ac56e7c457b310c5a4712a56580517f0"
+          "ingest": "2b6c17c9bfde388952aa2c3dc2b35dc00b4ffbc0ab8cfd7ea34927cc77589c87",
+          "ocr": "d72b9d044f1c5589b1aa440feae902eebefda4d1cb345ba46e2d18cc8975718e",
+          "extract": "b6c801d5b551aaa452e9dec502da2a669e82c855e3acd664c3d8f82ac432fd4c",
+          "fields_final": "de8a4b2ef2af91d3c5da961e2e5649b66d2d957e8f5e60270e31bed53c20bf0d"
         },
         "salary_slip": {
-          "ingest": "262550c01efb815a8a821975c4866ac96b7d89f73373d700857e9c4229cfe0e8",
-          "ocr": "39100ad5cf42fb6d368cac2d7a0eedcea0d8646161d601a8eb7f8481c5f2ad58",
-          "extract": "22f9349a7af4fa0d2558132724e5899dc09aeaaac0d92de4d50c71bd13918b10",
-          "fields_final": "0990d06d10e849985546d74d563af82462527419620abccccd6f9e4542649ad4"
+          "ingest": "439205874c2f016cba93170b911fd292330edeaff7e54736bbece96983268e05",
+          "ocr": "05d70e5430dbd52d3d69b01b93a18b7b0668ab1595a88cf2f569aa4ccd31ab7b",
+          "extract": "d84adc0d770de0802a2a5c2f2d0ece4982b9ae85833817d179cd46b0b3bad452",
+          "fields_final": "406d8cb01c73ddb619a8709da9fa03d217b12409bf7e7b27cc47df095c595d83"
         }
       },
-      "prev": "e11fba59f956ee506a2d99a38bb4ebeee34556c54411592a597166913e5d165f",
-      "hash": "11fc90a198950bfa6e5420d746e2011e95235d4a48ebe32085e7ae2e12e86ae7"
+      "prev": "7b444de29e004fb88f8b78f07c0a913824307fa485b3d35bf7cd505e874a720b",
+      "hash": "fccaf3a95e339ba6a6d802968d41d7833a9aa0e517168aa703ea5c1d53c422ed"
     },
     {
-      "ts": "2026-11-05T07:12:13+0000",
+      "ts": "2026-11-05T17:02:51+0000",
       "event": "finding",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "fid": "X-005",
       "kind": "cross",
       "severity": "medium",
@@ -3476,25 +3476,25 @@
       "evidence_sha256": "8c2842099909394c864ff07811a635ce05c6d71c6707f31d45ede9651b78df24",
       "produced_by": {
         "application_form": {
-          "ingest": "ecf4313c2bfe7af3eef7208690497b92ea600cd4ab7290c5bbe4ecec3c852986",
-          "ocr": "8bafc6bd8ffb9d84583753a46f5e31aad9ba11cfd9c0dd602fdf5f74f0f0ec58",
-          "extract": "0089a0554e65cae19db4d5e058b05ca9288a36c772266f513214bc7836dc81a4",
-          "fields_final": "0e33fb32012f9f28973b89c0a54585d9141b5f1c333dab3e88fdd5d21b7efc8b"
+          "ingest": "49a5fd34df74e849d78e67b87d1fa3f560730c3362a4759232357350082126c2",
+          "ocr": "87a89fe7e1147c6725591ff4f0c9427059ce0acb3a50f362214c5cc158b26c08",
+          "extract": "48f9ac2b786cc4b2cd5876818673c4000c7e9d7bac30d50c392044ac65884fc7",
+          "fields_final": "684cbc6abab33b6bc5d2a1f9dae4ad232014e0c6bfb754b020785d5787d869e4"
         },
         "bank_statement": {
-          "ingest": "21370fd01831d5d0954e8468b91e935bd6b7c662a4411bfa954cac19bd4c759a",
-          "ocr": "dfd9d40159b1c6ab961f4d6a1a7e6c044fb488cf1c0a195c2689a2252d744046",
-          "extract": "655fe1586a51f43c48f395778981ae9257883f168c11467c2a65cbf7106127c7",
-          "fields_final": "8231c8d43e4080412cc825e311d3ccc5ac56e7c457b310c5a4712a56580517f0"
+          "ingest": "2b6c17c9bfde388952aa2c3dc2b35dc00b4ffbc0ab8cfd7ea34927cc77589c87",
+          "ocr": "d72b9d044f1c5589b1aa440feae902eebefda4d1cb345ba46e2d18cc8975718e",
+          "extract": "b6c801d5b551aaa452e9dec502da2a669e82c855e3acd664c3d8f82ac432fd4c",
+          "fields_final": "de8a4b2ef2af91d3c5da961e2e5649b66d2d957e8f5e60270e31bed53c20bf0d"
         }
       },
-      "prev": "11fc90a198950bfa6e5420d746e2011e95235d4a48ebe32085e7ae2e12e86ae7",
-      "hash": "abf81c2a8ceee1ae4dc13285f3dcdcbfc9809663a6ba553e2ac4fbe206bd9e2c"
+      "prev": "fccaf3a95e339ba6a6d802968d41d7833a9aa0e517168aa703ea5c1d53c422ed",
+      "hash": "db32180525059c6225cede3225a109d87b0af9b31909e578b5bbd8b9946d5a59"
     },
     {
-      "ts": "2026-11-05T07:12:13+0000",
+      "ts": "2026-11-05T17:02:51+0000",
       "event": "finding",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "fid": "R-001",
       "kind": "cross",
       "severity": "medium",
@@ -3517,24 +3517,24 @@
       "evidence_sha256": null,
       "produced_by": {
         "bank_statement": {
-          "ingest": "21370fd01831d5d0954e8468b91e935bd6b7c662a4411bfa954cac19bd4c759a",
-          "ocr": "dfd9d40159b1c6ab961f4d6a1a7e6c044fb488cf1c0a195c2689a2252d744046",
-          "extract": "655fe1586a51f43c48f395778981ae9257883f168c11467c2a65cbf7106127c7",
-          "fields_final": "8231c8d43e4080412cc825e311d3ccc5ac56e7c457b310c5a4712a56580517f0"
+          "ingest": "2b6c17c9bfde388952aa2c3dc2b35dc00b4ffbc0ab8cfd7ea34927cc77589c87",
+          "ocr": "d72b9d044f1c5589b1aa440feae902eebefda4d1cb345ba46e2d18cc8975718e",
+          "extract": "b6c801d5b551aaa452e9dec502da2a669e82c855e3acd664c3d8f82ac432fd4c",
+          "fields_final": "de8a4b2ef2af91d3c5da961e2e5649b66d2d957e8f5e60270e31bed53c20bf0d"
         }
       },
-      "prev": "abf81c2a8ceee1ae4dc13285f3dcdcbfc9809663a6ba553e2ac4fbe206bd9e2c",
-      "hash": "984e066b21a6e84bc042665364b7d3df4c096662f70e987620e666582e12ee77"
+      "prev": "db32180525059c6225cede3225a109d87b0af9b31909e578b5bbd8b9946d5a59",
+      "hash": "6f1395d982ac7b6522698196aec05cb56adfbc708256eabab69752396dbead4d"
     },
     {
-      "ts": "2026-11-05T07:12:14+0000",
+      "ts": "2026-11-05T17:02:52+0000",
       "event": "dossier",
-      "run": "20261105T071202-fdf147",
+      "run": "20261105T170234-e8603f",
       "case_id": "case_tampered",
       "n_findings": 9,
       "summary_source": "template",
-      "prev": "984e066b21a6e84bc042665364b7d3df4c096662f70e987620e666582e12ee77",
-      "hash": "c928f5a6b2053ff47c7f9936fa8f82b4a3b1c952544d648b6368a943a844a102"
+      "prev": "6f1395d982ac7b6522698196aec05cb56adfbc708256eabab69752396dbead4d",
+      "hash": "6ab225d07b016bda25445a437966cda7157730c65bbf71de5b8ba05d1952bb1b"
     }
   ]
 }

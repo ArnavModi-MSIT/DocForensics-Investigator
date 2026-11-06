@@ -9,7 +9,8 @@ reads that record (pdf_layer.py) and looks for what an edit leaves behind:
                     original number before writing a new one)
   covered text      text that is still in the file but is hidden under a rectangle drawn later (the original value under a patch)
   hidden text       invisible, zero-opacity, microscopic or off-page text
-  file history      several saved revisions, a modification date later than the creation date, or an image / online editor as producer
+  file history      several saved revisions (unless signed), a modification date later than the creation date, an image / online editor as
+                    producer, Info and XMP records that disagree, a missing creation date, or one typeface embedded under several subset tags
 
 Every finding is an OBSERVATION about the file's structure. None of them proves that a value was changed, by whom, or why: legitimate
 documents also contain badges, annotations and re-saved revisions. They point a reviewer at a place to look and are worded that way.
@@ -18,7 +19,7 @@ import re
 from collections import Counter
 from datetime import timedelta
 from .schema import Finding
-from .pdf_layer import parse_pdf_date, SCALE
+from .pdf_layer import parse_pdf_date, to_utc, SCALE
 
 CCY = r"(?:INR|Rs\.?|₹)"
 MONEY_RE = re.compile(rf"^{CCY}\s*\d[\d,]*(?:\.\d{{1,2}})?$|^\d{{1,3}}(?:,\d{{2,3}})+(?:\.\d{{1,2}})?$", re.I)
@@ -237,27 +238,74 @@ def analyze_pdf_page(doc, audit, n):
     return findings, regions
 
 
+def subset_prefix_mismatch(docs):
+    """Base font names that occur under more than one subset prefix in the same file (e.g. 'AAAAAA+Arial' and 'BBBBBB+Arial'). One export
+    session normally embeds one subset per font; several prefixes for the same typeface can mean pages (or text) came from different sessions."""
+    seen = {}
+    for d in docs:
+        for s in (d.pdf or {}).get("spans", []):
+            m = re.match(r"^([A-Z]{6})\+(.+)$", str(s["font"]))
+            if m:
+                seen.setdefault(m.group(2), set()).add(m.group(1))
+    return {k: sorted(v) for k, v in seen.items() if len(v) > 1}
+
+
+def _tz_like(delta):
+    """A gap that looks like a time-zone offset (a multiple of 15 minutes, up to 14 h): when one date has no zone it cannot be told apart."""
+    r = delta % timedelta(minutes=15)
+    return delta <= timedelta(hours=14) and min(r, timedelta(minutes=15) - r) < timedelta(minutes=2)
+
+
+def metadata_disagreements(meta):
+    """Where the Info dictionary and the XMP packet describe the same property differently, and which standard fields are missing."""
+    out, x = [], meta.get("xmp") or {}
+    norm = lambda v: re.sub(r"[^a-z0-9]", "", str(v or "").lower())
+    for key, label in (("producer", "producer"), ("creator", "creator tool")):
+        a, b = norm(meta.get(key)), norm(x.get(key))
+        if a and b and a not in b and b not in a:
+            out.append(f"the {label} differs between the Info record ({meta.get(key)[:40]}) and the XMP record ({x.get(key)[:40]})")
+    for key, label in (("created", "creation"), ("modified", "modification")):
+        (a, ta), (b, tb) = to_utc(meta.get(key)), to_utc(x.get(key))
+        if a and b and abs(a - b) > timedelta(minutes=5) and not (not (ta and tb) and _tz_like(abs(a - b))):
+            out.append(f"the {label} date differs between the Info record ({a:%Y-%m-%d %H:%M}) and the XMP record ({b:%Y-%m-%d %H:%M})")
+    if (meta.get("producer") or meta.get("creator")) and not meta.get("created"):
+        out.append("a producer is recorded but the creation date is missing (it is a standard field that most tools write)")
+    return out
+
+
 def analyze_pdf_file(docs, meta, n):
     """File-level history of one PDF (once per file). Returns findings (possibly none)."""
     notes = []
     if meta.get("revisions", 1) > 1:
-        notes.append(f"saved {meta['revisions']} times (incremental updates): the file was changed after it was first created")
+        if meta.get("signed"):
+            notes.append(f"saved {meta['revisions']} times; the file carries a digital signature, and signing adds a revision, so this may be routine")
+        else:
+            notes.append(f"saved {meta['revisions']} times (incremental updates) with no digital signature to explain it: the file was changed after it was first created")
     c, m = parse_pdf_date(meta.get("created")), parse_pdf_date(meta.get("modified"))
     if c and m and m - c > timedelta(minutes=2):
         notes.append(f"modification date ({m:%Y-%m-%d %H:%M}) is later than the creation date ({c:%Y-%m-%d %H:%M})")
     prod = " / ".join(x for x in (meta.get("producer"), meta.get("creator")) if x)
     if prod and EDITOR_RE.search(prod):
         notes.append(f"produced by a graphics / online editing tool ({prod[:60]})")
+    notes += metadata_disagreements(meta)
+    sub = subset_prefix_mismatch(docs)
+    if sub:
+        k = sorted(sub)[0]
+        notes.append(f"the typeface {k} is embedded under {len(sub[k])} different subset tags ({', '.join(sub[k][:3])}), which can mean pages or text were produced in separate sessions "
+                     "(it also happens when separate PDFs are merged)")
     if meta.get("encrypted"):
         notes.append("the file is encrypted")
     if not notes:
         return []
     d = docs[0]
-    return [Finding(f"V-{n:03d}", "visual", f"PDF file history shows later changes ({d.path.split('/')[-1].split(chr(92))[-1]})", "low", 0.45, "observed",
-                    "The PDF's own records show that " + "; ".join(notes) + ". Re-saving is normal (signing, filling a form, optimising), so this alone proves nothing; "
+    conf = round(min(0.55, 0.45 + 0.04 * (len(notes) - 1)), 2)
+    return [Finding(f"V-{n:03d}", "visual", f"PDF file history shows later changes ({d.path.split('/')[-1].split(chr(92))[-1]})", "low", conf, "observed",
+                    "The PDF's own records show that " + "; ".join(notes) + ". Re-saving, merging and signing are normal, so this alone proves nothing; "
                     "it matters only together with other findings on the same file.",
-                    [{"doc_id": d.doc_id, "field": None, "value": None, "bbox": None}], metrics={"meta": {k: meta.get(k) for k in ("producer", "creator", "created", "modified", "revisions")}},
-                    method="PDF metadata")]
+                    [{"doc_id": d.doc_id, "field": None, "value": None, "bbox": None}],
+                    metrics={"meta": {k: meta.get(k) for k in ("producer", "creator", "created", "modified", "revisions", "signed")}, "xmp": meta.get("xmp") or {},
+                             "font_subset_tags": sub, "signals": len(notes)},
+                    method="PDF metadata and structure")]
 
 
 def analyze_pdf_docs(docs, audit, id_start=1):
@@ -277,7 +325,7 @@ def analyze_pdf_docs(docs, audit, id_start=1):
         if d.path not in seen_files:
             seen_files.add(d.path)
             meta = d.pdf.get("meta") or {}
-            d.facts["pdf_meta"] = {k: meta.get(k) for k in ("producer", "creator", "created", "modified", "revisions", "pages")}
+            d.facts["pdf_meta"] = {k: meta.get(k) for k in ("producer", "creator", "created", "modified", "revisions", "pages", "signed")}
             g = analyze_pdf_file([x for x in docs if x.path == d.path], meta, n)
             findings += g
             n += len(g)
