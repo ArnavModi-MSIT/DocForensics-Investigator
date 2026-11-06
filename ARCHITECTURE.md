@@ -29,7 +29,7 @@ summarised in section 7, but this document focuses on stages 1 to 4.
 
 ## 2. High-level architecture
 
-The current end-to-end data-flow diagram (document processing, computer vision, contextual analysis, evidence management, models and their roles) is in the README under "Pipeline". The diagram below shows the first stages in detail.
+The current end-to-end data-flow diagram (document processing, computer vision, contextual analysis, evidence management, models and their roles) is in the README under "Architecture". The diagram below shows the first stages in detail.
 
 ```
                     +-----------------------------+
